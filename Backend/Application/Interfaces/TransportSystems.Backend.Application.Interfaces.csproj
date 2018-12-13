@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Common\Common.Models\Common.Models.csproj" />
+        <ProjectReference Include="..\..\Core\Services.Interfaces\TransportSystems.Backend.Core.Services.Interfaces.csproj" />
+        <ProjectReference Include="..\..\External\Models\TransportSystems.Backend.External.Models.csproj" />
+        <ProjectReference Include="..\Models\TransportSystems.Backend.Application.Models.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="Mapping.cs" />
+    </ItemGroup>
+</Project>

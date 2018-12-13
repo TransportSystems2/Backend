@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="EmptyClass.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Domain.Core\TransportSystems.Backend.Core.Domain.Core.csproj" />
+    <ProjectReference Include="..\Core\Domain.Interfaces\TransportSystems.Backend.Core.Domain.Interfaces.csproj" />
+    <ProjectReference Include="..\Core\Infrastructure.Business\TransportSystems.Backend.Core.Infrastructure.Business.csproj" />
+    <ProjectReference Include="..\Core\Infrastructure.Database\TransportSystems.Backend.Core.Infrastructure.Database.csproj" />
+    <ProjectReference Include="..\Core\Infrastructure.Http\TransportSystems.Backend.Core.Infrastructure.Http.csproj" />
+    <ProjectReference Include="..\Core\Services.Interfaces\TransportSystems.Backend.Core.Services.Interfaces.csproj" />
+    <ProjectReference Include="..\Identity\API\TransportSystems.Backend.Identity.API.csproj" />
+  </ItemGroup>
+</Project>

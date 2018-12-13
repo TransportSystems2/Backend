@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <DockerComposeProjectPath>../../../docker-compose.dcproj</DockerComposeProjectPath>
+        <DockerTargetOS>Windows</DockerTargetOS>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="IdentityServer4.AspNetIdentity" Version="2.1.0" />
+        <PackageReference Include="IdentityServer4" Version="2.2.0" />
+        <PackageReference Include="IdentityServer4.EntityFramework" Version="2.1.1" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.0.1916590" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.1.1" />
+        <PackageReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Core\Database\TransportSystems.Backend.Identity.Core.Database.csproj" />
+        <ProjectReference Include="..\Core\Interfaces\TransportSystems.Backend.Identity.Core.Interfaces.csproj" />
+        <ProjectReference Include="..\Core\Business\TransportSystems.Backend.Identity.Core.Business.csproj" />
+        <ProjectReference Include="..\Core\Domain\Data\TransportSystems.Backend.Identity.Core.Data.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Remove="wwwroot\favicon.ico" />
+        <Content Remove="wwwroot\css\site.css" />
+        <Content Remove="wwwroot\css\site.min.css" />
+        <Content Remove="wwwroot\images\banner1.svg" />
+        <Content Remove="wwwroot\images\banner2.svg" />
+        <Content Remove="wwwroot\images\banner3.svg" />
+        <Content Remove="wwwroot\images\banner4.svg" />
+        <Content Remove="wwwroot\js\site.js" />
+        <Content Remove="wwwroot\js\site.min.js" />
+        <Content Remove="wwwroot\lib\bootstrap\.bower.json" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\css\bootstrap.css" />
+        <Content Remove="App.config" />
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Validation\" />
+        <Folder Include="Constants\" />
+        <Folder Include="Services\" />
+        <Folder Include="Controllers\" />
+        <Folder Include="Models\" />
+    </ItemGroup>
+    <ItemGroup>
+        <Reference Include="SmsRu">
+            <HintPath>..\..\FixedBin\SmsRu.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="App.config" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="Database\IdentityContextFactory.cs" />
+    </ItemGroup>
+</Project>

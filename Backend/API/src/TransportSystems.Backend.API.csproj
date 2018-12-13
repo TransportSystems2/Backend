@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <DockerComposeProjectPath>../../docker-compose.dcproj</DockerComposeProjectPath>
+        <DockerTargetOS>Windows</DockerTargetOS>
+    </PropertyGroup>
+    <ItemGroup>
+        <Folder Include="wwwroot\" />
+        <Folder Include="Controllers\SignUp\" />
+        <Folder Include="External\" />
+        <Folder Include="Controllers\Transport\" />
+        <Folder Include="Controllers\Organization\" />
+        <Folder Include="Controllers\Connection\" />
+        <Folder Include="Mapping\" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.6.0" />
+        <PackageReference Include="AutoMapper" Version="7.0.1" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.0.1916590" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.1.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.1" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Remove="test\bin\Debug\netstandard2.0\test.deps.json" />
+    </ItemGroup>
+    <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore">
+        <HintPath>..\..\..\..\..\..\usr\local\share\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore\2.1.0\lib\netstandard2.0\Microsoft.AspNetCore.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="Configuration\UsersProfile.cs" />
+      <Compile Remove="Models\Transport\VehicleModel.cs" />
+      <Compile Remove="Models\Users\DispatcherModel.cs" />
+      <Compile Remove="Models\BaseModel.cs" />
+      <Compile Remove="Controllers\ValuesController.cs" />
+      <Compile Remove="Database\ApplicationContextFactory.cs" />
+      <Compile Remove="Controllers\Catalogs\CatalogController.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\Core\Domain.Core\TransportSystems.Backend.Core.Domain.Core.csproj" />
+      <ProjectReference Include="..\..\Core\Domain.Interfaces\TransportSystems.Backend.Core.Domain.Interfaces.csproj" />
+      <ProjectReference Include="..\..\Core\Infrastructure.Business\TransportSystems.Backend.Core.Infrastructure.Business.csproj" />
+      <ProjectReference Include="..\..\Core\Infrastructure.Database\TransportSystems.Backend.Core.Infrastructure.Database.csproj" />
+      <ProjectReference Include="..\..\Core\Infrastructure.Http\TransportSystems.Backend.Core.Infrastructure.Http.csproj" />
+      <ProjectReference Include="..\..\Core\Services.Interfaces\TransportSystems.Backend.Core.Services.Interfaces.csproj" />
+      <ProjectReference Include="..\..\Application\Interfaces\TransportSystems.Backend.Application.Interfaces.csproj" />
+      <ProjectReference Include="..\..\Application\Business\TransportSystems.Backend.Application.Business.csproj" />
+      <ProjectReference Include="..\..\External\Business\TransportSystems.Backend.External.Business.csproj" />
+    </ItemGroup>
+</Project>

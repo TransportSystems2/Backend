@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="7.0.1" />
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Domain.Core\TransportSystems.Backend.Core.Domain.Core.csproj" />
+        <ProjectReference Include="..\Domain.Interfaces\TransportSystems.Backend.Core.Domain.Interfaces.csproj" />
+        <ProjectReference Include="..\..\Identity\API\TransportSystems.Backend.Identity.API.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Configuration\" />
+    </ItemGroup>
+</Project>

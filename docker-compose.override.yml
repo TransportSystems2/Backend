@@ -1,0 +1,22 @@
+version: '2.1'
+
+services:
+  transportsystems.backend.identity.signin:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "80"
+
+  transportsystems.backend.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "80"
+
+
+  transportsystems.backend.identity.manage:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "80"
+

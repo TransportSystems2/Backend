@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+    <ItemGroup>
+      <Compile Remove="Parameters\**" />
+      <EmbeddedResource Remove="Parameters\**" />
+      <None Remove="Parameters\**" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="xunit" Version="2.4.0" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+        <PackageReference Include="Moq" Version="4.9.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Domain.Core\TransportSystems.Backend.Core.Domain.Core.csproj" />
+        <ProjectReference Include="..\Domain.Interfaces\TransportSystems.Backend.Core.Domain.Interfaces.csproj" />
+        <ProjectReference Include="..\Infrastructure.Business\TransportSystems.Backend.Core.Infrastructure.Business.csproj" />
+        <ProjectReference Include="..\Services.Interfaces\TransportSystems.Backend.Core.Services.Interfaces.csproj" />
+        <ProjectReference Include="..\Infrastructure.Database\TransportSystems.Backend.Core.Infrastructure.Database.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="RegistrationNumber\" />
+    </ItemGroup>
+</Project>

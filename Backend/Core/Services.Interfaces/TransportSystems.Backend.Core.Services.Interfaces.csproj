@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+    <ItemGroup>
+        <Folder Include="Ordering\" />
+        <Folder Include="RegistrationNumber\" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="System.Interactive.Async" Version="3.2.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Domain.Core\TransportSystems.Backend.Core.Domain.Core.csproj" />
+        <ProjectReference Include="..\Domain.Interfaces\TransportSystems.Backend.Core.Domain.Interfaces.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="ICargoService.cs" />
+    </ItemGroup>
+</Project>

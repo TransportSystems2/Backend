@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="DaData.Client.Async" Version="1.1.2" />
+    <PackageReference Include="Geolocation.NetStandard" Version="1.1.1" />
+    <PackageReference Include="Yandex.Geocoder" Version="1.0.1" />
+    <PackageReference Include="GoogleApi" Version="3.6.13" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Interfaces\TransportSystems.Backend.External.Interfaces.csproj" />
+  </ItemGroup>
+</Project>

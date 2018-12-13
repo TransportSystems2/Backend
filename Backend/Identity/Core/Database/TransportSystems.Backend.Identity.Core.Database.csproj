@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.1" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Domain\Interfaces\TransportSystems.Backend.Identity.Core.Domain.Interfaces.csproj" />
+        <ProjectReference Include="..\Interfaces\TransportSystems.Backend.Identity.Core.Interfaces.csproj" />
+        <ProjectReference Include="..\Domain\Data\TransportSystems.Backend.Identity.Core.Data.csproj" />
+    </ItemGroup>
+</Project>

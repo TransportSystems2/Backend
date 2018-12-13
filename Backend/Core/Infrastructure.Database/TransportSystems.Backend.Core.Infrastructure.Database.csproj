@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.1" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Domain.Core\TransportSystems.Backend.Core.Domain.Core.csproj" />
+        <ProjectReference Include="..\Domain.Interfaces\TransportSystems.Backend.Core.Domain.Interfaces.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Ordering\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="CargoRepository.cs" />
+      <Compile Remove="Migrations\20180625124312_init.cs" />
+      <Compile Remove="Migrations\20180626104144_init.cs" />
+      <Compile Remove="Migrations\20180626155204_init.cs" />
+      <Compile Remove="Migrations\20180627120409_init.cs" />
+      <Compile Remove="Migrations\20180627120453_init.cs" />
+      <Compile Remove="Migrations\20180627134922_init.cs" />
+      <Compile Remove="Migrations\20180713084654_init.cs" />
+      <Compile Remove="Migrations\20180713162155_init.cs" />
+      <Compile Remove="Migrations\20180713162343_init.cs" />
+      <Compile Remove="Migrations\20180713162343_init.Designer.cs" />
+      <Compile Remove="Migrations\ApplicationContextModelSnapshot.cs" />
+    </ItemGroup>
+</Project>

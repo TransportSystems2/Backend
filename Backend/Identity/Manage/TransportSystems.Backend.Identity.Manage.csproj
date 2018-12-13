@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <DockerComposeProjectPath>../../../docker-compose.dcproj</DockerComposeProjectPath>
+        <DockerTargetOS>Windows</DockerTargetOS>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.6.0" />
+        <PackageReference Include="AutoMapper" Version="7.0.1" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.0.1916590" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.1.1" />
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\API\TransportSystems.Backend.Identity.API.csproj" />
+        <ProjectReference Include="..\Core\Business\TransportSystems.Backend.Identity.Core.Business.csproj" />
+        <ProjectReference Include="..\Core\Database\TransportSystems.Backend.Identity.Core.Database.csproj" />
+        <ProjectReference Include="..\Core\Interfaces\TransportSystems.Backend.Identity.Core.Interfaces.csproj" />
+        <ProjectReference Include="..\Core\Domain\Data\TransportSystems.Backend.Identity.Core.Data.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Remove="wwwroot\favicon.ico" />
+        <Content Remove="wwwroot\css\site.css" />
+        <Content Remove="wwwroot\css\site.min.css" />
+        <Content Remove="wwwroot\images\banner1.svg" />
+        <Content Remove="wwwroot\images\banner2.svg" />
+        <Content Remove="wwwroot\images\banner3.svg" />
+        <Content Remove="wwwroot\images\banner4.svg" />
+        <Content Remove="wwwroot\js\site.js" />
+        <Content Remove="wwwroot\js\site.min.js" />
+        <Content Remove="wwwroot\lib\bootstrap\.bower.json" />
+        <Content Remove="wwwroot\lib\bootstrap\LICENSE" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-theme.css" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-theme.css.map" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-theme.min.css" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\css\bootstrap-theme.min.css.map" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\css\bootstrap.css" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\css\bootstrap.css.map" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\css\bootstrap.min.css" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\fonts\glyphicons-halflings-regular.eot" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\fonts\glyphicons-halflings-regular.svg" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\fonts\glyphicons-halflings-regular.ttf" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\fonts\glyphicons-halflings-regular.woff" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\fonts\glyphicons-halflings-regular.woff2" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.js" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js" />
+        <Content Remove="wwwroot\lib\bootstrap\dist\js\npm.js" />
+        <Content Remove="wwwroot\lib\jquery\.bower.json" />
+        <Content Remove="wwwroot\lib\jquery\LICENSE.txt" />
+        <Content Remove="wwwroot\lib\jquery\dist\jquery.js" />
+        <Content Remove="wwwroot\lib\jquery\dist\jquery.min.js" />
+        <Content Remove="wwwroot\lib\jquery\dist\jquery.min.map" />
+        <Content Remove="wwwroot\lib\jquery-validation\.bower.json" />
+        <Content Remove="wwwroot\lib\jquery-validation\LICENSE.md" />
+        <Content Remove="wwwroot\lib\jquery-validation\dist\additional-methods.js" />
+        <Content Remove="wwwroot\lib\jquery-validation\dist\additional-methods.min.js" />
+        <Content Remove="wwwroot\lib\jquery-validation\dist\jquery.validate.js" />
+        <Content Remove="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js" />
+        <Content Remove="wwwroot\lib\jquery-validation-unobtrusive\.bower.json" />
+        <Content Remove="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.js" />
+    </ItemGroup>
+</Project>
