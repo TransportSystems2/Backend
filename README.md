@@ -1,3 +1,6 @@
+master [![Build Status](https://travis-ci.com/TransportSystems2/Backend.svg?branch=master)](https://travis-ci.com/TransportSystems2/Backend)
+develop [![Build Status](https://travis-ci.com/TransportSystems2/Backend.svg?branch=develop)](https://travis-ci.com/TransportSystems2/Backend)
+
 чтобы докер правильно работал на винде, надо создать локальные тома.
 Эти тома будут использоваться для того, чтобы хранить данные баз данных локально на компьютере, а не в образе.
 Без этих томов никак, потому что файловая система винды(ntfs) плохо дружит с файловой системой линуксов и напрямую сопоставить локальную виндовую папку с папкой внутри линуксового контейнера не получится
