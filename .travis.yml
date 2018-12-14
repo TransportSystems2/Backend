@@ -1,0 +1,23 @@
+language: csharp
+mono: none
+dotnet: 2.1.500
+install:
+- dotnet restore Backend/Core/UnitTests.Infrastructure.Business/
+- dotnet restore Backend/Core/UnitTests.Infrastructure.Data/
+- dotnet restore Backend/API/UnitTests.API/
+- dotnet restore Backend/External/UnitTests.Business/
+- dotnet restore Backend/Facade/UnitTests.Business/
+- dotnet restore Backend/Identity/UnitTests.Services/
+script:
+- dotnet build Backend/Core/UnitTests.Infrastructure.Business/
+- dotnet test Backend/Core/UnitTests.Infrastructure.Business/
+- dotnet build Backend/Core/UnitTests.Infrastructure.Data/
+- dotnet test Backend/Core/UnitTests.Infrastructure.Data/
+- dotnet build Backend/API/UnitTests.API/
+- dotnet test Backend/API/UnitTests.API/
+- dotnet build Backend/External/UnitTests.Business/
+- dotnet test Backend/External/UnitTests.Business/
+- dotnet build Backend/Facade/UnitTests.Business/
+- dotnet test Backend/Facade/UnitTests.Business/
+- dotnet build Backend/Identity/UnitTests.Services/
+- dotnet test Backend/Identity/UnitTests.Services/
