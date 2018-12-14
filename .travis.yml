@@ -6,7 +6,7 @@ install:
 - dotnet restore Backend/Core/UnitTests.Infrastructure.Data/
 - dotnet restore Backend/API/UnitTests.API/
 - dotnet restore Backend/External/UnitTests.Business/
-- dotnet restore Backend/Facade/UnitTests.Business/
+- dotnet restore Backend/Application/UnitTests.Business/
 - dotnet restore Backend/Identity/UnitTests.Services/
 script:
 - dotnet build Backend/Core/UnitTests.Infrastructure.Business/
@@ -17,7 +17,7 @@ script:
 - dotnet test Backend/API/UnitTests.API/
 - dotnet build Backend/External/UnitTests.Business/
 - dotnet test Backend/External/UnitTests.Business/
-- dotnet build Backend/Facade/UnitTests.Business/
-- dotnet test Backend/Facade/UnitTests.Business/
+- dotnet build Backend/Application/UnitTests.Business/
+- dotnet test Backend/Application/UnitTests.Business/
 - dotnet build Backend/Identity/UnitTests.Services/
 - dotnet test Backend/Identity/UnitTests.Services/
