@@ -14,6 +14,7 @@ using TransportSystems.Backend.Application.Models.Billing;
 using TransportSystems.Backend.Application.Models.Booking;
 using TransportSystems.Backend.Application.Models.Routing;
 using TransportSystems.Backend.Application.Models.Transport;
+using TransportSystems.Backend.Application.Interfaces.Prognosing;
 
 namespace TransportSystems.Backend.Application.Business.Booking
 {
@@ -22,11 +23,13 @@ namespace TransportSystems.Backend.Application.Business.Booking
         public ApplicationBookingService(
                 IApplicationAddressService addressService,
                 IApplicationBillService billService,
-                IApplicationRouteService routeService)
+                IApplicationRouteService routeService,
+                IApplicationPrognosisService prognosisService)
         {
             AddressService = addressService;
             BillService = billService;
             RouteService = routeService;
+            PrognosisService = prognosisService;
         }
 
         protected IApplicationAddressService AddressService { get; }
@@ -34,6 +37,8 @@ namespace TransportSystems.Backend.Application.Business.Booking
         protected IApplicationBillService BillService { get; }
 
         protected IApplicationRouteService RouteService { get; }
+
+        protected IApplicationPrognosisService PrognosisService { get; }
 
         public async Task<BookingResponseAM> CalculateBooking(BookingRequestAM request)
         {
@@ -53,9 +58,10 @@ namespace TransportSystems.Backend.Application.Business.Booking
         public async Task<BookingRouteAM> CalculateBookingRoute(RouteAM route, CargoAM cargo, BasketAM requestBasket)
         {
             var rootAddress = RouteService.GetRootAddress(route);
+            var rootAddressTimeZone = await AddressService.GetTimeZoneByCoordinate(rootAddress);
             var feedDistance = RouteService.GetFeedDistance(route);
-            var feedDuration = RouteService.GetFeedDuration(route);
             var totalDistance = RouteService.GetTotalDistance(route);
+            var avgDeliveryTime = await PrognosisService.GetAvgDeliveryTime(route, cargo, requestBasket);
 
             var billInfo = await BillService.GetBillInfo(rootAddress.ToCoordinate(), cargo.WeightCatalogItemId);
 
@@ -64,16 +70,17 @@ namespace TransportSystems.Backend.Application.Business.Booking
             basket.KmValue = totalDistance;
 
             var bill = await BillService.CalculateBill(billInfo, basket);
-            var title = $"{rootAddress.Locality} - {bill.TotalCost}₽"; 
-             
+            var title = $"{rootAddress.Locality} - {bill.TotalCost}₽";
+
             return new BookingRouteAM
             {
                 RootAddress = rootAddress,
+                RootAddressTimeZone = rootAddressTimeZone,
                 FeedDistance = feedDistance,
-                FeedDuration = feedDuration,
                 TotalDistance = totalDistance,
                 Bill = bill,
-                Title = title
+                Title = title,
+                AvgDeliveryTime = avgDeliveryTime
             };
         }
 

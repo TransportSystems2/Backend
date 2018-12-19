@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.External.Models.Geo;
 using TransportSystems.Backend.Application.Models.Geo;
+using System;
 
 namespace TransportSystems.Backend.Application.Interfaces.Geo
 {
@@ -36,5 +37,7 @@ namespace TransportSystems.Backend.Application.Interfaces.Geo
         AddressAM FromExternalAddress(AddressEM source);
 
         ICollection<AddressAM> FromDomainAddresses(ICollection<Address> source);
+
+        Task<TimeZoneInfo> GetTimeZoneByCoordinate(AddressAM address);
     }
 }

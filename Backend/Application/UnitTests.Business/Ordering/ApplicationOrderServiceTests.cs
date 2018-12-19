@@ -3,15 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TransportSystems.Backend.Core.Domain.Core.Billing;
-using TransportSystems.Backend.Core.Domain.Core.Ordering;
-using TransportSystems.Backend.Core.Domain.Core.Routing;
-using TransportSystems.Backend.Core.Domain.Core.Transport;
-using TransportSystems.Backend.Core.Domain.Core.Users;
-using TransportSystems.Backend.Core.Services.Interfaces.Interfaces;
 using TransportSystems.Backend.Application.Business;
 using TransportSystems.Backend.Application.Interfaces;
 using TransportSystems.Backend.Application.Interfaces.Billing;
+using TransportSystems.Backend.Application.Interfaces.Ordering;
 using TransportSystems.Backend.Application.Interfaces.Routing;
 using TransportSystems.Backend.Application.Interfaces.Users;
 using TransportSystems.Backend.Application.Models.Billing;
@@ -21,8 +16,13 @@ using TransportSystems.Backend.Application.Models.Routing;
 using TransportSystems.Backend.Application.Models.Transport;
 using TransportSystems.Backend.Application.Models.Users;
 using TransportSystems.Backend.Application.UnitTests.Business.Suite;
+using TransportSystems.Backend.Core.Domain.Core.Billing;
+using TransportSystems.Backend.Core.Domain.Core.Ordering;
+using TransportSystems.Backend.Core.Domain.Core.Routing;
+using TransportSystems.Backend.Core.Domain.Core.Transport;
+using TransportSystems.Backend.Core.Domain.Core.Users;
+using TransportSystems.Backend.Core.Services.Interfaces.Interfaces;
 using Xunit;
-using TransportSystems.Backend.Application.Interfaces.Ordering;
 
 namespace TransportSystems.Backend.Application.UnitTests.Business
 {
@@ -121,9 +121,9 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
 
             var domainOrders = new List<Order>
             {
-                new Order { Id = commonId++, CargoId = domainCargos[0].Id, RouteId = commonId++, AddedDate = new DateTime(2018, 6, 2, 11, 55, 3) },
-                new Order { Id = commonId++, CargoId = domainCargos[1].Id, RouteId = commonId++, AddedDate = new DateTime(2018, 6, 2, 12, 55, 3)  },
-                new Order { Id = commonId++, CargoId = domainCargos[2].Id, RouteId = commonId++, AddedDate = new DateTime(2018, 6, 2, 13, 55, 3)  }
+                new Order { Id = commonId++, CargoId = domainCargos[0].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 2, 11, 55, 3) },
+                new Order { Id = commonId++, CargoId = domainCargos[1].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 3, 12, 55, 3)  },
+                new Order { Id = commonId++, CargoId = domainCargos[2].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 4, 13, 55, 3)  }
             };
 
             var domainOrdersStates = new List<OrderState>
@@ -161,7 +161,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             for (var i = 0; i < domainOrders.Count; i++)
             {
                 Assert.Equal(domainOrders[i].Id, orders.ElementAt(i).Id);
-                Assert.Equal(domainOrders[i].AddedDate, orders.ElementAt(i).ReceiptTime);
+                Assert.Equal(domainOrders[i].TimeOfDelivery, orders.ElementAt(i).TimeOfDelivery);
                 Assert.Equal(routesData[i].ShortTitle, orders.ElementAt(i).Title);
             }
         }
@@ -173,7 +173,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
 
             var booking = new BookingAM
             {
-                OrderTime = DateTime.MinValue,
+                TimeOfDelivery = DateTime.MinValue,
                 RootAddress = new AddressAM
                 {
                     Latitude = 11.2222,
@@ -241,7 +241,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 .Setup(m => m.CreateDomainBill(booking.BillInfo, booking.Basket))
                 .ReturnsAsync(domainBill);
             Suite.DomainOrderServiceMock
-                .Setup(m => m.Create(booking.OrderTime,
+                .Setup(m => m.Create(booking.TimeOfDelivery,
                     domainCustomer.Id,
                     domainCargo.Id,
                     domainRoute.Id,

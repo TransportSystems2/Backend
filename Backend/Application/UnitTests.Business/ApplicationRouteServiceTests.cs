@@ -3,12 +3,6 @@ using Moq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TransportSystems.Backend.Core.Domain.Core.Geo;
-using TransportSystems.Backend.Core.Domain.Core.Routing;
-using TransportSystems.Backend.Core.Services.Interfaces.Routing;
-using TransportSystems.Backend.External.Interfaces.Services;
-using TransportSystems.Backend.External.Models.Geo;
-using TransportSystems.Backend.External.Models.Routing;
 using TransportSystems.Backend.Application.Business;
 using TransportSystems.Backend.Application.Business.Geo;
 using TransportSystems.Backend.Application.Interfaces.Geo;
@@ -16,6 +10,11 @@ using TransportSystems.Backend.Application.Interfaces.Routing;
 using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Application.Models.Routing;
 using TransportSystems.Backend.Application.UnitTests.Business.Suite;
+using TransportSystems.Backend.Core.Domain.Core.Geo;
+using TransportSystems.Backend.Core.Domain.Core.Routing;
+using TransportSystems.Backend.Core.Services.Interfaces.Routing;
+using TransportSystems.Backend.External.Interfaces.Services;
+using TransportSystems.Backend.External.Models.Routing;
 using Xunit;
 
 namespace TransportSystems.Backend.Application.UnitTests.Business
@@ -619,7 +618,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
         }
 
         [Fact]
-        public void GetFeedDuration()
+        public async Task GetFeedDuration()
         {
             var route = new RouteAM
             {
@@ -652,9 +651,9 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 }
             };
 
-            var result = Suite.RouteService.GetFeedDuration(route);
+            var result = await Suite.RouteService.GetFeedDuration(route);
 
-            Assert.Equal(1600, result);
+            Assert.Equal(route.Legs[0].Duration, result.TotalSeconds);
         }
     }
 }

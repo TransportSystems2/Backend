@@ -62,7 +62,7 @@ namespace TransportSystems.Backend.Application.Business
         public async Task<CargoCatalogItemsAM> GetCatalogItems()
         {
             var result = new CargoCatalogItemsAM();
-
+            
             var brands = await CatalogService.GetCatalogItems(CatalogKind.Cargo, CatalogItemKind.Brand);
             result.Brands.AddRange(brands);
 

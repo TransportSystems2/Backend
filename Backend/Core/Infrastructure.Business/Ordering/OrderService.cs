@@ -106,7 +106,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
         }
 
         public async Task<Order> Create(
-            DateTime time,
+            DateTime timeOfDelivery,
             int customerId,
             int cargoId,
             int routeId,
@@ -114,7 +114,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
         {
             var order = new Order
             {
-                Time = time,
+                TimeOfDelivery = timeOfDelivery,
                 CustomerId = customerId,
                 CargoId = cargoId,
                 RouteId = routeId,
@@ -136,9 +136,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
 
         protected override async Task<bool> DoVerifyEntity(Order entity)
         {
-            if (entity.Time == null)
+            if (entity.TimeOfDelivery == null)
             {
-                throw new ArgumentNullException(nameof(entity.Time));
+                throw new ArgumentNullException(nameof(entity.TimeOfDelivery));
             }
 
             if (!await CustomerService.IsExist(entity.CustomerId))

@@ -1,15 +1,16 @@
-﻿using Common.Models.Geolocation;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Models.Geolocation;
+using TransportSystems.Backend.Application.Interfaces.Geo;
+using TransportSystems.Backend.Application.Interfaces.Mapping;
+using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Geo;
 using TransportSystems.Backend.External.Interfaces.Services;
 using TransportSystems.Backend.External.Models.Geo;
-using TransportSystems.Backend.Application.Interfaces.Geo;
-using TransportSystems.Backend.Application.Interfaces.Mapping;
-using TransportSystems.Backend.Application.Models.Geo;
 
 namespace TransportSystems.Backend.Application.Business.Geo
 {
@@ -172,6 +173,12 @@ namespace TransportSystems.Backend.Application.Business.Geo
         public Task<Address> GetDomainAddressByCoordinate(Coordinate coordinate)
         {
             return DomainAddressService.GetByCoordinate(coordinate.Latitude, coordinate.Longitude);
+        }
+
+        public Task<TimeZoneInfo> GetTimeZoneByCoordinate(AddressAM address)
+        {
+            var moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
+            return Task.FromResult(moscowTimeZone);
         }
     }
 }

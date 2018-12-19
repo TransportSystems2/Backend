@@ -70,7 +70,7 @@ namespace TransportSystems.UnitTests.Infrastructure.Business
         {
             var suite = new OrderServiceTestSuite();
 
-            var time = DateTime.MinValue;
+            var timeOfDelivery = DateTime.MinValue;
             var customerId = 2;
             var cargoId = 3;
             var routeId = 4;
@@ -89,11 +89,11 @@ namespace TransportSystems.UnitTests.Infrastructure.Business
                 .Setup(m => m.IsExist(billId))
                 .ReturnsAsync(true);
 
-            var newOrder = await suite.OrderService.Create(time, customerId, cargoId, routeId, billId);
+            var newOrder = await suite.OrderService.Create(timeOfDelivery, customerId, cargoId, routeId, billId);
 
             suite.OrderRepositoryMock
                 .Verify(m => m.Add(It.Is<Order>(
-                    o => o.Time.Equals(time)
+                    o => o.TimeOfDelivery.Equals(timeOfDelivery)
                     && o.CustomerId.Equals(customerId)
                     && o.CargoId.Equals(cargoId)
                     && o.RouteId.Equals(routeId)
