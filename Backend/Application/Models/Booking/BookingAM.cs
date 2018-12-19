@@ -13,7 +13,7 @@ namespace TransportSystems.Backend.Application.Models.Booking
 
         public WaypointsAM Waypoints { get; set; }
 
-        public DateTime OrderTime { get; set; }
+        public DateTime TimeOfDelivery { get; set; }
 
         public CustomerAM Customer {get;set;}
 

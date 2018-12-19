@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using TransportSystems.Backend.Core.Domain.Core.Routing;
-using TransportSystems.Backend.External.Models.Routing;
 using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Application.Models.Routing;
+using TransportSystems.Backend.Core.Domain.Core.Routing;
+using TransportSystems.Backend.External.Models.Routing;
 
 namespace TransportSystems.Backend.Application.Interfaces.Routing
 {
@@ -25,6 +26,6 @@ namespace TransportSystems.Backend.Application.Interfaces.Routing
 
         int GetFeedDistance(RouteAM route);
 
-        int GetFeedDuration(RouteAM route);
+        Task<TimeSpan> GetFeedDuration(RouteAM route);
     }
 }

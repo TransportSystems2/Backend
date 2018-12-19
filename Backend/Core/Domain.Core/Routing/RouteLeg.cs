@@ -29,8 +29,14 @@
 
         public int EndAddressId { get; set; }
 
+        /// <summary>
+        /// Seconds
+        /// </summary>
         public int Duration { get; set; }
 
+        /// <summary>
+        /// Metres
+        /// </summary>
         public int Distance { get; set; }
 
         public RouteLegKind Kind { get; set; }

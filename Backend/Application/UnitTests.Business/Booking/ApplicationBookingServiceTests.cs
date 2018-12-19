@@ -1,22 +1,20 @@
 ﻿using Common.Models.Geolocation;
 using Moq;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using TransportSystems.Backend.Core.Domain.Core.Geo;
-using TransportSystems.Backend.Core.Domain.Core.Routing;
 using TransportSystems.Backend.Application.Business.Booking;
-using TransportSystems.Backend.Application.Business.Geo;
 using TransportSystems.Backend.Application.Interfaces.Billing;
 using TransportSystems.Backend.Application.Interfaces.Booking;
 using TransportSystems.Backend.Application.Interfaces.Geo;
+using TransportSystems.Backend.Application.Interfaces.Prognosing;
 using TransportSystems.Backend.Application.Interfaces.Routing;
 using TransportSystems.Backend.Application.Models.Billing;
-using TransportSystems.Backend.Application.Models.Booking;
 using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Application.Models.Routing;
 using TransportSystems.Backend.Application.Models.Transport;
 using TransportSystems.Backend.Application.UnitTests.Business.Suite;
+using TransportSystems.Backend.Core.Domain.Core.Routing;
 using Xunit;
 
 namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
@@ -28,11 +26,13 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
             AddressServiceMock = new Mock<IApplicationAddressService>();
             BillServiceMock = new Mock<IApplicationBillService>();
             RouteServiceMock = new Mock<IApplicationRouteService>();
+            PrognosisServiceMock = new Mock<IApplicationPrognosisService>();
 
             BookingService = new ApplicationBookingService(
                 AddressServiceMock.Object,
                 BillServiceMock.Object,
-                RouteServiceMock.Object);
+                RouteServiceMock.Object,
+                PrognosisServiceMock.Object);
         }
 
         public IApplicationBookingService BookingService { get; }
@@ -42,6 +42,8 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
         public Mock<IApplicationBillService> BillServiceMock { get; }
 
         public Mock<IApplicationRouteService> RouteServiceMock { get; }
+
+        public Mock<IApplicationPrognosisService> PrognosisServiceMock { get; }
     }
 
     public class ApplicationBookingServiceTests : BaseServiceTests<ApplicationBookingServiceTestSuite>
@@ -57,6 +59,8 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
                 Latitude = 11.1111,
                 Longitude = 22.2222
             };
+
+            var rootAddressTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
 
             var billInfo = new BillInfoAM
             {
@@ -94,12 +98,15 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
             };
 
             var feedDistance = route.Legs[0].Distance;
-            var feedDuration = route.Legs[0].Duration;
+            var avgDeliveryTime = TimeSpan.FromMinutes(30);
             var totalDistance = route.Legs.Select(l => l.Distance).Sum();
 
             var bill = new BillAM {  TotalCost = 100 };
             var title = $"{rootAddress.Locality} - {bill.TotalCost}₽";
 
+            Suite.PrognosisServiceMock
+                .Setup(m => m.GetAvgDeliveryTime(route, cargo, basket))
+                .ReturnsAsync(avgDeliveryTime);
             Suite.RouteServiceMock
                 .Setup(m => m.GetRootAddress(route))
                 .Returns(rootAddress);
@@ -107,11 +114,11 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
                 .Setup(m => m.GetFeedDistance(route))
                 .Returns(feedDistance);
             Suite.RouteServiceMock
-                .Setup(m => m.GetFeedDuration(route))
-                .Returns(feedDuration);
-            Suite.RouteServiceMock
                 .Setup(m => m.GetTotalDistance(route))
                 .Returns(totalDistance);
+            Suite.AddressServiceMock
+                .Setup(m => m.GetTimeZoneByCoordinate(rootAddress))
+                .ReturnsAsync(rootAddressTimeZone);
 
             Suite.BillServiceMock
                 .Setup(m => m.GetBillInfo(
@@ -127,8 +134,9 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
             var result = await Suite.BookingService.CalculateBookingRoute(route, cargo, basket);
 
             Assert.Equal(rootAddress, result.RootAddress);
+            Assert.Equal(rootAddressTimeZone, result.RootAddressTimeZone);
             Assert.Equal(feedDistance, result.FeedDistance);
-            Assert.Equal(feedDuration, result.FeedDuration);
+            Assert.Equal(avgDeliveryTime, result.AvgDeliveryTime);
             Assert.Equal(totalDistance, result.TotalDistance);
             Assert.Equal(bill, result.Bill);
             Assert.Equal(title, result.Title);

@@ -131,6 +131,77 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Ordering
         }
 
         [Fact]
+        public async void AcceptWhenOrderDoesNotExist()
+        {
+            var commonId = 1;
+            var suite = new OrderStateServiceTestSuite();
+            var order = new Order { Id = commonId++ };
+            var currentState = new OrderState { Id = commonId++, OrderId = order.Id, Status = OrderStatus.New };
+            var moderator = new Moderator { Id = commonId++ };
+
+            suite.ModeratorServiceMock
+                .Setup(m => m.IsExist(moderator.Id))
+                .ReturnsAsync(true);
+            suite.OrderServiceMock
+                .Setup(m => m.Get(order.Id))
+                .Returns(Task.FromResult<Order>(null));
+            suite.OrderStateRepositoryMock
+                .Setup(m => m.GetCurrentState(order.Id))
+                .ReturnsAsync(currentState);
+
+            await Assert.ThrowsAsync<EntityNotFoundException>(
+                "Order",
+                () => suite.OrderStateService.Accept(order.Id, moderator.Id));
+        }
+
+        [Fact]
+        public async void AcceptWhenModeratorDoesNotExist()
+        {
+            var commonId = 1;
+            var suite = new OrderStateServiceTestSuite();
+            var order = new Order { Id = commonId++ };
+            var currentState = new OrderState { Id = commonId++, OrderId = order.Id, Status = OrderStatus.New };
+            var moderator = new Moderator { Id = commonId++ };
+
+            suite.ModeratorServiceMock
+                .Setup(m => m.IsExist(moderator.Id))
+                .ReturnsAsync(false);
+            suite.OrderServiceMock
+                .Setup(m => m.Get(order.Id))
+                .ReturnsAsync(order);
+            suite.OrderStateRepositoryMock
+                .Setup(m => m.GetCurrentState(order.Id))
+                .ReturnsAsync(currentState);
+
+            await Assert.ThrowsAsync<EntityNotFoundException>(
+                "Moderator", 
+                () => suite.OrderStateService.Accept(order.Id, moderator.Id));
+        }
+
+        [Fact]
+        public async void AcceptWnenOrderStatusIsUnsuitable()
+        {
+            var commonId = 1;
+            var suite = new OrderStateServiceTestSuite();
+            var order = new Order { Id = commonId++ };
+            var currentState = new OrderState { Id = commonId++, OrderId = order.Id, Status = OrderStatus.AssignedDispatcher };
+            var moderator = new Moderator { Id = commonId++ };
+
+            suite.ModeratorServiceMock
+                .Setup(m => m.IsExist(moderator.Id))
+                .ReturnsAsync(true);
+            suite.OrderServiceMock
+                .Setup(m => m.Get(order.Id))
+                .ReturnsAsync(order);
+            suite.OrderStateRepositoryMock
+                .Setup(m => m.GetCurrentState(order.Id))
+                .ReturnsAsync(currentState);
+
+            await Assert.ThrowsAsync<OrderStatusException>(
+                () => suite.OrderStateService.Accept(order.Id, moderator.Id));
+        }
+
+        [Fact]
         public async void ReadyToTrade()
         {
             var commonId = 1;

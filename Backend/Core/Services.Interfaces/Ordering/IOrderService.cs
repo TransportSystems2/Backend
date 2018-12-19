@@ -6,7 +6,7 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Interfaces
 {
     public interface IOrderService : IDomainService<Order>
     {
-        Task<Order> Create(DateTime time, int customerId, int cargoId, int routeId, int billId);
+        Task<Order> Create(DateTime timeOfDelivery, int customerId, int cargoId, int routeId, int billId);
 
         Task AssignModerator(int orderId, int moderatorId);
 

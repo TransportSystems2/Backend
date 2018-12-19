@@ -1,4 +1,5 @@
-﻿using TransportSystems.Backend.Application.Models.Billing;
+﻿using System;
+using TransportSystems.Backend.Application.Models.Billing;
 using TransportSystems.Backend.Application.Models.Geo;
 
 namespace TransportSystems.Backend.Application.Models.Booking
@@ -9,11 +10,13 @@ namespace TransportSystems.Backend.Application.Models.Booking
 
         public AddressAM RootAddress { get; set; }
 
+        public TimeZoneInfo RootAddressTimeZone { get; set; }
+
         public int TotalDistance { get; set; }
 
         public int FeedDistance { get; set; }
 
-        public int FeedDuration { get; set; }
+        public TimeSpan AvgDeliveryTime { get; set; }
 
         public BillAM Bill { get; set;  }
     }

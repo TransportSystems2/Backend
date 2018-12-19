@@ -10,7 +10,7 @@ namespace TransportSystems.Backend.Application.Interfaces
     {
         Task<ICollection<OrderGroupAM>> GetOrderGroupsByStatuses(OrderStatus[] statuses);
 
-        Task<ICollection<OrderAM>> GetOrdersByStatus(OrderStatus status);
+        Task<ICollection<OrderInfoAM>> GetOrdersByStatus(OrderStatus status);
 
         Task<ICollection<Order>> GetDomainOrdersByStatus(OrderStatus status);
 

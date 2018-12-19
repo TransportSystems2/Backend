@@ -63,7 +63,7 @@ namespace TransportSystems.Backend.Application.Business
                     var domainRoute = await RouteService.CreateDomainRoute(route);
 
                     var result = await DomainOrderService.Create(
-                        booking.OrderTime,
+                        booking.TimeOfDelivery,
                         domainCustomer.Id,
                         domainCargo.Id,
                         domainRoute.Id,
@@ -123,9 +123,9 @@ namespace TransportSystems.Backend.Application.Business
             return await DomainOrderService.Get(ordersIdArray);
         }
 
-        public async Task<ICollection<OrderAM>> GetOrdersByStatus(OrderStatus status)
+        public async Task<ICollection<OrderInfoAM>> GetOrdersByStatus(OrderStatus status)
         {
-            var result = new List<OrderAM>();
+            var result = new List<OrderInfoAM>();
             var exceptions = new ConcurrentQueue<Exception>();
 
             var domainOrders = await GetDomainOrdersByStatus(status);
@@ -138,14 +138,14 @@ namespace TransportSystems.Backend.Application.Business
                         //var cargo = await CargoService.GetEntity(domainOrder.CargoId);
                         var routeTitle = await RouteService.GetShortTitle(domainOrder.RouteId);
 
-                        var ApplicationOrder = new OrderAM
+                        var orderInfo = new OrderInfoAM
                         {
-                            ReceiptTime = domainOrder.AddedDate,
+                            TimeOfDelivery = domainOrder.TimeOfDelivery,
                             Id = domainOrder.Id,
                             Title = routeTitle
                         };
 
-                        result.Add(ApplicationOrder);
+                        result.Add(orderInfo);
                     }
                     catch (Exception e)
                     {
@@ -159,7 +159,7 @@ namespace TransportSystems.Backend.Application.Business
                 throw new AggregateException(exceptions);
             }
 
-            result = result.OrderBy(o => o.ReceiptTime).ToList();
+            result = result.OrderBy(o => o.AddedDate).ToList();
 
             return result;
         }
