@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Domain.Interfaces.Users;
 using TransportSystems.Backend.Core.Services.Interfaces;
@@ -42,10 +41,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
             var specificRoles = await GetSpecificRoles();
             await IdentityUserService.AsignToRoles(identityUser.Id, specificRoles);
 
-            var result = new T
-            {
-                IdentityUserId = identityUser.Id,
-            };
+            var result = await Create(identityUser.Id);
 
             await Repository.Add(result);
             await Repository.Save();
@@ -76,9 +72,26 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
             return Repository.IsExistByIdentityUser(userIdnentity);
         }
 
-        protected override Task<bool> DoVerifyEntity(T entity)
+        protected async Task<T> Create(int identityUserId)
         {
-            throw new NotImplementedException();
+            var user =  new T
+            {
+                IdentityUserId = identityUserId,
+            };
+
+            await DoVerifyEntity(user);
+
+            return user;
+        }
+
+        protected override async Task<bool> DoVerifyEntity(T entity)
+        {
+            if (!await IdentityUserService.IsExistById(entity.IdentityUserId))
+            {
+                throw new EntityNotFoundException($"IdentityUser with id {entity.IdentityUserId} not found");
+            }
+
+            return true;
         }
     }
 }
