@@ -7,8 +7,13 @@ using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Users;
 using Xunit;
 
-namespace TransportSystems.UnitTests.Infrastructure.Business.Users
+namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Users
 {
+    public class TestUser : User
+    {
+
+    }
+
     public class TestUserService<T> : UserService<T>, IUserService<T> where T : User, new()
     {
         public TestUserService(IUserRepository<T> repository, IIdentityUserService identityUserService) : base(repository, identityUserService)
@@ -23,7 +28,7 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Users
         }
     }
 
-    public class UserServiceTestSuite<T> where T : User, new()
+    public class UserServiceTestSuite<T> where T : TestUser, new()
     {
         public UserServiceTestSuite()
         {
@@ -44,10 +49,10 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Users
 
         public UserServiceTests()
         {
-            Suite = new UserServiceTestSuite<User>();
+            Suite = new UserServiceTestSuite<TestUser>();
         }
 
-        protected UserServiceTestSuite<User> Suite { get; }
+        protected UserServiceTestSuite<TestUser> Suite { get; }
 
         [Fact]
         public async Task CreateUser()
@@ -81,7 +86,7 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Users
                 .Verify(m =>m.AsignToRoles(identityUserId, It.IsAny<string[]>()));
 
             Suite.UserRepositoryMock
-                .Verify(m => m.Add(It.Is<User>(d => d.IdentityUserId.Equals(identityUserId))));
+                .Verify(m => m.Add(It.Is<TestUser>(d => d.IdentityUserId.Equals(identityUserId))));
 
             Suite.UserRepositoryMock
                 .Verify(m => m.Save());
@@ -124,7 +129,7 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Users
         public async Task GetByIdentityUser()
         {
             var identityUserId = 1;
-            var user = new User { IdentityUserId = identityUserId };
+            var user = new TestUser { IdentityUserId = identityUserId };
 
             Suite.UserRepositoryMock
                 .Setup(m => m.GetByIndentityUser(identityUserId))
@@ -142,7 +147,7 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Users
             var phoneNumber = "+77777777";
             var identityUserId = 1;
             var identityUser = new IdentityUser { Id = identityUserId };
-            var user = new User { IdentityUserId = identityUserId };
+            var user = new TestUser { IdentityUserId = identityUserId };
 
             Suite.IdentityUserServiceMock
                 .Setup(m => m.GetUserByPhoneNumber(phoneNumber))

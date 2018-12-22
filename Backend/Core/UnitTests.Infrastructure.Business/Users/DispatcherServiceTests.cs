@@ -8,7 +8,7 @@ using TransportSystems.Backend.Core.Services.Interfaces.Users;
 
 using Xunit;
 
-namespace TransportSystems.UnitTests.Infrastructure.Business.Users
+namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Users
 {
     public class DispatcherServiceTestSuite
     {
