@@ -69,7 +69,7 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Users
             suite.IdentityUserServiceMock
                 .Verify(m => m.AssignName(identityUser.Id, userInfo.FirstName, userInfo.LastName), Times.Once);
             suite.IdentityUserServiceMock
-                 .Verify(m => m.AsignToRoles(identityUser.Id, new[] { UserRole.DispatcherRoleName }), Times.Once);
+                 .Verify(m => m.AsignToRoles(identityUser.Id, new[] { UserRole.DispatcherRoleName, UserRole.EmployeeRoleName }), Times.Once);
 
             suite.DispatcherRepositoryMock
                  .Verify(m => m.Add(dispatcher), Times.Once);

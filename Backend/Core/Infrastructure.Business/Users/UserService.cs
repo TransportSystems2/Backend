@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Domain.Interfaces.Users;
+using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Users;
 
 namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
@@ -18,15 +19,19 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
 
         public IIdentityUserService IdentityUserService { get; }
 
-        public abstract string[] GetSpecificRoles();
+        public abstract Task<string[]> GetSpecificRoles();
 
         public async Task<T> Create(string firstName, string lastName, string phoneNumber)
         {
             var identityUser = await IdentityUserService.GetUserByPhoneNumber(phoneNumber);
-
             if (identityUser == null)
             {
-                identityUser = await IdentityUserService.Create(firstName, lastName, phoneNumber);
+                throw new EntityNotFoundException($"identityUser with phoneNumber {phoneNumber} not found");
+            }
+
+            if (await Repository.IsExistByIdentityUser(identityUser.Id))
+            {
+                throw new EntityAlreadyExistsException($"user with IdentityUserId {identityUser.Id} alredy exists");
             }
 
             if ((firstName != null) && (lastName != null))
@@ -34,7 +39,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
                 await IdentityUserService.AssignName(identityUser.Id, firstName, lastName);
             }
 
-            var specificRoles = GetSpecificRoles();
+            var specificRoles = await GetSpecificRoles();
             await IdentityUserService.AsignToRoles(identityUser.Id, specificRoles);
 
             var result = new T

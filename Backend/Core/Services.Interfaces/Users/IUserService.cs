@@ -14,5 +14,7 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Users
         Task<T> GetByIndentityUser(int identityUserId);
 
         Task<bool> IsExistByIdentityUser(int identityUserId);
+
+        Task<string[]> GetSpecificRoles();
     }
 }
