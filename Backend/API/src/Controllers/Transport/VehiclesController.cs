@@ -10,9 +10,9 @@ namespace TransportSystems.Backend.API.Controllers.Transport
     [Authorize(Roles = "user")]
     public class VehiclesController : Controller
     {
-        public VehiclesController(IApplicationVehicleService ApplicationVehicleService)
+        public VehiclesController(IApplicationVehicleService applicationVehicleService)
         {
-            ApplicationVehicleService = ApplicationVehicleService;
+            ApplicationVehicleService = applicationVehicleService;
         }
 
         protected IApplicationVehicleService ApplicationVehicleService { get; }

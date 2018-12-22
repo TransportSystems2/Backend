@@ -25,8 +25,8 @@ namespace TransportSystems.Backend.Core.Infrastructure.Http.Users
         public async Task Add(IdentityUser entity)
         {
             var userModel = Mapper.Map<UserModel>(entity);
-            var createUserModel = await IdentityUsersAPI.Create(userModel);
-            entity.Id = createUserModel.Id;
+            var createdUserModel = await IdentityUsersAPI.Create(userModel);
+            entity.Id = createdUserModel.Id;
         }
 
         public async Task AddRange(params IdentityUser[] entities)

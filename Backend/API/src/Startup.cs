@@ -263,7 +263,8 @@ namespace TransportSystems.Backend.API
 
             services.AddScoped<ICustomerService, CustomerService>();
 
-            var identityUsersAPI = IdentityUsersAPIFactory<IIdentityUsersAPI>.Create("http://localhost:61137");
+            var identityUri = Configuration.GetConnectionString("identity");
+            var identityUsersAPI = IdentityUsersAPIFactory<IIdentityUsersAPI>.Create(identityUri);
             services.AddSingleton(identityUsersAPI);
         }
 
