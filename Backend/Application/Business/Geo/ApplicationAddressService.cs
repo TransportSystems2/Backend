@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Models;
 using Common.Models.Geolocation;
 using TransportSystems.Backend.Application.Interfaces.Geo;
 using TransportSystems.Backend.Application.Interfaces.Mapping;
@@ -9,7 +9,9 @@ using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Geo;
-using TransportSystems.Backend.External.Interfaces.Services;
+using TransportSystems.Backend.External.Interfaces.Services.Direction;
+using TransportSystems.Backend.External.Interfaces.Services.Geocoder;
+using TransportSystems.Backend.External.Interfaces.Services.Maps;
 using TransportSystems.Backend.External.Models.Geo;
 
 namespace TransportSystems.Backend.Application.Business.Geo
@@ -21,13 +23,15 @@ namespace TransportSystems.Backend.Application.Business.Geo
             IMappingService mappingService,
             IAddressService domainAddressService,
             IDirectionService directionService,
-            IGeocoderService geocoderService)
+            IGeocoderService geocoderService,
+            IMapsService mapsService)
             : base(transactionService)
         {
             MappingService = mappingService;
             DomainAddressService = domainAddressService;
             DirectionService = directionService;
             GeocoderService = geocoderService;
+            MapsService = mapsService;
         }
 
         protected IMappingService MappingService { get; }
@@ -37,6 +41,8 @@ namespace TransportSystems.Backend.Application.Business.Geo
         protected IDirectionService DirectionService { get; }
 
         protected IGeocoderService GeocoderService { get; }
+
+        protected IMapsService MapsService { get; }
 
         public Task<Address> CreateDomainAddress(AddressKind kind, AddressAM address)
         {
@@ -175,10 +181,11 @@ namespace TransportSystems.Backend.Application.Business.Geo
             return DomainAddressService.GetByCoordinate(coordinate.Latitude, coordinate.Longitude);
         }
 
-        public Task<TimeZoneInfo> GetTimeZoneByCoordinate(AddressAM address)
+        public Task<TimeBelt> GetTimeBeltByAddress(AddressAM address)
         {
-            var moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
-            return Task.FromResult(moscowTimeZone);
+            var coordinate = address.ToCoordinate();
+
+            return MapsService.GetTimeBelt(coordinate);
         }
     }
 }

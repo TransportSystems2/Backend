@@ -4,13 +4,13 @@ using TransportSystems.Backend.External.Business.Geocoder.Providers;
 using TransportSystems.Backend.External.Interfaces.Geocoder;
 using Xunit;
 
-namespace TransportSystems.Backend.External.UnitTests.Business
+namespace TransportSystems.Backend.External.UnitTests.Business.Geocoder
 {
-    public class GoogleGeocoderTests
+    public class YandexGeocoderTests
     {
-        public GoogleGeocoderTests()
+        public YandexGeocoderTests()
         {
-            Geocoder = new GoogleGeocoder();
+            Geocoder = new YandexGeocoder();
         }
 
         public IGeocoder Geocoder { get; }
@@ -23,28 +23,28 @@ namespace TransportSystems.Backend.External.UnitTests.Business
 
             Assert.Equal("Россия", firstAddress.Country);
             Assert.Equal("Ярославская область", firstAddress.Province);
-            Assert.Equal("город Ярославль", firstAddress.Area);
+            Assert.Equal("городской округ Ярославль", firstAddress.Area);
             Assert.Equal("Ярославль", firstAddress.Locality);
             Assert.Equal("улица Серова", firstAddress.Street);
             Assert.Equal("5", firstAddress.House);
-            Assert.Equal(57.609274, firstAddress.Latitude);
-            Assert.Equal(39.803979, firstAddress.Longitude);
+            Assert.Equal(57.609206, firstAddress.Latitude);
+            Assert.Equal(39.804018, firstAddress.Longitude);
         }
 
         [Fact]
         public async Task GeocodeSettlement()
         {
-            var result = await Geocoder.Geocode("Тутаев Привокзальная 22");
+            var result = await Geocoder.Geocode("Ярославская область Октябрьский 12");
             var firstAddress = result.FirstOrDefault();
 
             Assert.Equal("Россия", firstAddress.Country);
             Assert.Equal("Ярославская область", firstAddress.Province);
-            Assert.Equal("город Тутаев", firstAddress.Area);
-            Assert.Equal("Тутаев", firstAddress.Locality);
-            Assert.Equal("Привокзальная улица", firstAddress.Street);
-            Assert.Equal("22", firstAddress.House);
-            Assert.Equal(57.8709797, firstAddress.Latitude);
-            Assert.Equal(39.5239717, firstAddress.Longitude);
+            Assert.Equal("Рыбинский район", firstAddress.Area);
+            Assert.Equal("поселок Октябрьский", firstAddress.Locality);
+            Assert.Null(firstAddress.Street);
+            Assert.Equal("12", firstAddress.House);
+            Assert.Equal(57.984794, firstAddress.Latitude);
+            Assert.Equal(39.110177, firstAddress.Longitude);
         }
     }
 }

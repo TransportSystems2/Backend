@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using TransportSystems.Backend.External.Models.Enums;
 using TransportSystems.Backend.External.Models.Geo;
 
-namespace TransportSystems.Backend.External.Interfaces.Services
+namespace TransportSystems.Backend.External.Interfaces.Services.Geocoder
 {
     public interface IGeocoderService
     {

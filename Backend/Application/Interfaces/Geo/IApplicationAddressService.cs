@@ -1,10 +1,10 @@
-﻿using Common.Models.Geolocation;
+﻿using Common.Models;
+using Common.Models.Geolocation;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.External.Models.Geo;
-using TransportSystems.Backend.Application.Models.Geo;
-using System;
 
 namespace TransportSystems.Backend.Application.Interfaces.Geo
 {
@@ -38,6 +38,6 @@ namespace TransportSystems.Backend.Application.Interfaces.Geo
 
         ICollection<AddressAM> FromDomainAddresses(ICollection<Address> source);
 
-        Task<TimeZoneInfo> GetTimeZoneByCoordinate(AddressAM address);
+        Task<TimeBelt> GetTimeBeltByAddress(AddressAM address);
     }
 }

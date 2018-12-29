@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Routing;
 using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Routing;
-using TransportSystems.Backend.External.Interfaces.Services;
 using TransportSystems.Backend.External.Models.Routing;
 using TransportSystems.Backend.Application.Business.Geo;
 using TransportSystems.Backend.Application.Interfaces.Geo;
 using TransportSystems.Backend.Application.Interfaces.Routing;
 using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Application.Models.Routing;
+using TransportSystems.Backend.External.Interfaces.Services.Direction;
 
 namespace TransportSystems.Backend.Application.Business
 {

@@ -13,7 +13,7 @@ using TransportSystems.Backend.Application.UnitTests.Business.Suite;
 using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.Core.Domain.Core.Routing;
 using TransportSystems.Backend.Core.Services.Interfaces.Routing;
-using TransportSystems.Backend.External.Interfaces.Services;
+using TransportSystems.Backend.External.Interfaces.Services.Direction;
 using TransportSystems.Backend.External.Models.Routing;
 using Xunit;
 
