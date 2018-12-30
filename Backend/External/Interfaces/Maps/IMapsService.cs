@@ -1,5 +1,5 @@
 ﻿using Common.Models;
-using Common.Models.Geolocation;
+using Common.Models.Units;
 using System.Threading.Tasks;
 using TransportSystems.Backend.External.Models.Enums;
 

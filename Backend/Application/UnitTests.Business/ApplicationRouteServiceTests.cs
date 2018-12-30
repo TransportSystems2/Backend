@@ -1,5 +1,6 @@
-﻿using Common.Models.Geolocation;
+﻿using Common.Models.Units;
 using Moq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -85,7 +86,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = rootAddress,
                         EndAddress = firstWaypointAddress,
                         Distance = 30000,
-                        Duration = 1600,
+                        Duration = TimeSpan.FromMinutes(30),
                         Kind = RouteLegKind.Feed
                     },
                     new RouteLegAM
@@ -93,7 +94,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = firstWaypointAddress,
                         EndAddress = secondWaypointAddress,
                         Distance = 35000,
-                        Duration = 18000,
+                        Duration = TimeSpan.FromMinutes(35),
                         Kind = RouteLegKind.Transportation
                     },
                     new RouteLegAM
@@ -101,7 +102,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = secondWaypointAddress,
                         EndAddress = rootAddress,
                         Distance = 38000,
-                        Duration = 19600,
+                        Duration = TimeSpan.FromMinutes(38),
                         Kind = RouteLegKind.WayBack
                     }
                 }
@@ -133,15 +134,33 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
 
             var firstLeg = route.Legs[0];
             Suite.DomainRouteLegServiceMock
-                .Verify(m => m.Create(domainRoute.Id, firstLeg.Kind, domainRouteAddress.Id, firstDomainWaypointAddress.Id, firstLeg.Duration, firstLeg.Distance));
+                .Verify(m => m.Create(
+                    domainRoute.Id,
+                    firstLeg.Kind,
+                    domainRouteAddress.Id,
+                    firstDomainWaypointAddress.Id,
+                    firstLeg.Duration,
+                    firstLeg.Distance));
 
             var secondLeg = route.Legs[1];
             Suite.DomainRouteLegServiceMock
-                .Verify(m => m.Create(domainRoute.Id, secondLeg.Kind, firstDomainWaypointAddress.Id, secondDomainWaypoinAddress.Id, secondLeg.Duration, secondLeg.Distance));
+                .Verify(m => m.Create(
+                    domainRoute.Id,
+                    secondLeg.Kind,
+                    firstDomainWaypointAddress.Id,
+                    secondDomainWaypoinAddress.Id,
+                    secondLeg.Duration,
+                    secondLeg.Distance));
 
             var thirdLeg = route.Legs[2];
             Suite.DomainRouteLegServiceMock
-                .Verify(m => m.Create(domainRoute.Id, thirdLeg.Kind, secondDomainWaypoinAddress.Id, domainRouteAddress.Id, thirdLeg.Duration, thirdLeg.Distance));
+                .Verify(m => m.Create(
+                    domainRoute.Id,
+                    thirdLeg.Kind,
+                    secondDomainWaypoinAddress.Id,
+                    domainRouteAddress.Id,
+                    thirdLeg.Duration,
+                    thirdLeg.Distance));
         }
 
         [Fact]
@@ -191,21 +210,21 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartCoordinate = rootCoordinate,
                         EndCoordinate = firstWaypointCoordinate,
                         Distance = 3000,
-                        Duration = 1600
+                        Duration = TimeSpan.FromMinutes(10)
                     },
                     new LegEM
                     {
                         StartCoordinate = firstWaypointCoordinate,
                         EndCoordinate = secondWaypointCoordinate,
                         Distance = 35000,
-                        Duration = 18000
+                        Duration = TimeSpan.FromMinutes(45)
                     },
                     new LegEM
                     {
                         StartCoordinate = secondWaypointCoordinate,
                         EndCoordinate = rootCoordinate,
                         Distance = 38000,
-                        Duration = 19600
+                        Duration = TimeSpan.FromMinutes(48)
                     }
                 }
             };
@@ -307,21 +326,21 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartCoordinate = rootCoordinate,
                         EndCoordinate = firstWaypointCoordinate,
                         Distance = 3000,
-                        Duration = 1600
+                        Duration = TimeSpan.FromMinutes(10)
                     },
                     new LegEM
                     {
                         StartCoordinate = firstWaypointCoordinate,
                         EndCoordinate = secondWaypointCoordinate,
                         Distance = 35000,
-                        Duration = 18000
+                        Duration = TimeSpan.FromMinutes(46)
                     },
                     new LegEM
                     {
                         StartCoordinate = secondWaypointCoordinate,
                         EndCoordinate = rootCoordinate,
                         Distance = 38000,
-                        Duration = 19600
+                        Duration = TimeSpan.FromMinutes(48)
                     }
                 }
             };
@@ -512,7 +531,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = rootAddress,
                         EndAddress = new AddressAM(),
                         Distance = 30000,
-                        Duration = 1600,
+                        Duration = TimeSpan.FromMinutes(10),
                         Kind = RouteLegKind.Feed
                     },
                     new RouteLegAM
@@ -520,7 +539,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = new AddressAM(),
                         EndAddress = new AddressAM(),
                         Distance = 35000,
-                        Duration = 18000,
+                        Duration = TimeSpan.FromMinutes(35),
                         Kind = RouteLegKind.Transportation
                     },
                     new RouteLegAM
@@ -528,7 +547,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = new AddressAM(),
                         EndAddress = rootAddress,
                         Distance = 38000,
-                        Duration = 19600,
+                        Duration = TimeSpan.FromMinutes(48),
                         Kind = RouteLegKind.WayBack
                     }
                 }
@@ -551,7 +570,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = new AddressAM(),
                         EndAddress = new AddressAM(),
                         Distance = 30000,
-                        Duration = 1600,
+                        Duration = TimeSpan.FromMinutes(9),
                         Kind = RouteLegKind.Feed
                     },
                     new RouteLegAM
@@ -559,7 +578,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = new AddressAM(),
                         EndAddress = new AddressAM(),
                         Distance = 35000,
-                        Duration = 18000,
+                        Duration = TimeSpan.FromMinutes(35),
                         Kind = RouteLegKind.Transportation
                     },
                     new RouteLegAM
@@ -567,7 +586,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = new AddressAM(),
                         EndAddress = new AddressAM(),
                         Distance = 38000,
-                        Duration = 19600,
+                        Duration = TimeSpan.FromMinutes(38),
                         Kind = RouteLegKind.WayBack
                     }
                 }
@@ -590,7 +609,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = new AddressAM(),
                         EndAddress = new AddressAM(),
                         Distance = 30000,
-                        Duration = 1600,
+                        Duration = TimeSpan.FromMinutes(30),
                         Kind = RouteLegKind.Feed
                     },
                     new RouteLegAM
@@ -598,7 +617,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = new AddressAM(),
                         EndAddress = new AddressAM(),
                         Distance = 35000,
-                        Duration = 18000,
+                        Duration = TimeSpan.FromMinutes(34),
                         Kind = RouteLegKind.Transportation
                     },
                     new RouteLegAM
@@ -606,7 +625,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = new AddressAM(),
                         EndAddress = new AddressAM(),
                         Distance = 38000,
-                        Duration = 19600,
+                        Duration = TimeSpan.FromMinutes(48),
                         Kind = RouteLegKind.WayBack
                     }
                 }
@@ -629,7 +648,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = new AddressAM(),
                         EndAddress = new AddressAM(),
                         Distance = 30000,
-                        Duration = 1600,
+                        Duration = TimeSpan.FromMinutes(12),
                         Kind = RouteLegKind.Feed
                     },
                     new RouteLegAM
@@ -637,7 +656,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = new AddressAM(),
                         EndAddress = new AddressAM(),
                         Distance = 35000,
-                        Duration = 18000,
+                        Duration = TimeSpan.FromMinutes(38),
                         Kind = RouteLegKind.Transportation
                     },
                     new RouteLegAM
@@ -645,7 +664,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                         StartAddress = new AddressAM(),
                         EndAddress = new AddressAM(),
                         Distance = 38000,
-                        Duration = 19600,
+                        Duration = TimeSpan.FromMinutes(48),
                         Kind = RouteLegKind.WayBack
                     }
                 }
@@ -653,7 +672,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
 
             var result = await Suite.RouteService.GetFeedDuration(route);
 
-            Assert.Equal(route.Legs[0].Duration, result.TotalSeconds);
+            Assert.Equal(route.Legs[0].Duration, result);
         }
     }
 }

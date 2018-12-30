@@ -1,4 +1,4 @@
-﻿using Common.Models.Geolocation;
+﻿using Common.Models.Units;
 using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.Application.Models.Geo;
 

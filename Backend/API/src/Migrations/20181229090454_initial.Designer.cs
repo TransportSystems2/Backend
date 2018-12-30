@@ -10,8 +10,8 @@ using TransportSystems.Backend.Core.Infrastructure.Database;
 namespace TransportSystems.Backend.API.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20181118144709_init")]
-    partial class init
+    [Migration("20181229090454_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -186,13 +186,13 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<int>("CargoId");
 
+                    b.Property<int>("CompanyId");
+
                     b.Property<int>("CustomerId");
 
                     b.Property<int>("DispatcherId");
 
                     b.Property<int>("DriverId");
-
-                    b.Property<int>("GarageId");
 
                     b.Property<int>("ModeratorId");
 
@@ -202,7 +202,7 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<int>("RouteId");
 
-                    b.Property<DateTime>("Time");
+                    b.Property<DateTime>("TimeOfDelivery");
 
                     b.HasKey("Id");
 
@@ -364,7 +364,7 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<int>("Distance");
 
-                    b.Property<int>("Duration");
+                    b.Property<TimeSpan>("Duration");
 
                     b.Property<int>("EndAddressId");
 

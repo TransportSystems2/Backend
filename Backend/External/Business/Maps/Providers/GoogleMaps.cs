@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Common.Models;
-using Common.Models.Geolocation;
+using Common.Models.Units;
 using GoogleApi.Entities.Maps.TimeZone.Request;
 using TransportSystems.Backend.External.Interfaces.Exceptions;
 using TransportSystems.Backend.External.Interfaces.Maps;

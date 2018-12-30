@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace TransportSystems.Backend.API.Migrations
 {
-    public partial class init : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -305,13 +305,13 @@ namespace TransportSystems.Backend.API.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     AddedDate = table.Column<DateTime>(nullable: false),
                     ModifiedDate = table.Column<DateTime>(nullable: false),
-                    Time = table.Column<DateTime>(nullable: false),
+                    TimeOfDelivery = table.Column<DateTime>(nullable: false),
                     ModeratorId = table.Column<int>(nullable: false),
-                    GarageId = table.Column<int>(nullable: false),
                     CustomerId = table.Column<int>(nullable: false),
                     PathId = table.Column<int>(nullable: false),
                     RouteId = table.Column<int>(nullable: false),
                     CargoId = table.Column<int>(nullable: false),
+                    CompanyId = table.Column<int>(nullable: false),
                     DispatcherId = table.Column<int>(nullable: false),
                     DriverId = table.Column<int>(nullable: false),
                     BillId = table.Column<int>(nullable: false)
@@ -419,7 +419,7 @@ namespace TransportSystems.Backend.API.Migrations
                     RouteId = table.Column<int>(nullable: false),
                     StartAddressId = table.Column<int>(nullable: false),
                     EndAddressId = table.Column<int>(nullable: false),
-                    Duration = table.Column<int>(nullable: false),
+                    Duration = table.Column<TimeSpan>(nullable: false),
                     Distance = table.Column<int>(nullable: false),
                     Kind = table.Column<int>(nullable: false)
                 },

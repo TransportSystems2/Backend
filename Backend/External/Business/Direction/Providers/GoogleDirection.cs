@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Common.Models.Geolocation;
+using Common.Models.Units;
 using GoogleApi;
 using GoogleApi.Entities.Common.Enums;
 using GoogleApi.Entities.Maps.Directions.Request;
@@ -53,7 +54,7 @@ namespace TransportSystems.Backend.External.Business.Direction.Providers
             var result = new LegEM
             {
                 Distance = googleLeg.Distance.Value,
-                Duration = googleLeg.Duration.Value,
+                Duration = TimeSpan.FromSeconds(googleLeg.Duration.Value),
 
                 StartCoordinate = new Coordinate
                 {

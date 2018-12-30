@@ -1,4 +1,4 @@
-﻿namespace Common.Models.Geolocation
+﻿namespace Common.Models.Units
 {
     public struct Coordinate
     {

@@ -1,4 +1,4 @@
-﻿using Common.Models.Geolocation;
+﻿using Common.Models.Units;
 using Moq;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Geo;

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Models;
-using Common.Models.Geolocation;
+using Common.Models.Units;
 using TransportSystems.Backend.Application.Interfaces.Geo;
 using TransportSystems.Backend.Application.Interfaces.Mapping;
 using TransportSystems.Backend.Application.Models.Geo;
