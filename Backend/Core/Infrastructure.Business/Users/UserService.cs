@@ -25,6 +25,11 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
             var identityUser = await IdentityUserService.GetUserByPhoneNumber(phoneNumber);
             if (identityUser == null)
             {
+                identityUser = await IdentityUserService.Create(firstName, lastName, phoneNumber);
+            }
+
+            if (identityUser == null)
+            {
                 throw new EntityNotFoundException($"identityUser with phoneNumber {phoneNumber} not found");
             }
 

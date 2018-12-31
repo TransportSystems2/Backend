@@ -55,7 +55,7 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Users
         protected UserServiceTestSuite<TestUser> Suite { get; }
 
         [Fact]
-        public async Task CreateUser()
+        public async Task CreateUserWithExistIdentityUser()
         {
             var firstName = "Alexandr";
             var lastName = "Fadeev";
@@ -98,10 +98,55 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Users
             var firstName = "Alexandr";
             var lastName = "Fadeev";
             var phoneNumber = "+77777777";
+            var identityUserId = 0;
+            var identityUser = new IdentityUser { Id = identityUserId };
 
             Suite.IdentityUserServiceMock
                 .Setup(m => m.GetUserByPhoneNumber(phoneNumber))
-                .Returns(Task.FromResult<IdentityUser>(null));
+                .ReturnsAsync((IdentityUser)null);
+
+            Suite.IdentityUserServiceMock
+                .Setup(m => m.Create(firstName, lastName, phoneNumber))
+                .ReturnsAsync(identityUser);
+
+            Suite.IdentityUserServiceMock
+                .Setup(m => m.IsExistById(identityUserId))
+                .ReturnsAsync(true);
+
+            var user = await Suite.UserService.Create(firstName, lastName, phoneNumber);
+
+            Assert.Equal(identityUserId, user.IdentityUserId);
+
+            Suite.IdentityUserServiceMock
+                .Verify(m => m.Create(firstName, lastName, phoneNumber));
+
+            Suite.IdentityUserServiceMock
+                .Verify(m => m.AssignName(identityUserId, firstName, lastName));
+
+            Suite.IdentityUserServiceMock
+                .Verify(m => m.AsignToRoles(identityUserId, It.IsAny<string[]>()));
+
+            Suite.UserRepositoryMock
+                .Verify(m => m.Add(It.Is<TestUser>(d => d.IdentityUserId.Equals(identityUserId))));
+
+            Suite.UserRepositoryMock
+                .Verify(m => m.Save());
+        }
+
+        [Fact]
+        public async Task CreateUserWithIdentityCantCreateUser()
+        {
+            var firstName = "Alexandr";
+            var lastName = "Fadeev";
+            var phoneNumber = "+77777777";
+
+            Suite.IdentityUserServiceMock
+                .Setup(m => m.GetUserByPhoneNumber(phoneNumber))
+                .ReturnsAsync((IdentityUser)null);
+
+            Suite.IdentityUserServiceMock
+                .Setup(m => m.Create(firstName, lastName, phoneNumber))
+                .ReturnsAsync((IdentityUser)null);
 
             await Assert.ThrowsAsync<EntityNotFoundException>(() => Suite.UserService.Create(firstName, lastName, phoneNumber));
         }
