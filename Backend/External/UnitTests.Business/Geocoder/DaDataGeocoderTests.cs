@@ -4,7 +4,7 @@ using TransportSystems.Backend.External.Business.Geocoder.Providers;
 using TransportSystems.Backend.External.Interfaces.Geocoder;
 using Xunit;
 
-namespace TransportSystems.Backend.External.UnitTests.Business
+namespace TransportSystems.Backend.External.UnitTests.Business.Geocoder
 {
     public class DaDataGeocoderTests
     {

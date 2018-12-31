@@ -5,6 +5,8 @@ namespace TransportSystems.Backend.Core.Domain.Interfaces.Users
 {
     public interface IIdentityUserRepository : IRepository<IdentityUser>
     {
+        new Task<IdentityUser> Add(IdentityUser identityUser);
+
         Task<bool> IsExistByPhoneNumber(string phoneNumber);
 
         Task<bool> IsInRole(int userId, string role);

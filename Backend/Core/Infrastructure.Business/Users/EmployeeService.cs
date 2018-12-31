@@ -38,19 +38,25 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
 
         public async Task<T> Create(string firstName, string lastName, string phoneNumber, int companyId)
         {
-            var result = await Create(firstName, lastName, phoneNumber);
-
             if (!await CompanyService.IsExist(companyId))
             {
                 throw new EntityNotFoundException($"Company with id = {companyId}, doesn't exist", "Company");
             }
 
+            var result = await Create(firstName, lastName, phoneNumber);
             result.CompanyId = companyId;
 
             await Repository.Update(result);
             await Repository.Save();
 
             return result;
+        }
+
+        public override Task<string[]> GetSpecificRoles()
+        {
+            var specificRoles = new string[] { UserRole.EmployeeRoleName };
+
+            return Task.FromResult(specificRoles);
         }
     }
 }

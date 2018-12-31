@@ -58,7 +58,7 @@ namespace TransportSystems.Backend.Application.Business.Booking
         public async Task<BookingRouteAM> CalculateBookingRoute(RouteAM route, CargoAM cargo, BasketAM requestBasket)
         {
             var rootAddress = RouteService.GetRootAddress(route);
-            var rootAddressTimeZone = await AddressService.GetTimeZoneByCoordinate(rootAddress);
+            var rootAddressTimeBelt = await AddressService.GetTimeBeltByAddress(rootAddress);
             var feedDistance = RouteService.GetFeedDistance(route);
             var totalDistance = RouteService.GetTotalDistance(route);
             var avgDeliveryTime = await PrognosisService.GetAvgDeliveryTime(route, cargo, requestBasket);
@@ -75,7 +75,7 @@ namespace TransportSystems.Backend.Application.Business.Booking
             return new BookingRouteAM
             {
                 RootAddress = rootAddress,
-                RootAddressTimeZone = rootAddressTimeZone,
+                RootAddressTimeBelt = rootAddressTimeBelt,
                 FeedDistance = feedDistance,
                 TotalDistance = totalDistance,
                 Bill = bill,

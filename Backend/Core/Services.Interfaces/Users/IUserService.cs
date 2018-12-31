@@ -7,12 +7,12 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Users
     {
         Task<T> Create(string firstName, string lastName, string phoneNumber);
 
-        IIdentityUserService IdentityUserService { get; }
-
         Task<T> GetByPhoneNumber(string phoneNumber);
 
         Task<T> GetByIndentityUser(int identityUserId);
 
         Task<bool> IsExistByIdentityUser(int identityUserId);
+
+        Task<string[]> GetSpecificRoles();
     }
 }

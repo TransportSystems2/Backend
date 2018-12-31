@@ -1,20 +1,23 @@
-﻿using Common.Models.Geolocation;
+﻿using Common.Models;
+using Common.Models.Geolocation;
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TransportSystems.Backend.Core.Domain.Core.Geo;
-using TransportSystems.Backend.Core.Services.Interfaces.Geo;
-using TransportSystems.Backend.External.Interfaces.Services;
-using TransportSystems.Backend.External.Models.Geo;
 using TransportSystems.Backend.Application.Business.Geo;
 using TransportSystems.Backend.Application.Interfaces.Geo;
 using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Application.UnitTests.Business.Suite;
+using TransportSystems.Backend.Core.Domain.Core.Geo;
+using TransportSystems.Backend.Core.Services.Interfaces.Geo;
+using TransportSystems.Backend.External.Interfaces.Services.Direction;
+using TransportSystems.Backend.External.Interfaces.Services.Geocoder;
+using TransportSystems.Backend.External.Interfaces.Services.Maps;
+using TransportSystems.Backend.External.Models.Geo;
 using Xunit;
 
 namespace TransportSystems.Backend.Application.UnitTests.Business.Geo
-{ 
+{
     public class ApplicationAddressServiceTestsSuite : TransactionTestsSuite
     {
         public ApplicationAddressServiceTestsSuite()
@@ -22,13 +25,15 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Geo
             DomainAddressServiceMock = new Mock<IAddressService>();
             DirectionServiceMock = new Mock<IDirectionService>();
             GeocoderServiceMock = new Mock<IGeocoderService>();
+            MapsServiceMock = new Mock<IMapsService>();
 
             AddressService = new ApplicationAddressService(
                 TransactionServiceMock.Object,
                 MappingService,
                 DomainAddressServiceMock.Object,
                 DirectionServiceMock.Object,
-                GeocoderServiceMock.Object);
+                GeocoderServiceMock.Object,
+                MapsServiceMock.Object);
         }
 
         public IApplicationAddressService AddressService { get; }
@@ -38,6 +43,8 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Geo
         public Mock<IDirectionService> DirectionServiceMock { get; }
 
         public Mock<IGeocoderService> GeocoderServiceMock { get; }
+
+        public Mock<IMapsService> MapsServiceMock { get; } 
     }
 
     public class ApplicationAddressServiceTests : BaseServiceTests<ApplicationAddressServiceTestsSuite>
@@ -422,6 +429,24 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Geo
             Assert.Equal(domainAddress.Longitude, ApplicationAddress.Longitude);
             Assert.Equal(domainAddress.FormattedText, ApplicationAddress.FormattedText);
             Assert.Equal(domainAddress.Request, ApplicationAddress.Request);
+        }
+
+        [Fact]
+        public async Task GetTimeBeltByAddress()
+        {
+            var address = new AddressAM { Latitude = 1, Longitude = 2 };
+            var timeBelt = new TimeBelt();
+
+            Suite.MapsServiceMock
+                .Setup(m => m.GetTimeBelt(
+                    It.Is<Coordinate>(
+                        c => c.Latitude.Equals(address.Latitude)
+                        && c.Longitude.Equals(address.Longitude))))
+                .ReturnsAsync(timeBelt);
+
+            var result = await Suite.AddressService.GetTimeBeltByAddress(address);
+
+            Assert.Equal(timeBelt, result);
         }
     }
 }

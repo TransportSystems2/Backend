@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.External.Business.Direction;
 using TransportSystems.Backend.External.Interfaces.Direction;
-using TransportSystems.Backend.External.Interfaces.Services;
+using TransportSystems.Backend.External.Interfaces.Services.Direction;
 using Xunit;
 
-namespace TransportSystems.Backend.External.UnitTests.Business
+namespace TransportSystems.Backend.External.UnitTests.Business.Direction
 {
     public class DirectionServiceTestSuite
     {

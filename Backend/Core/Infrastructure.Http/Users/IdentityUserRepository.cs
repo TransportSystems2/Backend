@@ -22,11 +22,17 @@ namespace TransportSystems.Backend.Core.Infrastructure.Http.Users
 
         protected IIdentityUsersAPI IdentityUsersAPI { get; }
 
-        public async Task Add(IdentityUser entity)
+        public async Task<IdentityUser> Add(IdentityUser entity)
         {
             var userModel = Mapper.Map<UserModel>(entity);
-            var createUserModel = await IdentityUsersAPI.Create(userModel);
-            entity.Id = createUserModel.Id;
+            var createdUserModel = await IdentityUsersAPI.Create(userModel);
+
+            return Mapper.Map<IdentityUser>(createdUserModel);
+        }
+
+        Task IRepository<IdentityUser>.Add(IdentityUser entity)
+        {
+            return Add(entity);
         }
 
         public async Task AddRange(params IdentityUser[] entities)
@@ -135,11 +141,6 @@ namespace TransportSystems.Backend.Core.Infrastructure.Http.Users
             var usersModel = await IdentityUsersAPI.GetAllAsync();
 
             return Mapper.Map<IEnumerable<UserModel>, ICollection<IdentityUser>>(usersModel);
-        }
-
-        public Task<ITransaction> BeginTransaction()
-        {
-            throw new NotImplementedException();
         }
     }
 }

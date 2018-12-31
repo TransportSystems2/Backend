@@ -88,6 +88,12 @@ using TransportSystems.Backend.Application.Interfaces.Routing;
 using TransportSystems.Backend.Application.Interfaces.Users;
 using TransportSystems.Backend.Identity.API;
 using TransportSystems.Backend.API.Database;
+using TransportSystems.Backend.External.Interfaces.Services.Direction;
+using TransportSystems.Backend.External.Interfaces.Services.Geocoder;
+using TransportSystems.Backend.External.Interfaces.Services.Maps;
+using TransportSystems.Backend.External.Business.Maps;
+using TransportSystems.Backend.External.Interfaces.Maps;
+using TransportSystems.Backend.External.Business.Maps.Providers;
 
 namespace TransportSystems.Backend.API
 {
@@ -263,7 +269,8 @@ namespace TransportSystems.Backend.API
 
             services.AddScoped<ICustomerService, CustomerService>();
 
-            var identityUsersAPI = IdentityUsersAPIFactory<IIdentityUsersAPI>.Create("http://localhost:61137");
+            var identityUri = Configuration.GetConnectionString("identity");
+            var identityUsersAPI = IdentityUsersAPIFactory<IIdentityUsersAPI>.Create(identityUri);
             services.AddSingleton(identityUsersAPI);
         }
 
@@ -288,15 +295,18 @@ namespace TransportSystems.Backend.API
         protected virtual void ConfigureExternalServices(IServiceCollection services)
         {
             services.AddScoped<IDirectionService, DirectionService>();
-            services.AddScoped<IDirectionAccessor>(sp => new DirectionAccessor(GetDirection));
+            services.AddScoped<IDirectionAccessor>(sp => new DirectionAccessor(GetDirectionProvider));
 
             services.AddScoped<IGeocoderService, GeocoderService>();
-            services.AddScoped<IGeocoderAccessor>(sp => new GeocoderAccessor(GetGeocoder));
+            services.AddScoped<IGeocoderAccessor>(sp => new GeocoderAccessor(GetGeocoderProvider));
+
+            services.AddScoped<IMapsService, MapsService>();
+            services.AddScoped<IMapsAccessor>(sp => new MapsAccessor(GetMapsProvider));
         }
 
-        protected IDirection GetDirection(ProviderKind arg)
+        protected IDirection GetDirectionProvider(ProviderKind kind)
         {
-            switch (arg)
+            switch (kind)
             {
                 case ProviderKind.Google:
                     {
@@ -307,9 +317,9 @@ namespace TransportSystems.Backend.API
             return new GoogleDirection();
         }
 
-        protected IGeocoder GetGeocoder(ProviderKind arg)
+        protected IGeocoder GetGeocoderProvider(ProviderKind kind)
         {
-            switch (arg)
+            switch (kind)
             {
                 case ProviderKind.Google:
                     {
@@ -328,6 +338,19 @@ namespace TransportSystems.Backend.API
             }
 
             return new GoogleGeocoder();
+        }
+
+        protected IMaps GetMapsProvider(ProviderKind kind)
+        {
+            switch (kind)
+            {
+                case ProviderKind.Google:
+                    {
+                        return new GoogleMaps();
+                    }
+            }
+
+            return new GoogleMaps();
         }
     }
 }

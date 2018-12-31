@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Domain.Interfaces.Users;
@@ -51,9 +52,15 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
             await Repository.Save();
         }
 
-        public override string[] GetSpecificRoles()
+        public override async Task<string[]> GetSpecificRoles()
         {
-            return new[] { UserRole.DriverRoleName, UserRole.EmployeeRoleName };
+            var baseSpecificRoles = await base.GetSpecificRoles();
+            var specificRoles = new List<string>(baseSpecificRoles)
+            {
+                UserRole.DriverRoleName
+            };
+
+            return specificRoles.ToArray();
         }
     }
 }

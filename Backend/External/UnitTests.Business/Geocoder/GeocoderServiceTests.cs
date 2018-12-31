@@ -1,15 +1,14 @@
 ﻿using Moq;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.External.Business.Geocoder;
 using TransportSystems.Backend.External.Interfaces.Geocoder;
-using TransportSystems.Backend.External.Interfaces.Services;
+using TransportSystems.Backend.External.Interfaces.Services.Geocoder;
 using TransportSystems.Backend.External.Models.Enums;
 using TransportSystems.Backend.External.Models.Geo;
 using Xunit;
 
-namespace TransportSystems.Backend.External.UnitTests.Business
+namespace TransportSystems.Backend.External.UnitTests.Business.Geocoder
 {
     public class GeocoderServiceTestSuite
     {
