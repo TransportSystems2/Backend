@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Common.Models;
-using Common.Models.Geolocation;
+using Common.Models.Units;
 using GoogleApi.Entities.Maps.TimeZone.Request;
 using TransportSystems.Backend.External.Interfaces.Exceptions;
 using TransportSystems.Backend.External.Interfaces.Maps;
@@ -12,7 +12,7 @@ namespace TransportSystems.Backend.External.Business.Maps.Providers
 {
     public class GoogleMaps : IMaps
     {
-        public ProviderKind Kind => throw new NotImplementedException();
+        public ProviderKind Kind => ProviderKind.Google;
 
         public async Task<TimeBelt> GetTimeBelt(Coordinate coordinate)
         {

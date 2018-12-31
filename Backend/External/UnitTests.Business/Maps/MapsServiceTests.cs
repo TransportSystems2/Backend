@@ -1,5 +1,5 @@
 ﻿using Common.Models;
-using Common.Models.Geolocation;
+using Common.Models.Units;
 using Moq;
 using System;
 using System.Threading.Tasks;

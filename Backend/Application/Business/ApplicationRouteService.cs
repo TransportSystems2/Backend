@@ -196,9 +196,8 @@ namespace TransportSystems.Backend.Application.Business
         public Task<TimeSpan> GetFeedDuration(RouteAM route)
         {
             var feedLeg = GetLeg(route, RouteLegKind.Feed);
-            var durationSeconds = feedLeg != null ? feedLeg.Duration : 0;
 
-            return Task.FromResult(TimeSpan.FromSeconds(durationSeconds));
+            return Task.FromResult(feedLeg.Duration);
         }
 
         public RouteLegAM GetLeg(RouteAM route, RouteLegKind legKind)

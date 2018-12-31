@@ -1,4 +1,4 @@
-﻿using Common.Models.Geolocation;
+﻿using Common.Models.Units;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
 using TransportSystems.Backend.Application.Models.Billing;

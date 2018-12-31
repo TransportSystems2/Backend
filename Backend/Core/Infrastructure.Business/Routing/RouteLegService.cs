@@ -27,7 +27,13 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Routing
 
         protected IAddressService AddressService { get; }
 
-        public async Task<RouteLeg> Create(int routeId, RouteLegKind kind, int startAddressId, int endAddressId, int duration, int distance)
+        public async Task<RouteLeg> Create(
+            int routeId,
+            RouteLegKind kind,
+            int startAddressId,
+            int endAddressId,
+            TimeSpan duration,
+            int distance)
         {
             var leg = new RouteLeg
             {
@@ -74,7 +80,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Routing
                 throw new EntityNotFoundException($"EndAddressId:{entity.EndAddressId} doesn't exist.", "EndAddress");
             }
 
-            if (entity.Duration <= 0)
+            if (entity.Duration.Ticks <= 0)
             {
                 throw new ArgumentException($"Duration can't be lower than or equal to Zero. Duration:{entity.Duration}", "Duration");
             }

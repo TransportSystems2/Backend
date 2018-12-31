@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Common.Models.Geolocation;
+using Common.Models.Units;
 using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Core.Services.Interfaces;

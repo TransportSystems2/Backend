@@ -1,4 +1,6 @@
-﻿namespace TransportSystems.Backend.Core.Domain.Core.Routing
+﻿using System;
+
+namespace TransportSystems.Backend.Core.Domain.Core.Routing
 {
     /// <summary>
     /// Leg of a route
@@ -29,10 +31,7 @@
 
         public int EndAddressId { get; set; }
 
-        /// <summary>
-        /// Seconds
-        /// </summary>
-        public int Duration { get; set; }
+        public TimeSpan Duration { get; set; }
 
         /// <summary>
         /// Metres

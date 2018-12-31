@@ -38,9 +38,9 @@ namespace TransportSystems.Backend.Application.Business.Prognosing
             var avgTradingTime = await GetAvgTradingTime(route, cargo, basket);
 
             var result = new TimeSpan();
-            result.Add(feedDurationTime);
-            result.Add(avgPreparationDriverTime);
-            result.Add(avgTradingTime);
+            result = result.Add(feedDurationTime);
+            result = result.Add(avgPreparationDriverTime);
+            result = result.Add(avgTradingTime);
 
             return result;
         }

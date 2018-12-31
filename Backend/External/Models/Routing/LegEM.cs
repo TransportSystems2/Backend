@@ -1,4 +1,5 @@
-﻿using Common.Models.Geolocation;
+﻿using Common.Models.Units;
+using System;
 
 namespace TransportSystems.Backend.External.Models.Routing
 {
@@ -8,10 +9,7 @@ namespace TransportSystems.Backend.External.Models.Routing
 
         public Coordinate EndCoordinate { get; set; }
 
-        /// <summary>
-        /// In seconds
-        /// </summary>
-        public int Duration { get; set; }
+        public TimeSpan Duration { get; set; }
 
         /// <summary>
         /// In meter

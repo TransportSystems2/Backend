@@ -37,13 +37,13 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Prognosing
             {
                 Legs =
                 {
-                    new RouteLegAM { Duration = 900, Kind = RouteLegKind.Feed }
+                    new RouteLegAM { Duration = TimeSpan.FromMinutes(17), Kind = RouteLegKind.Feed }
                 }
             };
 
             var cargo = new CargoAM();
             var basket = new BasketAM();
-            var feedDurationTimeSpan = TimeSpan.FromSeconds(route.Legs[0].Duration);
+            var feedDurationTimeSpan = route.Legs[0].Duration;
 
             Suite.RouteServiceMock
                 .Setup(m => m.GetFeedDuration(route))
@@ -52,9 +52,9 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Prognosing
             var result = await Suite.PrognosisService.GetAvgDeliveryTime(route, cargo, basket);
 
             var avgDeliveryTime = new TimeSpan();
-            avgDeliveryTime.Add(feedDurationTimeSpan);
-            avgDeliveryTime.Add(ApplicationPrognosisService.DefaultAvgPreparationDeiverTime);
-            avgDeliveryTime.Add(ApplicationPrognosisService.DefaultAvgTradingTime);
+            avgDeliveryTime = avgDeliveryTime.Add(feedDurationTimeSpan);
+            avgDeliveryTime = avgDeliveryTime.Add(ApplicationPrognosisService.DefaultAvgPreparationDeiverTime);
+            avgDeliveryTime = avgDeliveryTime.Add(ApplicationPrognosisService.DefaultAvgTradingTime);
 
             Assert.Equal(avgDeliveryTime, result);
         }
