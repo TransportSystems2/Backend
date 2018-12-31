@@ -12,7 +12,7 @@ namespace TransportSystems.Backend.External.Business.Maps.Providers
 {
     public class GoogleMaps : IMaps
     {
-        public ProviderKind Kind => throw new NotImplementedException();
+        public ProviderKind Kind => ProviderKind.Google;
 
         public async Task<TimeBelt> GetTimeBelt(Coordinate coordinate)
         {
