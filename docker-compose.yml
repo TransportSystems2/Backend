@@ -3,6 +3,8 @@ version: '2.1'
 services:
   reverseproxy:
     image: nginx:alpine
+    networks:
+      - gosevakuator_default
     ports:
       - "80:80"
       - "82:82"
@@ -12,6 +14,8 @@ services:
 
   db.postgres.core:
     image: postgres:alpine
+    networks:
+      - gosevakuator_default
     restart: always
     ports:
       - 5430:5432
@@ -28,6 +32,8 @@ services:
 
   db.postgres.identity:
     image: postgres:alpine
+    networks:
+      - gosevakuator_default
     restart: always
     ports:
       - 5432:5432
@@ -44,6 +50,8 @@ services:
 
   transportsystems.backend.api:
     image: transportsystemsbackendapi
+    networks:
+      - gosevakuator_default
     build:
       context: .
       dockerfile: Backend/API/src/Dockerfile
@@ -53,6 +61,8 @@ services:
 
   transportsystems.backend.identity.signin:
     image: transportsystemsbackendidentitysignin
+    networks:
+      - gosevakuator_default
     build:
       context: .
       dockerfile: Backend/Identity/Signin/Dockerfile
@@ -62,6 +72,8 @@ services:
 
   transportsystems.backend.identity.manage:
     image: transportsystemsbackendidentitymanage
+    networks:
+      - gosevakuator_default
     build:
       context: .
       dockerfile: Backend/Identity/Manage/Dockerfile
@@ -73,4 +85,7 @@ volumes:
   postgres-core-data:
     external: true
   postgres-identity-data:
+    external: true
+networks:
+  gosevakuator_default:
     external: true
