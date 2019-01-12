@@ -1,4 +1,6 @@
-﻿using TransportSystems.Backend.Core.Domain.Core.Users;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Domain.Interfaces.Users;
 using TransportSystems.Backend.Core.Services.Interfaces.Users;
 
@@ -15,9 +17,14 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
 
         protected new ICustomerRepository Repository => (ICustomerRepository)base.Repository;
 
-        public override string[] GetSpecificRoles()
+        public override Task<string[]> GetSpecificRoles()
         {
-            return new[] { UserRole.CustomerRoleName };
+            var specificRoles = new string[]
+            {
+                UserRole.CustomerRoleName
+            };
+
+            return Task.FromResult(specificRoles);
         }
     }
 }

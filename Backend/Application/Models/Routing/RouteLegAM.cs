@@ -1,5 +1,6 @@
 ﻿using TransportSystems.Backend.Core.Domain.Core.Routing;
 using TransportSystems.Backend.Application.Models.Geo;
+using System;
 
 namespace TransportSystems.Backend.Application.Models.Routing
 {
@@ -9,10 +10,7 @@ namespace TransportSystems.Backend.Application.Models.Routing
 
         public AddressAM EndAddress { get; set; }
 
-        /// <summary>
-        /// Seconds
-        /// </summary>
-        public int Duration { get; set; }
+        public TimeSpan Duration { get; set; }
 
         /// <summary>
         /// Metres

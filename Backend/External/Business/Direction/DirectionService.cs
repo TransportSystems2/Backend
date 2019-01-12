@@ -1,11 +1,11 @@
-﻿using Common.Models.Geolocation;
+﻿using Common.Models.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TransportSystems.Backend.External.Interfaces.Direction;
 using TransportSystems.Backend.External.Interfaces.Exceptions;
-using TransportSystems.Backend.External.Interfaces.Services;
+using TransportSystems.Backend.External.Interfaces.Services.Direction;
 using TransportSystems.Backend.External.Models.Enums;
 using TransportSystems.Backend.External.Models.Routing;
 
@@ -20,7 +20,7 @@ namespace TransportSystems.Backend.External.Business.Direction
 
         protected IDirectionAccessor ProviderAccessor { get; }
 
-        public ProviderKind[] DefaultProvidersKind { get => new[] { ProviderKind.Google }; }
+        public ProviderKind[] DefaultProvidersKind => new[] { ProviderKind.Google };
 
         public async Task<RouteEM> GetRoute(Coordinate origin, Coordinate destination, IEnumerable<Coordinate> waypoints, params ProviderKind[] providersKind)
         {
@@ -44,7 +44,7 @@ namespace TransportSystems.Backend.External.Business.Direction
                 }
             }
 
-            throw new DirectionException(Status.ZeroResults, "Route didn't found");
+            throw new ResponseStatusException(Status.ZeroResults, "Route didn't found");
         }
 
         public Task<ICollection<Coordinate>> GetNearestCoordinates(Coordinate originCoordinate, IEnumerable<Coordinate> coordinates, int maxResultCount = 5)
@@ -82,6 +82,5 @@ namespace TransportSystems.Backend.External.Business.Direction
 
             return Task.FromResult(result);
         }
-
     }
 }

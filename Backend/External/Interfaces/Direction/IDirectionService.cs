@@ -1,10 +1,10 @@
-﻿using Common.Models.Geolocation;
+﻿using Common.Models.Units;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.External.Models.Enums;
 using TransportSystems.Backend.External.Models.Routing;
 
-namespace TransportSystems.Backend.External.Interfaces.Services
+namespace TransportSystems.Backend.External.Interfaces.Services.Direction
 {
     public interface IDirectionService
     {

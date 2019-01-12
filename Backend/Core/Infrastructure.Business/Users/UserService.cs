@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Domain.Interfaces.Users;
+using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Users;
 
 namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
@@ -18,15 +18,24 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
 
         public IIdentityUserService IdentityUserService { get; }
 
-        public abstract string[] GetSpecificRoles();
+        public abstract Task<string[]> GetSpecificRoles();
 
         public async Task<T> Create(string firstName, string lastName, string phoneNumber)
         {
             var identityUser = await IdentityUserService.GetUserByPhoneNumber(phoneNumber);
-
             if (identityUser == null)
             {
                 identityUser = await IdentityUserService.Create(firstName, lastName, phoneNumber);
+            }
+
+            if (identityUser == null)
+            {
+                throw new EntityNotFoundException($"identityUser with phoneNumber {phoneNumber} not found");
+            }
+
+            if (await Repository.IsExistByIdentityUser(identityUser.Id))
+            {
+                throw new EntityAlreadyExistsException($"user with IdentityUserId {identityUser.Id} alredy exists");
             }
 
             if ((firstName != null) && (lastName != null))
@@ -34,13 +43,10 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
                 await IdentityUserService.AssignName(identityUser.Id, firstName, lastName);
             }
 
-            var specificRoles = GetSpecificRoles();
+            var specificRoles = await GetSpecificRoles();
             await IdentityUserService.AsignToRoles(identityUser.Id, specificRoles);
 
-            var result = new T
-            {
-                IdentityUserId = identityUser.Id,
-            };
+            var result = await Create(identityUser.Id);
 
             await Repository.Add(result);
             await Repository.Save();
@@ -71,9 +77,26 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
             return Repository.IsExistByIdentityUser(userIdnentity);
         }
 
-        protected override Task<bool> DoVerifyEntity(T entity)
+        protected async Task<T> Create(int identityUserId)
         {
-            throw new NotImplementedException();
+            var user =  new T
+            {
+                IdentityUserId = identityUserId,
+            };
+
+            await DoVerifyEntity(user);
+
+            return user;
+        }
+
+        protected override async Task<bool> DoVerifyEntity(T entity)
+        {
+            if (!await IdentityUserService.IsExistById(entity.IdentityUserId))
+            {
+                throw new EntityNotFoundException($"IdentityUser with id {entity.IdentityUserId} not found");
+            }
+
+            return true;
         }
     }
 }

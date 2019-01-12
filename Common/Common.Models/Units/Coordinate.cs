@@ -1,6 +1,6 @@
-﻿namespace Common.Models.Geolocation
+﻿namespace Common.Models.Units
 {
-    public class Coordinate
+    public struct Coordinate
     {
         public double Latitude { get; set; }
 

@@ -1,4 +1,4 @@
-﻿using Common.Models.Geolocation;
+﻿using Common.Models.Units;
 using GoogleApi.Entities.Common;
 
 namespace TransportSystems.Backend.External.Business.Extension

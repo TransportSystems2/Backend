@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-using System.Reflection;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,7 +8,33 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using System;
+using System.IO;
+using System.Reflection;
+using TransportSystems.Backend.API.Database;
 using TransportSystems.Backend.API.Mapping;
+using TransportSystems.Backend.Application.Business;
+using TransportSystems.Backend.Application.Business.Billing;
+using TransportSystems.Backend.Application.Business.Booking;
+using TransportSystems.Backend.Application.Business.Catalogs;
+using TransportSystems.Backend.Application.Business.Geo;
+using TransportSystems.Backend.Application.Business.Mapping;
+using TransportSystems.Backend.Application.Business.Ordering;
+using TransportSystems.Backend.Application.Business.Organization;
+using TransportSystems.Backend.Application.Business.Pricing;
+using TransportSystems.Backend.Application.Business.Prognosing;
+using TransportSystems.Backend.Application.Interfaces;
+using TransportSystems.Backend.Application.Interfaces.Billing;
+using TransportSystems.Backend.Application.Interfaces.Booking;
+using TransportSystems.Backend.Application.Interfaces.Catalogs;
+using TransportSystems.Backend.Application.Interfaces.Geo;
+using TransportSystems.Backend.Application.Interfaces.Mapping;
+using TransportSystems.Backend.Application.Interfaces.Ordering;
+using TransportSystems.Backend.Application.Interfaces.Organization;
+using TransportSystems.Backend.Application.Interfaces.Pricing;
+using TransportSystems.Backend.Application.Interfaces.Prognosing;
+using TransportSystems.Backend.Application.Interfaces.Routing;
+using TransportSystems.Backend.Application.Interfaces.Users;
 using TransportSystems.Backend.Core.Domain.Interfaces;
 using TransportSystems.Backend.Core.Domain.Interfaces.Billing;
 using TransportSystems.Backend.Core.Domain.Interfaces.Catalogs;
@@ -64,30 +87,16 @@ using TransportSystems.Backend.External.Business.Direction;
 using TransportSystems.Backend.External.Business.Direction.Providers;
 using TransportSystems.Backend.External.Business.Geocoder;
 using TransportSystems.Backend.External.Business.Geocoder.Providers;
+using TransportSystems.Backend.External.Business.Maps;
+using TransportSystems.Backend.External.Business.Maps.Providers;
 using TransportSystems.Backend.External.Interfaces.Direction;
 using TransportSystems.Backend.External.Interfaces.Geocoder;
-using TransportSystems.Backend.External.Interfaces.Services;
+using TransportSystems.Backend.External.Interfaces.Maps;
+using TransportSystems.Backend.External.Interfaces.Services.Direction;
+using TransportSystems.Backend.External.Interfaces.Services.Geocoder;
+using TransportSystems.Backend.External.Interfaces.Services.Maps;
 using TransportSystems.Backend.External.Models.Enums;
-using TransportSystems.Backend.Application.Business;
-using TransportSystems.Backend.Application.Business.Billing;
-using TransportSystems.Backend.Application.Business.Booking;
-using TransportSystems.Backend.Application.Business.Catalogs;
-using TransportSystems.Backend.Application.Business.Geo;
-using TransportSystems.Backend.Application.Business.Mapping;
-using TransportSystems.Backend.Application.Business.Organization;
-using TransportSystems.Backend.Application.Business.Pricing;
-using TransportSystems.Backend.Application.Interfaces;
-using TransportSystems.Backend.Application.Interfaces.Billing;
-using TransportSystems.Backend.Application.Interfaces.Booking;
-using TransportSystems.Backend.Application.Interfaces.Catalogs;
-using TransportSystems.Backend.Application.Interfaces.Geo;
-using TransportSystems.Backend.Application.Interfaces.Mapping;
-using TransportSystems.Backend.Application.Interfaces.Organization;
-using TransportSystems.Backend.Application.Interfaces.Pricing;
-using TransportSystems.Backend.Application.Interfaces.Routing;
-using TransportSystems.Backend.Application.Interfaces.Users;
 using TransportSystems.Backend.Identity.API;
-using TransportSystems.Backend.API.Database;
 
 namespace TransportSystems.Backend.API
 {
@@ -263,7 +272,8 @@ namespace TransportSystems.Backend.API
 
             services.AddScoped<ICustomerService, CustomerService>();
 
-            var identityUsersAPI = IdentityUsersAPIFactory<IIdentityUsersAPI>.Create("http://localhost:61137");
+            var identityUri = Configuration.GetConnectionString("identity");
+            var identityUsersAPI = IdentityUsersAPIFactory<IIdentityUsersAPI>.Create(identityUri);
             services.AddSingleton(identityUsersAPI);
         }
 
@@ -282,21 +292,26 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IApplicationCityService, ApplicationCityService>();
             services.AddScoped<IApplicationRouteService, ApplicationRouteService>();
             services.AddScoped<IApplicationOrderService, ApplicationOrderService>();
+            services.AddScoped<IApplicationOrderStateService, ApplicationOrderStateService>();
             services.AddScoped<IApplicationCustomerService, ApplicationCustomerService>();
+            services.AddScoped<IApplicationPrognosisService, ApplicationPrognosisService>();
         }
 
         protected virtual void ConfigureExternalServices(IServiceCollection services)
         {
             services.AddScoped<IDirectionService, DirectionService>();
-            services.AddScoped<IDirectionAccessor>(sp => new DirectionAccessor(GetDirection));
+            services.AddScoped<IDirectionAccessor>(sp => new DirectionAccessor(GetDirectionProvider));
 
             services.AddScoped<IGeocoderService, GeocoderService>();
-            services.AddScoped<IGeocoderAccessor>(sp => new GeocoderAccessor(GetGeocoder));
+            services.AddScoped<IGeocoderAccessor>(sp => new GeocoderAccessor(GetGeocoderProvider));
+
+            services.AddScoped<IMapsService, MapsService>();
+            services.AddScoped<IMapsAccessor>(sp => new MapsAccessor(GetMapsProvider));
         }
 
-        protected IDirection GetDirection(ProviderKind arg)
+        protected IDirection GetDirectionProvider(ProviderKind kind)
         {
-            switch (arg)
+            switch (kind)
             {
                 case ProviderKind.Google:
                     {
@@ -307,9 +322,9 @@ namespace TransportSystems.Backend.API
             return new GoogleDirection();
         }
 
-        protected IGeocoder GetGeocoder(ProviderKind arg)
+        protected IGeocoder GetGeocoderProvider(ProviderKind kind)
         {
-            switch (arg)
+            switch (kind)
             {
                 case ProviderKind.Google:
                     {
@@ -328,6 +343,19 @@ namespace TransportSystems.Backend.API
             }
 
             return new GoogleGeocoder();
+        }
+
+        protected IMaps GetMapsProvider(ProviderKind kind)
+        {
+            switch (kind)
+            {
+                case ProviderKind.Google:
+                    {
+                        return new GoogleMaps();
+                    }
+            }
+
+            return new GoogleMaps();
         }
     }
 }

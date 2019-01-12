@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.External.Interfaces.Geocoder;
-using TransportSystems.Backend.External.Interfaces.Services;
+using TransportSystems.Backend.External.Interfaces.Services.Geocoder;
 using TransportSystems.Backend.External.Models.Enums;
 using TransportSystems.Backend.External.Models.Geo;
 

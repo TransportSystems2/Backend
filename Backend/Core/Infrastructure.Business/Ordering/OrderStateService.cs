@@ -60,7 +60,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             }
 
             var currentState = await GetCurrentState(orderId);
-            if ((currentState != null) || (currentState.Status != OrderStatus.Canceled))
+            if ((currentState != null) && (currentState.Status != OrderStatus.Canceled))
             {
                 throw new OrderStatusException("Status the new can be set only to order without currentState or canceled status.");
             }

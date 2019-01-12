@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.Models;
+using System;
 using TransportSystems.Backend.Application.Models.Billing;
 using TransportSystems.Backend.Application.Models.Geo;
 
@@ -10,7 +11,7 @@ namespace TransportSystems.Backend.Application.Models.Booking
 
         public AddressAM RootAddress { get; set; }
 
-        public TimeZoneInfo RootAddressTimeZone { get; set; }
+        public TimeBelt RootAddressTimeBelt { get; set; }
 
         public int TotalDistance { get; set; }
 

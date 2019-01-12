@@ -1,4 +1,5 @@
-﻿using Common.Models.Geolocation;
+﻿using Common.Models;
+using Common.Models.Units;
 using Moq;
 using System;
 using System.Linq;
@@ -60,7 +61,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
                 Longitude = 22.2222
             };
 
-            var rootAddressTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
+            var rootAddressTimeBelt = new TimeBelt();
 
             var billInfo = new BillInfoAM
             {
@@ -91,9 +92,9 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
             {
                 Legs =
                 {
-                    new RouteLegAM { Kind = RouteLegKind.Feed, Distance = 3000, Duration = 1200 },
-                    new RouteLegAM { Kind = RouteLegKind.Transportation, Distance = 100000, Duration = 7200 },
-                    new RouteLegAM { Kind = RouteLegKind.WayBack, Distance = 103000, Duration = 8400 }
+                    new RouteLegAM { Kind = RouteLegKind.Feed, Distance = 3000, Duration = TimeSpan.FromMinutes(10) },
+                    new RouteLegAM { Kind = RouteLegKind.Transportation, Distance = 100000, Duration = TimeSpan.FromMinutes(600) },
+                    new RouteLegAM { Kind = RouteLegKind.WayBack, Distance = 103000, Duration = TimeSpan.FromMinutes(650) }
                 }
             };
 
@@ -117,8 +118,8 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
                 .Setup(m => m.GetTotalDistance(route))
                 .Returns(totalDistance);
             Suite.AddressServiceMock
-                .Setup(m => m.GetTimeZoneByCoordinate(rootAddress))
-                .ReturnsAsync(rootAddressTimeZone);
+                .Setup(m => m.GetTimeBeltByAddress(rootAddress))
+                .ReturnsAsync(rootAddressTimeBelt);
 
             Suite.BillServiceMock
                 .Setup(m => m.GetBillInfo(
@@ -134,7 +135,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
             var result = await Suite.BookingService.CalculateBookingRoute(route, cargo, basket);
 
             Assert.Equal(rootAddress, result.RootAddress);
-            Assert.Equal(rootAddressTimeZone, result.RootAddressTimeZone);
+            Assert.Equal(rootAddressTimeBelt, result.RootAddressTimeBelt);
             Assert.Equal(feedDistance, result.FeedDistance);
             Assert.Equal(avgDeliveryTime, result.AvgDeliveryTime);
             Assert.Equal(totalDistance, result.TotalDistance);
