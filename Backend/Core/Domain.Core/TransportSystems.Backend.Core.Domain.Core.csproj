@@ -6,4 +6,7 @@
   <ItemGroup>
     <Compile Remove="Transport\VehicleParameterKind.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Common.Models\Common.Models.csproj" />
+  </ItemGroup>
 </Project>
