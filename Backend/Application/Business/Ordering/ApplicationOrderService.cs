@@ -159,7 +159,7 @@ namespace TransportSystems.Backend.Application.Business
                 throw new AggregateException(exceptions);
             }
 
-            var orderedResult = result.OrderBy(o => o.AddedDate).ToList();
+            var orderedResult = result.OrderBy(o => o.Id).ToList();
 
             return orderedResult;
         }

@@ -123,8 +123,8 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             var domainOrders = new List<Order>
             {
                 new Order { Id = commonId++, CargoId = domainCargos[0].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 2, 11, 55, 3) },
-                new Order { Id = commonId++, CargoId = domainCargos[1].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 3, 12, 55, 3)  },
-                new Order { Id = commonId++, CargoId = domainCargos[2].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 4, 13, 55, 3)  }
+                new Order { Id = commonId++, CargoId = domainCargos[1].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 3, 12, 55, 3) },
+                new Order { Id = commonId++, CargoId = domainCargos[2].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 4, 13, 55, 3) }
             };
 
             var domainOrdersStates = new List<OrderState>
