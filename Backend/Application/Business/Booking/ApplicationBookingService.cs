@@ -49,6 +49,7 @@ namespace TransportSystems.Backend.Application.Business.Booking
 
             var possibleRoutes = await RouteService.GetPossibleRoutes(rootAddresses, request.Waypoints);
             var bookingRoutes = await GetBookingRoutes(possibleRoutes, request.Cargo, request.Basket);
+            bookingRoutes = bookingRoutes.OrderBy(b => b.Bill.TotalCost).ToList();
 
             result.Routes.AddRange(bookingRoutes);
 
@@ -67,7 +68,7 @@ namespace TransportSystems.Backend.Application.Business.Booking
 
             // клонируем т.к. количество километров для каждого маршрута - индивидуально, а параметром передается общий объект
             var basket = requestBasket.Clone() as BasketAM;
-            basket.KmValue = totalDistance;
+            basket.Distance = totalDistance;
 
             var bill = await BillService.CalculateBill(billInfo, basket);
             var title = $"{rootAddress.Locality} - {bill.TotalCost}₽";
@@ -86,8 +87,7 @@ namespace TransportSystems.Backend.Application.Business.Booking
 
         private async Task<ICollection<BookingRouteAM>> GetBookingRoutes(ICollection<RouteAM> possibleRoutes, CargoAM cargo, BasketAM basket)
         {
-            var result = new List<BookingRouteAM>();
-
+            var result = new ConcurrentBag<BookingRouteAM>();
             var exceptions = new ConcurrentQueue<Exception>();
 
             await possibleRoutes.ParallelForEachAsync(
@@ -110,7 +110,7 @@ namespace TransportSystems.Backend.Application.Business.Booking
                 throw new AggregateException(exceptions);
             }
 
-            return result;
+            return result.ToList();
         }
     }
 }

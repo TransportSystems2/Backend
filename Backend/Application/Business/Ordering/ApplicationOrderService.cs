@@ -85,7 +85,7 @@ namespace TransportSystems.Backend.Application.Business
 
         public async Task<ICollection<OrderGroupAM>> GetOrderGroupsByStatuses(OrderStatus[] statuses)
         {
-            var result = new List<OrderGroupAM>();
+            var result = new ConcurrentBag<OrderGroupAM>();
             var exceptions = new ConcurrentQueue<Exception>();
 
             await statuses.ParallelForEachAsync(
@@ -110,9 +110,9 @@ namespace TransportSystems.Backend.Application.Business
                 throw new AggregateException(exceptions);
             }
 
-            result = result.OrderBy(o => Array.IndexOf(statuses, o.Status)).ToList();
+            var orderedResult = result.OrderBy(o => Array.IndexOf(statuses, o.Status)).ToList();
 
-            return result;
+            return orderedResult;
         }
 
         public async Task<ICollection<Order>> GetDomainOrdersByStatus(OrderStatus status)
@@ -125,7 +125,7 @@ namespace TransportSystems.Backend.Application.Business
 
         public async Task<ICollection<OrderInfoAM>> GetOrdersByStatus(OrderStatus status)
         {
-            var result = new List<OrderInfoAM>();
+            var result = new ConcurrentBag<OrderInfoAM>();
             var exceptions = new ConcurrentQueue<Exception>();
 
             var domainOrders = await GetDomainOrdersByStatus(status);
@@ -159,9 +159,9 @@ namespace TransportSystems.Backend.Application.Business
                 throw new AggregateException(exceptions);
             }
 
-            result = result.OrderBy(o => o.AddedDate).ToList();
+            var orderedResult = result.OrderBy(o => o.AddedDate).ToList();
 
-            return result;
+            return orderedResult;
         }
     }
 }

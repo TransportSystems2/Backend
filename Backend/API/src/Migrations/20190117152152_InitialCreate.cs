@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace TransportSystems.Backend.API.Migrations
 {
-    public partial class initial : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -44,7 +44,7 @@ namespace TransportSystems.Backend.API.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     AddedDate = table.Column<DateTime>(nullable: false),
                     ModifiedDate = table.Column<DateTime>(nullable: false),
-                    KmValue = table.Column<int>(nullable: false),
+                    Distance_Meters = table.Column<double>(nullable: false),
                     LoadingValue = table.Column<int>(nullable: false),
                     LockedSteeringValue = table.Column<int>(nullable: false),
                     LockedWheelsValue = table.Column<int>(nullable: false),
@@ -396,7 +396,7 @@ namespace TransportSystems.Backend.API.Migrations
                     CatalogItemId = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     CommissionPercentage = table.Column<byte>(nullable: false),
-                    PerKm = table.Column<decimal>(nullable: false),
+                    PerMeter = table.Column<decimal>(nullable: false),
                     Loading = table.Column<decimal>(nullable: false),
                     LockedSteering = table.Column<decimal>(nullable: false),
                     LockedWheel = table.Column<decimal>(nullable: false),
@@ -420,7 +420,7 @@ namespace TransportSystems.Backend.API.Migrations
                     StartAddressId = table.Column<int>(nullable: false),
                     EndAddressId = table.Column<int>(nullable: false),
                     Duration = table.Column<TimeSpan>(nullable: false),
-                    Distance = table.Column<int>(nullable: false),
+                    Distance_Meters = table.Column<double>(nullable: false),
                     Kind = table.Column<int>(nullable: false)
                 },
                 constraints: table =>

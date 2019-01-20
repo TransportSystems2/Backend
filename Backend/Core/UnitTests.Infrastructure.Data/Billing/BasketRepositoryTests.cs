@@ -1,9 +1,7 @@
-﻿using System.Threading.Tasks;
-using TransportSystems.Backend.Core.Domain.Core.Billing;
+﻿using TransportSystems.Backend.Core.Domain.Core.Billing;
 using TransportSystems.Backend.Core.Domain.Interfaces.Billing;
 using TransportSystems.Backend.Core.Infrastructure.Database;
 using TransportSystems.Backend.Core.Infrastructure.Database.Billing;
-using Xunit;
 
 namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Data.Billing
 {

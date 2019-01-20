@@ -1,4 +1,5 @@
 ﻿using Common.Models.Units;
+using DotNetDistance;
 using System;
 
 namespace TransportSystems.Backend.External.Models.Routing
@@ -11,9 +12,6 @@ namespace TransportSystems.Backend.External.Models.Routing
 
         public TimeSpan Duration { get; set; }
 
-        /// <summary>
-        /// In meter
-        /// </summary>
-        public int Distance { get; set; }
+        public Distance Distance { get; set; }
     }
 }

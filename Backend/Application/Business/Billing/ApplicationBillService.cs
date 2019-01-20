@@ -56,9 +56,9 @@ namespace TransportSystems.Backend.Application.Business.Billing
                 Info = billInfo
             };
 
-            if (basket.KmValue > 0)
+            if (basket.Distance.ToMeters() > 0)
             {
-                var billItem = await CalculateBillItem(BillItem.KmBillKey, basket.KmValue, domainPrice.PerKm, billInfo.DegreeOfDifficulty);
+                var billItem = await CalculateBillItem(BillItem.MetersBillKey, (int)basket.Distance.ToMeters(), domainPrice.PerMeter, billInfo.DegreeOfDifficulty);
                 result.Items.Add(billItem);
             }
 
@@ -118,7 +118,7 @@ namespace TransportSystems.Backend.Application.Business.Billing
             var bill = await CalculateBill(billInfo, basket);
 
             var domainBasket = await DomainBasketService.Create(
-                basket.KmValue,
+                basket.Distance,
                 basket.LoadingValue,
                 basket.LockedSteeringValue,
                 basket.LockedWheelsValue,

@@ -51,7 +51,7 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Pricin
 
             var name = "some name";
             byte commissionPercentage = 10;
-            var perKm = 1m;
+            var perMeter = 1m;
             var loading = 2m;
             var lockedSteering = 3m;
             var lockedWheel = 4m;
@@ -79,7 +79,7 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Pricin
                 catalogItem.Id,
                 name,
                 commissionPercentage,
-                perKm,
+                perMeter,
                 loading,
                 lockedSteering,
                 lockedWheel,
@@ -92,7 +92,7 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Pricin
                     && p.CatalogItemId.Equals(catalogItem.Id)
                     && p.Name.Equals(name)
                     && p.CommissionPercentage.Equals(commissionPercentage)
-                    && p.PerKm.Equals(perKm)
+                    && p.PerMeter.Equals(perMeter)
                     && p.Loading.Equals(loading)
                     && p.LockedSteering.Equals(lockedSteering)
                     && p.LockedWheel.Equals(lockedWheel)
@@ -106,7 +106,7 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Pricin
             Assert.Equal(catalogItem.Id, result.CatalogItemId);
             Assert.Equal(name, result.Name);
             Assert.Equal(commissionPercentage, result.CommissionPercentage);
-            Assert.Equal(perKm, result.PerKm);
+            Assert.Equal(perMeter, result.PerMeter);
             Assert.Equal(loading, result.Loading);
             Assert.Equal(lockedSteering, result.LockedSteering);
             Assert.Equal(lockedWheel, result.LockedWheel);

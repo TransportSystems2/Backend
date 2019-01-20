@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="AsyncEnumerator" Version="2.2.1" />
     <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="DotNetDistance" Version="1.0.4" />
   </ItemGroup>
 
   <ItemGroup>

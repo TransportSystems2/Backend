@@ -13,9 +13,9 @@
         public byte CommissionPercentage { get; set; }
 
         /// <summary>
-        /// Транспортировка (км)
+        /// Транспортировка
         /// </summary>
-        public decimal PerKm { get; set; }
+        public decimal PerMeter { get; set; }
 
         /// <summary>
         /// Погрузка

@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using DotNetDistance;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -192,7 +193,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 },
                 Basket = new BasketAM
                 {
-                    KmValue = 200,
+                    Distance = Distance.FromKilometers(200),
                     DitchValue = 0,
                     LoadingValue = 1,
                     LockedWheelsValue = 2,

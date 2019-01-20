@@ -9,6 +9,10 @@
     <Folder Include="Ordering\" />
     <Folder Include="RegistrationNumber\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetDistance" Version="1.0.4" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Common.Extensions\Common.Extensions\Common.Extensions.csproj" />
     <ProjectReference Include="..\Domain.Core\TransportSystems.Backend.Core.Domain.Core.csproj" />

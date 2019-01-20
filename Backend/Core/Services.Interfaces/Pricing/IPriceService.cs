@@ -10,7 +10,7 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Pricing
             int catalogItemId,
             string name,
             byte commissionPercentage,
-            decimal perKm,
+            decimal perMeter,
             decimal loading,
             decimal lockedSteering,
             decimal lockedWheel,

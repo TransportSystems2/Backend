@@ -277,6 +277,7 @@ namespace TransportSystems.Backend.API
             services.AddSingleton(identityUsersAPI);
         }
 
+
         protected virtual void ConfigureApplications(IServiceCollection services)
         {
             services.AddScoped<IMappingService, ApplicationMappingService>();
