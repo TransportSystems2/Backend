@@ -1,5 +1,6 @@
 ﻿using Common.Models;
 using Common.Models.Units;
+using DotNetDistance;
 using Moq;
 using System;
 using System.Linq;
@@ -72,7 +73,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
 
             var basket = new BasketAM
             {
-                KmValue = 0,
+                Distance = Distance.FromKilometers(0),
                 LoadingValue = 1,
                 LockedSteeringValue = 0,
                 LockedWheelsValue = 3,
@@ -92,9 +93,9 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
             {
                 Legs =
                 {
-                    new RouteLegAM { Kind = RouteLegKind.Feed, Distance = 3000, Duration = TimeSpan.FromMinutes(10) },
-                    new RouteLegAM { Kind = RouteLegKind.Transportation, Distance = 100000, Duration = TimeSpan.FromMinutes(600) },
-                    new RouteLegAM { Kind = RouteLegKind.WayBack, Distance = 103000, Duration = TimeSpan.FromMinutes(650) }
+                    new RouteLegAM { Kind = RouteLegKind.Feed, Distance = Distance.FromKilometers(30), Duration = TimeSpan.FromMinutes(10) },
+                    new RouteLegAM { Kind = RouteLegKind.Transportation, Distance = Distance.FromKilometers(100), Duration = TimeSpan.FromMinutes(600) },
+                    new RouteLegAM { Kind = RouteLegKind.WayBack, Distance = Distance.FromKilometers(103), Duration = TimeSpan.FromMinutes(650) }
                 }
             };
 
@@ -129,7 +130,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
             Suite.BillServiceMock
                 .Setup(m => m.CalculateBill(
                     billInfo,
-                    It.Is<BasketAM>(b => (b != basket) && b.KmValue.Equals(totalDistance))))
+                    It.Is<BasketAM>(b => (b != basket) && b.Distance.Equals(totalDistance))))
                 .ReturnsAsync(bill);
 
             var result = await Suite.BookingService.CalculateBookingRoute(route, cargo, basket);

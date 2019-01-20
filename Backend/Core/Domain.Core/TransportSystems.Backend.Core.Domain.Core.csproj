@@ -6,4 +6,10 @@
   <ItemGroup>
     <Compile Remove="Transport\VehicleParameterKind.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DotNetDistance" Version="1.0.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Common.Models\Common.Models.csproj" />
+  </ItemGroup>
 </Project>

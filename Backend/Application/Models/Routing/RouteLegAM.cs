@@ -1,6 +1,7 @@
-﻿using TransportSystems.Backend.Core.Domain.Core.Routing;
-using TransportSystems.Backend.Application.Models.Geo;
+﻿using DotNetDistance;
 using System;
+using TransportSystems.Backend.Application.Models.Geo;
+using TransportSystems.Backend.Core.Domain.Core.Routing;
 
 namespace TransportSystems.Backend.Application.Models.Routing
 {
@@ -12,10 +13,7 @@ namespace TransportSystems.Backend.Application.Models.Routing
 
         public TimeSpan Duration { get; set; }
 
-        /// <summary>
-        /// Metres
-        /// </summary>
-        public int Distance { get; set; }
+        public Distance Distance { get; set; }
 
         public RouteLegKind Kind { get; set; }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Models.Units;
+using DotNetDistance;
 using GoogleApi;
 using GoogleApi.Entities.Common.Enums;
 using GoogleApi.Entities.Maps.Directions.Request;
@@ -53,7 +54,7 @@ namespace TransportSystems.Backend.External.Business.Direction.Providers
         {
             var result = new LegEM
             {
-                Distance = googleLeg.Distance.Value,
+                Distance = Distance.FromMeters(googleLeg.Distance.Value),
                 Duration = TimeSpan.FromSeconds(googleLeg.Duration.Value),
 
                 StartCoordinate = new Coordinate

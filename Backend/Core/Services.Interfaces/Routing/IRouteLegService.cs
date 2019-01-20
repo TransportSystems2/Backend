@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNetDistance;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Routing;
@@ -13,7 +14,7 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Routing
             int startAddressId,
             int endAddressId,
             TimeSpan duration,
-            int distance);
+            Distance distance);
 
         Task<ICollection<RouteLeg>> GetByRoute(int routeId, RouteLegKind kind);
     }

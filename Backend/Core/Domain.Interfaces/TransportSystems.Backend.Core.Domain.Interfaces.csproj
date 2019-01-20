@@ -12,4 +12,7 @@
     <Folder Include="Ordering\" />
     <Folder Include="Trading\" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DotNetDistance" Version="1.0.4" />
+  </ItemGroup>
 </Project>

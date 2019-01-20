@@ -139,7 +139,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.AP
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D4D76F89-9478-46F2-BE43-4A8A382F8D21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Extensions", "Common\Common.Extensions\Common.Extensions\Common.Extensions.csproj", "{1D60EB80-F793-48DD-8CCA-CDB520529470}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Extensions", "Common\Common.Extensions\Common.Extensions\Common.Extensions.csproj", "{1D60EB80-F793-48DD-8CCA-CDB520529470}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
