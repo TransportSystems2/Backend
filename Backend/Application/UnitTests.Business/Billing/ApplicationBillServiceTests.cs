@@ -13,6 +13,7 @@ using TransportSystems.Backend.Application.Interfaces.Pricing;
 using TransportSystems.Backend.Application.Models.Billing;
 using TransportSystems.Backend.Application.UnitTests.Business.Suite;
 using Xunit;
+using DotNetDistance;
 
 namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
 {
@@ -65,7 +66,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
             var basket = new BasketAM
             {
                 LockedWheelsValue = 1,
-                KmValue = 200,
+                Distance = Distance.FromKilometers(200),
                 DitchValue = 1,
                 LoadingValue = 1,
                 OverturnedValue = 1,
@@ -83,7 +84,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
             var domainPrice = new Price
             {
                 Id = billInfo.PriceId,
-                PerKm = 40,
+                PerMeter = 0.04m,
                 Loading = 900,
                 LockedSteering = 300,
                 LockedWheel = 400,
@@ -93,7 +94,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
 
             Suite.DomainBasketServiceMock
                 .Setup(m => m.Create(
-                    basket.KmValue,
+                    basket.Distance,
                     basket.LoadingValue,
                     basket.LockedSteeringValue,
                     basket.LockedWheelsValue,
@@ -117,14 +118,14 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
 
             var result = await Suite.BillService.CreateDomainBill(billInfo, basket);
 
-            var perKmPrice = domainPrice.PerKm * (decimal)billInfo.DegreeOfDifficulty;
-            var kmCost = basket.KmValue * perKmPrice;
+            var perMeterPrice = domainPrice.PerMeter * (decimal)billInfo.DegreeOfDifficulty;
+            var kmCost = (int)basket.Distance.ToMeters() * perMeterPrice;
             Suite.DomainBillItemServiceMock
                 .Verify(m => m.Create(
                     domainBill.Id,
-                    BillItem.KmBillKey,
-                    basket.KmValue,
-                    perKmPrice,
+                    BillItem.MetersBillKey,
+                    (int)basket.Distance.ToMeters(),
+                    perMeterPrice,
                     kmCost));
 
             var loadingPrice = domainPrice.Loading * (decimal)billInfo.DegreeOfDifficulty;
@@ -207,7 +208,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
             var domainPrice = new Price
             {
                 Id = 123,
-                PerKm = 40m,
+                PerMeter = 40m,
                 Loading = 900m,
                 LockedSteering = 400m,
                 LockedWheel = 300m,
@@ -225,7 +226,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
             var basket = new BasketAM
             {
                 LockedWheelsValue = 1,
-                KmValue = 200,
+                Distance = Distance.FromKilometers(200),
                 DitchValue = 1,
                 LoadingValue = 1,
                 OverturnedValue = 1,
@@ -242,11 +243,11 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
             Assert.Equal(6, result.Items.Count);
 
             var kmBillItem = result.Items[0];
-            var perKmPrice = domainPrice.PerKm * (decimal)billInfo.DegreeOfDifficulty;
-            var kmCost = basket.KmValue * perKmPrice;
-            Assert.Equal(BillItem.KmBillKey, kmBillItem.Key);
-            Assert.Equal(basket.KmValue, kmBillItem.Value);
-            Assert.Equal(perKmPrice, kmBillItem.Price);
+            var perMeterPrice = domainPrice.PerMeter * (decimal)billInfo.DegreeOfDifficulty;
+            var kmCost = (int)basket.Distance.ToMeters() * perMeterPrice;
+            Assert.Equal(BillItem.MetersBillKey, kmBillItem.Key);
+            Assert.Equal(basket.Distance.ToMeters(), kmBillItem.Value);
+            Assert.Equal(perMeterPrice, kmBillItem.Price);
             Assert.Equal(kmCost, kmBillItem.Cost);
 
             var loadingBillItem = result.Items[1];
@@ -294,12 +295,12 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
         }
 
         [Fact]
-        public async Task CalculateBillWhenInBasketOnlyKmAndLoading()
+        public async Task CalculateBillWhenInBasketOnlyMetersAndLoading()
         {
             var domainPrice = new Price
             {
                 Id = 123,
-                PerKm = 40m,
+                PerMeter = 40m,
                 Loading = 900m,
                 LockedSteering = 400m,
                 LockedWheel = 300m,
@@ -317,7 +318,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
             var basket = new BasketAM
             {
                 LockedWheelsValue = 0,
-                KmValue = 200,
+                Distance = Distance.FromKilometers(200),
                 LoadingValue = 1,
                 DitchValue = 0,
                 OverturnedValue = 0,

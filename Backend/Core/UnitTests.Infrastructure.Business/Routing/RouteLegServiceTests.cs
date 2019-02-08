@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using DotNetDistance;
+using Moq;
 using System;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Routing;
@@ -50,7 +51,7 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Routin
             var startAddressId = commonId++;
             var endAddressId = commonId++;
             var duration = TimeSpan.FromHours(1);
-            var distance = 10000;
+            var distance = Distance.FromKilometers(80);
 
             Suite.RouteServiceMock
                 .Setup(m => m.IsExist(routeId))

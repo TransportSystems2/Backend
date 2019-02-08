@@ -2,7 +2,7 @@
 {
     public class BillItem : BaseEntity
     {
-        public const string KmBillKey = "KmBill";
+        public const string MetersBillKey = "MetersBill";
         public const string LoadingBillKey = "LoadingBill";
         public const string LockedSteeringKey = "LockedSteeringBill";
         public const string LockedWheelsKey = "LockedWheelsBill";

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using DotNetDistance;
 using Microsoft.EntityFrameworkCore;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
 using TransportSystems.Backend.Core.Domain.Core.Catalogs;
@@ -76,6 +77,14 @@ namespace TransportSystems.Backend.Core.Infrastructure.Database
             var contextTransaction = await Database.BeginTransactionAsync();
 
             return new Transaction(contextTransaction);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Basket>().OwnsOne(typeof(Distance), "Distance");
+            modelBuilder.Entity<RouteLeg>().OwnsOne(typeof(Distance), "Distance");
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

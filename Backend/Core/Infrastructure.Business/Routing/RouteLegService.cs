@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNetDistance;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Routing;
@@ -33,7 +34,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Routing
             int startAddressId,
             int endAddressId,
             TimeSpan duration,
-            int distance)
+            Distance distance)
         {
             var leg = new RouteLeg
             {
@@ -85,7 +86,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Routing
                 throw new ArgumentException($"Duration can't be lower than or equal to Zero. Duration:{entity.Duration}", "Duration");
             }
 
-            if (entity.Distance <= 0)
+            if (entity.Distance.ToMeters() <= 0)
             {
                 throw new ArgumentException($"Distance can't be lower than or equal to Zero. Distance:{entity.Distance}", "Distance");
             }

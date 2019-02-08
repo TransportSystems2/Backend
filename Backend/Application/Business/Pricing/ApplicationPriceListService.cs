@@ -74,7 +74,7 @@ namespace TransportSystems.Backend.Application.Business.Pricing
                 price.CatalogItemId,
                 price.Name,
                 price.CommissionPercentage,
-                price.PerKm,
+                price.PerMeter,
                 price.Loading,
                 price.LockedSteering,
                 price.LockedWheel,
