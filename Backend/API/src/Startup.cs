@@ -203,13 +203,16 @@ namespace TransportSystems.Backend.API
 
         protected virtual void ConfigureApplicationContext(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("db"), b => b.MigrationsAssembly("TransportSystems.Backend.API")));
+            services.AddDbContext<ApplicationContext>(
+                options => options.UseNpgsql(Configuration.GetConnectionString("db"),
+                b => b.MigrationsAssembly("TransportSystems.Backend.API")));
         }
 
         protected virtual void ConfigureCustomRepositories(IServiceCollection services)
         {
-            services.AddScoped<IContext, ApplicationContext>();
+            services.AddScoped<IContext>(
+                provider => provider.GetService<ApplicationContext>()
+            );
 
             services.AddScoped<IIdentityUserRepository, IdentityUserRepository>();
             services.AddScoped<IModeratorRepository, ModeratorRepository>();
