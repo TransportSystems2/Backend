@@ -1,5 +1,6 @@
 language: csharp
 mono: none
+dist: xenial
 dotnet: 2.2
 install:
 - dotnet restore Backend/Core/UnitTests.Infrastructure.Business/
