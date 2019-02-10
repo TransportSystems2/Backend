@@ -2,12 +2,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Library</OutputType>
-        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
         <ApplicationIcon />
         <StartupObject />
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.1" />
+        <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Interfaces\TransportSystems.Backend.Identity.Core.Interfaces.csproj" />

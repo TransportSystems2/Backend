@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <ApplicationIcon />
     <StartupObject />
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Refit" Version="4.6.16" />
+    <PackageReference Include="Refit" Version="4.6.58" />
   </ItemGroup>
 
   <ItemGroup>
