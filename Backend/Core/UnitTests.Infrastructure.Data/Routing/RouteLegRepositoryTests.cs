@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Common.Models.Units;
+using System.Linq;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Routing;
 using TransportSystems.Backend.Core.Domain.Interfaces.Routing;
@@ -31,6 +32,7 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Data.Routing
 
             Assert.Equal(2, result.Count);
             Assert.Equal(3, result.ElementAt(0).Id);
+
             Assert.Equal(4, result.ElementAt(1).Id);
         }
 

@@ -1,13 +1,14 @@
-﻿using System;
+﻿using DotNetDistance;
+using System;
 
 namespace TransportSystems.Backend.Application.Models.Billing
 {
     public class BasketAM : BaseAM, ICloneable
     {
         /// <summary>
-        /// Протяженость маршрута (км)
+        /// Протяженость маршрута
         /// </summary>
-        public int KmValue { get; set; }
+        public Distance Distance { get; set; }
 
         /// <summary>
         /// Требуется погрузка
@@ -38,7 +39,7 @@ namespace TransportSystems.Backend.Application.Models.Billing
         {
             return new BasketAM
             {
-                KmValue = KmValue,
+                Distance = Distance,
                 LoadingValue = LoadingValue,
                 LockedSteeringValue = LockedSteeringValue,
                 LockedWheelsValue = LockedWheelsValue,

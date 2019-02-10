@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNetDistance;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Application.Models.Geo;
@@ -22,9 +23,9 @@ namespace TransportSystems.Backend.Application.Interfaces.Routing
 
         AddressAM GetRootAddress(RouteAM route);
 
-        int GetTotalDistance(RouteAM route);
+        Distance GetTotalDistance(RouteAM route);
 
-        int GetFeedDistance(RouteAM route);
+        Distance GetFeedDistance(RouteAM route);
 
         Task<TimeSpan> GetFeedDuration(RouteAM route);
     }

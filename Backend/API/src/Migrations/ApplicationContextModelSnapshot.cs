@@ -28,8 +28,6 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<int>("DitchValue");
 
-                    b.Property<int>("KmValue");
-
                     b.Property<int>("LoadingValue");
 
                     b.Property<int>("LockedSteeringValue");
@@ -314,7 +312,7 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<decimal>("Overturned");
 
-                    b.Property<decimal>("PerKm");
+                    b.Property<decimal>("PerMeter");
 
                     b.Property<int>("PricelistId");
 
@@ -359,8 +357,6 @@ namespace TransportSystems.Backend.API.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("AddedDate");
-
-                    b.Property<int>("Distance");
 
                     b.Property<TimeSpan>("Duration");
 
@@ -577,6 +573,40 @@ namespace TransportSystems.Backend.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Moderators");
+                });
+
+            modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Billing.Basket", b =>
+                {
+                    b.OwnsOne("DotNetDistance.Distance", "Distance", b1 =>
+                        {
+                            b1.Property<int>("BasketId");
+
+                            b1.Property<double>("Meters");
+
+                            b1.ToTable("Baskets");
+
+                            b1.HasOne("TransportSystems.Backend.Core.Domain.Core.Billing.Basket")
+                                .WithOne("Distance")
+                                .HasForeignKey("DotNetDistance.Distance", "BasketId")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+                });
+
+            modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Routing.RouteLeg", b =>
+                {
+                    b.OwnsOne("DotNetDistance.Distance", "Distance", b1 =>
+                        {
+                            b1.Property<int>("RouteLegId");
+
+                            b1.Property<double>("Meters");
+
+                            b1.ToTable("RouteLegs");
+
+                            b1.HasOne("TransportSystems.Backend.Core.Domain.Core.Routing.RouteLeg")
+                                .WithOne("Distance")
+                                .HasForeignKey("DotNetDistance.Distance", "RouteLegId")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
                 });
 #pragma warning restore 612, 618
         }

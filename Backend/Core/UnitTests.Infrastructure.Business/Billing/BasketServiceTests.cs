@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using DotNetDistance;
+using Moq;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
 using TransportSystems.Backend.Core.Domain.Interfaces.Billing;
@@ -35,7 +36,7 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Billin
         {
             var basket = new Basket
             {
-                KmValue = 762,
+                Distance = Distance.FromKilometers(762),
                 LoadingValue = 1,
                 LockedSteeringValue = 0,
                 LockedWheelsValue = 3,
@@ -44,7 +45,7 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Billin
             };
 
             var result = await Suite.BillService.Create(
-                basket.KmValue,
+                basket.Distance,
                 basket.LoadingValue,
                 basket.LockedSteeringValue,
                 basket.LockedWheelsValue,
@@ -53,7 +54,7 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Billin
 
             Suite.BillRepositoryMock
                 .Verify(m => m.Add(It.Is<Basket>(
-                    newBill => newBill.KmValue.Equals(basket.KmValue)
+                    newBill => newBill.Distance.Equals(basket.Distance)
                     && newBill.LoadingValue.Equals(basket.LoadingValue)
                     && newBill.LockedSteeringValue.Equals(basket.LockedSteeringValue)
                     && newBill.LockedWheelsValue.Equals(basket.LockedWheelsValue)
@@ -62,7 +63,7 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Billin
             Suite.BillRepositoryMock
                 .Verify(m => m.Save());
 
-            Assert.Equal(basket.KmValue, result.KmValue);
+            Assert.Equal(basket.Distance, result.Distance);
             Assert.Equal(basket.LoadingValue, result.LoadingValue);
             Assert.Equal(basket.LockedSteeringValue, result.LockedSteeringValue);
             Assert.Equal(basket.LockedWheelsValue, result.LockedWheelsValue);

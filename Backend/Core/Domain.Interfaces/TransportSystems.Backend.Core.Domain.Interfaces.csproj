@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,5 +11,8 @@
   <ItemGroup>
     <Folder Include="Ordering\" />
     <Folder Include="Trading\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DotNetDistance" Version="1.0.4" />
   </ItemGroup>
 </Project>

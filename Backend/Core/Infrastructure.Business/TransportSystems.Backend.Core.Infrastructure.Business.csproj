@@ -2,12 +2,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Ordering\" />
     <Folder Include="RegistrationNumber\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetDistance" Version="1.0.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Common.Extensions\Common.Extensions\Common.Extensions.csproj" />

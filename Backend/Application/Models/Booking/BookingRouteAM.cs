@@ -1,4 +1,5 @@
 ﻿using Common.Models;
+using DotNetDistance;
 using System;
 using TransportSystems.Backend.Application.Models.Billing;
 using TransportSystems.Backend.Application.Models.Geo;
@@ -13,9 +14,9 @@ namespace TransportSystems.Backend.Application.Models.Booking
 
         public TimeBelt RootAddressTimeBelt { get; set; }
 
-        public int TotalDistance { get; set; }
+        public Distance TotalDistance { get; set; }
 
-        public int FeedDistance { get; set; }
+        public Distance FeedDistance { get; set; }
 
         public TimeSpan AvgDeliveryTime { get; set; }
 

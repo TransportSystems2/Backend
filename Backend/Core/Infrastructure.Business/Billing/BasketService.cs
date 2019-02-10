@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNetDistance;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
@@ -22,7 +23,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Billing
         protected new IBasketRepository Repository => base.Repository as IBasketRepository;
 
         public async Task<Basket> Create(
-            int kmValue,
+            Distance distance,
             int loadingValue,
             int lockedSteeringValue,
             int lockedWheelsValue,
@@ -31,7 +32,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Billing
         {
             var basket = new Basket
             {
-                KmValue = kmValue,
+                Distance = distance,
                 LoadingValue = loadingValue,
                 LockedSteeringValue = lockedSteeringValue,
                 LockedWheelsValue = lockedWheelsValue,

@@ -1,19 +1,20 @@
-﻿using System;
+﻿using DotNetDistance;
+using System;
 using System.Collections.Async;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TransportSystems.Backend.Core.Domain.Core.Routing;
-using TransportSystems.Backend.Core.Services.Interfaces;
-using TransportSystems.Backend.Core.Services.Interfaces.Routing;
-using TransportSystems.Backend.External.Models.Routing;
 using TransportSystems.Backend.Application.Business.Geo;
 using TransportSystems.Backend.Application.Interfaces.Geo;
 using TransportSystems.Backend.Application.Interfaces.Routing;
 using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Application.Models.Routing;
+using TransportSystems.Backend.Core.Domain.Core.Routing;
+using TransportSystems.Backend.Core.Services.Interfaces;
+using TransportSystems.Backend.Core.Services.Interfaces.Routing;
 using TransportSystems.Backend.External.Interfaces.Services.Direction;
+using TransportSystems.Backend.External.Models.Routing;
 
 namespace TransportSystems.Backend.Application.Business
 {
@@ -66,7 +67,7 @@ namespace TransportSystems.Backend.Application.Business
         {
             var exceptions = new ConcurrentQueue<Exception>();
 
-            var result = new List<RouteAM>();
+            var result = new ConcurrentBag<RouteAM>();
 
             await rootAddresses.ParallelForEachAsync(
                 async rootAddress =>
@@ -91,7 +92,7 @@ namespace TransportSystems.Backend.Application.Business
                 throw new AggregateException(exceptions);
             }
 
-            return result;
+            return result.ToList();
         }
 
         public async Task<RouteAM> GetRoute(AddressAM rootAddress, WaypointsAM waypoints)
@@ -180,15 +181,15 @@ namespace TransportSystems.Backend.Application.Business
             return GetLeg(route, RouteLegKind.Feed)?.StartAddress;
         }
 
-        public int GetTotalDistance(RouteAM route)
+        public Distance GetTotalDistance(RouteAM route)
         {
             return route.Legs.Select(l => l.Distance).Sum();
         }
 
-        public int GetFeedDistance(RouteAM route)
+        public Distance GetFeedDistance(RouteAM route)
         {
             var feedLeg = GetLeg(route, RouteLegKind.Feed);
-            var result = feedLeg != null ? feedLeg.Distance : 0;
+            var result = feedLeg != null ? feedLeg.Distance : Distance.FromMeters(0);
 
             return result;
         }
