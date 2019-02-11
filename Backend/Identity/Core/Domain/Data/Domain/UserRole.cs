@@ -8,9 +8,9 @@ namespace TransportSystems.Backend.Identity.Core.Data.Domain
 
         public const string UserRoleName = "user";
 
-        public const string ModeratorRoleName = "Moderator";
+        public const string ModeratorRoleName = "moderator";
 
-        public const string DispatcherRoleName = "Dispatcher";
+        public const string DispatcherRoleName = "dispatcher";
 
         public const string DriverRoleName = "driver";
 
