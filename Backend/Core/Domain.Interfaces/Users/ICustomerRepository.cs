@@ -2,7 +2,7 @@
 
 namespace TransportSystems.Backend.Core.Domain.Interfaces.Users
 {
-    public interface ICustomerRepository : IUserRepository<Customer>
+    public interface ICustomerRepository : IEmployeeRepository<Customer>
     {
     }
 }
