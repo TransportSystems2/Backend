@@ -1,5 +1,4 @@
-﻿using System.Data;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using DotNetDistance;
 using Microsoft.EntityFrameworkCore;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
