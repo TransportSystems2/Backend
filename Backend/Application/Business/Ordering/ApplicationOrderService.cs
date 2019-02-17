@@ -26,7 +26,8 @@ namespace TransportSystems.Backend.Application.Business
             IApplicationCargoService cargoService,
             IApplicationRouteService routeService,
             IApplicationCustomerService customerService,
-            IApplicationBillService billService)
+            IApplicationBillService billService,
+            IApplicationOrderValidatorService validatorService)
             : base(transactionService)
         {
             DomainOrderService = domainOrderService;
@@ -35,6 +36,7 @@ namespace TransportSystems.Backend.Application.Business
             RouteService = routeService;
             CustomerService = customerService;
             BillService = billService;
+            ValidatorService = validatorService;
         }
 
         protected IOrderService DomainOrderService { get; }
@@ -49,6 +51,8 @@ namespace TransportSystems.Backend.Application.Business
 
         protected IApplicationBillService BillService { get; }
 
+        protected IApplicationOrderValidatorService ValidatorService { get; }
+
         public async Task<Order> CreateOrder(BookingAM booking)
         {
             using (var transaction = await TransactionService.BeginTransaction())
@@ -57,10 +61,14 @@ namespace TransportSystems.Backend.Application.Business
                 {
                     var domainCustomer = await CustomerService.GetDomainCustomer(booking.Customer);
                     var domainCargo = await CargoService.CreateDomainCargo(booking.Cargo);
-                    var domainBill = await BillService.CreateDomainBill(booking.BillInfo, booking.Basket);
 
-                    var route = await RouteService.GetRoute(booking.RootAddress, booking.Waypoints);
-                    var domainRoute = await RouteService.CreateDomainRoute(route);
+                    var orderRoute = await RouteService.GetRoute(booking.RootAddress, booking.Waypoints);
+                    var orderBill = await BillService.CalculateBill(booking.Bill.Info, booking.Bill.Basket);
+
+                    await ValidatorService.Validate(booking, orderRoute, orderBill);
+
+                    var domainRoute = await RouteService.CreateDomainRoute(orderRoute);
+                    var domainBill = await BillService.CreateDomainBill(orderBill);
 
                     var result = await DomainOrderService.Create(
                         booking.TimeOfDelivery,
