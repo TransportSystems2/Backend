@@ -69,10 +69,6 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Ordering
 
             var orderBill = new BillAM
             {
-                Basket = new BasketAM
-                {
-                    Distance = Distance.FromKilometers(70)
-                },
                 TotalCost = 10000
             };
 
