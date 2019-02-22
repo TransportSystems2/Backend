@@ -13,6 +13,7 @@ using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Application.Models.Pricing;
 using TransportSystems.Backend.Application.UnitTests.Business.Suite;
 using Xunit;
+using TransportSystems.Backend.Core.Domain.Core.Catalogs;
 
 namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
 {
@@ -57,6 +58,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
                 Longitude = 22.2222
             };
 
+            var pricelistBlank = new PricelistAM();
             var domainAddress = new Address { Id = commonId++ };
             var domainPricelist = new Pricelist { Id = commonId++ };
 
@@ -66,7 +68,10 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
                 .Setup(m => m.CreateDomainAddress(AddressKind.City, address))
                 .ReturnsAsync(domainAddress);
             Suite.PricelistServiceMock
-                .Setup(m => m.CreateDomainPricelist())
+                .Setup(m => m.GetPricelistBlank(CatalogKind.Cargo, CatalogItemKind.Weight, true))
+                .ReturnsAsync(pricelistBlank);
+            Suite.PricelistServiceMock
+                .Setup(m => m.CreateDomainPricelist(pricelistBlank))
                 .ReturnsAsync(domainPricelist);
 
             var result = await Suite.CityService.CreateDomainCity(domain, address);

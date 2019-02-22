@@ -41,7 +41,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Pricing
     public class ApplicationPricelistServiceTests : BaseServiceTests<PricelistServiceTestsTestsSuite>
     {
         [Fact]
-        public async Task CreatePricelistBlank()
+        public async Task GetPricelistBlankWithDefaultPrices()
         {
             var catalogKind = CatalogKind.Cargo;
             var catalogItemKind = CatalogItemKind.Weight;
@@ -68,7 +68,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Pricing
                 .Setup(m => m.GetCatalogItems(catalogKind, catalogItemKind))
                 .ReturnsAsync(catalogItems);
 
-            var result = await Suite.PricelistService.CreatePricelistBlank();
+            var result = await Suite.PricelistService.GetPricelistBlank(catalogKind, catalogItemKind, true);
 
             Assert.Equal(catalogItems.Count, result.Items.Count);
 
@@ -78,11 +78,16 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Pricing
                 Assert.Equal(catalog.Id, price.CatalogItemId);
                 Assert.Equal(catalog.Name, price.Name);
                 Assert.Equal(Price.DefaultComissionPercentage, price.CommissionPercentage);
+                Assert.Equal(Price.DefaultPerMeterPrice, price.PerMeter);
+                Assert.Equal(Price.DefaultLockedSteeringPrice, price.LockedSteering);
+                Assert.Equal(Price.DefaultLockedWheelPrice, price.LockedWheel);
+                Assert.Equal(Price.DefaultOverturnedPrice, price.Overturned);
+                Assert.Equal(Price.DefaultDitchPrice, price.Ditch);
             }
         }
 
         [Fact]
-        public async Task CreatePricelist()
+        public async Task CreateDomainPricelist()
         {
             var catalogKind = CatalogKind.Cargo;
             var catalogItemKind = CatalogItemKind.Weight;
@@ -124,7 +129,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Pricing
                 .Setup(m => m.Create())
                 .ReturnsAsync(domainPricelist);
 
-            var result = await Suite.PricelistService.CreateDomainPricelist();
+            var result = await Suite.PricelistService.CreateDomainPricelist(pricelist);
 
             Suite.DomainPriceServiceMock
                 .Verify(
@@ -140,6 +145,20 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Pricing
                         It.IsAny<decimal>(),
                         It.IsAny<decimal>()),
                     Times.Exactly(pricelist.Items.Count));
+        }
+
+        [Fact]
+        public void FillPricesByDefault()
+        {
+            var price = new PriceAM();
+
+            Suite.PricelistService.FillPricesByDefault(price);
+
+            Assert.Equal(Price.DefaultPerMeterPrice, price.PerMeter);
+            Assert.Equal(Price.DefaultLockedSteeringPrice, price.LockedSteering);
+            Assert.Equal(Price.DefaultLockedWheelPrice, price.LockedWheel);
+            Assert.Equal(Price.DefaultOverturnedPrice, price.Overturned);
+            Assert.Equal(Price.DefaultDitchPrice, price.Ditch);
         }
 
         [Fact]

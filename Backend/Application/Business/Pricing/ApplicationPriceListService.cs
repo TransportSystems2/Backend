@@ -31,9 +31,10 @@ namespace TransportSystems.Backend.Application.Business.Pricing
 
         protected IApplicationCatalogService CatalogService { get; }
 
-        public async Task<PricelistAM> CreatePricelistBlank(
+        public async Task<PricelistAM> GetPricelistBlank(
             CatalogKind catalogKind = CatalogKind.Cargo,
-            CatalogItemKind catalogItemKind = CatalogItemKind.Weight)
+            CatalogItemKind catalogItemKind = CatalogItemKind.Weight,
+            bool withDefaultPrices = true)
         {
             var catalogItems = await CatalogService.GetCatalogItems(catalogKind, catalogItemKind);
 
@@ -48,18 +49,32 @@ namespace TransportSystems.Backend.Application.Business.Pricing
                     Name = catalogItem.Name
                 };
 
+                if (withDefaultPrices)
+                {
+                    FillPricesByDefault(price);
+                }
+
                 result.Items.Add(price);
             }
 
             return result;
         }
 
-        public async Task<Pricelist> CreateDomainPricelist()
+        public void FillPricesByDefault(PriceAM price)
         {
-            var pricelistBlank = await CreatePricelistBlank();
+            price.PerMeter = Price.DefaultPerMeterPrice;
+            price.Loading = Price.DefaultLoadingPrice;
+            price.LockedSteering = Price.DefaultLockedSteeringPrice;
+            price.LockedWheel = Price.DefaultLockedWheelPrice;
+            price.Overturned = Price.DefaultOverturnedPrice;
+            price.Ditch = Price.DefaultDitchPrice;
+        }
+
+        public async Task<Pricelist> CreateDomainPricelist(PricelistAM pricelist)
+        {
             var result = await DomainPricelistService.Create();
 
-            foreach (var price in pricelistBlank.Items)
+            foreach (var price in pricelist.Items)
             {
                 await CreateDomainPrice(result.Id, price);
             }
