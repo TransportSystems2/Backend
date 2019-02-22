@@ -37,6 +37,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             RouteServiceMock = new Mock<IApplicationRouteService>();
             CustomerServiceMock = new Mock<IApplicationCustomerService>();
             BillServiceMock = new Mock<IApplicationBillService>();
+            OrderValidatorServiceMock = new Mock<IApplicationOrderValidatorService>();
 
             OrderService = new ApplicationOrderService(
                 TransactionServiceMock.Object,
@@ -45,7 +46,8 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 CargoServiceMock.Object,
                 RouteServiceMock.Object,
                 CustomerServiceMock.Object,
-                BillServiceMock.Object);
+                BillServiceMock.Object,
+                OrderValidatorServiceMock.Object);
         }
 
         public IApplicationOrderService OrderService { get; }
@@ -61,6 +63,8 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
         public Mock<IApplicationCustomerService> CustomerServiceMock { get; }
 
         public Mock<IApplicationBillService> BillServiceMock { get; }
+
+        public Mock<IApplicationOrderValidatorService> OrderValidatorServiceMock { get; }
     }
 
     public class ApplicationOrderServiceTests : BaseServiceTests<ApplicationOrderServiceTestSuite>
@@ -180,25 +184,28 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                     Latitude = 11.2222,
                     Longitude = 22.3333
                 },
-                BillInfo = new BillInfoAM
+                Bill = new BillAM
                 {
-                    PriceId = commonId++,
-                    CommissionPercentage = 10,
-                    DegreeOfDifficulty = 1
+                    Info = new BillInfoAM
+                    {
+                        PriceId = commonId++,
+                        CommissionPercentage = 10,
+                        DegreeOfDifficulty = 1
+                    },
+                    Basket = new BasketAM
+                    {
+                        Distance = Distance.FromKilometers(200),
+                        DitchValue = 0,
+                        LoadingValue = 1,
+                        LockedWheelsValue = 2,
+                        LockedSteeringValue = 1,
+                        OverturnedValue = 0
+                    }
                 },
                 Customer = new CustomerAM
                 {
                     PhoneNumber = "79101112233",
                     FirstName = "Генадий"
-                },
-                Basket = new BasketAM
-                {
-                    Distance = Distance.FromKilometers(200),
-                    DitchValue = 0,
-                    LoadingValue = 1,
-                    LockedWheelsValue = 2,
-                    LockedSteeringValue = 1,
-                    OverturnedValue = 0
                 },
                 Cargo = new CargoAM
                 {
@@ -220,6 +227,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             };
 
             var route = new RouteAM();
+            var bill = new BillAM();
             var domainRoute = new Route { Id = commonId++ };
             var domainCustomer = new Customer { Id = commonId++ };
             var domainCargo = new Cargo { Id = commonId++ };
@@ -239,8 +247,12 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 .Setup(m => m.CreateDomainRoute(route))
                 .ReturnsAsync(domainRoute);
             Suite.BillServiceMock
-                .Setup(m => m.CreateDomainBill(booking.BillInfo, booking.Basket))
+                .Setup(m => m.CalculateBill(booking.Bill.Info, booking.Bill.Basket))
+                .ReturnsAsync(bill);
+            Suite.BillServiceMock
+                .Setup(m => m.CreateDomainBill(bill))
                 .ReturnsAsync(domainBill);
+
             Suite.DomainOrderServiceMock
                 .Setup(m => m.Create(booking.TimeOfDelivery,
                     domainCustomer.Id,
@@ -253,6 +265,9 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
 
             Suite.OrderStateServiceMock
                 .Verify(m => m.New(domainOrder.Id));
+            Suite.OrderValidatorServiceMock
+                .Verify(m => m.Validate(booking, route, bill));
+            
             Assert.Equal(domainOrder, result);
         }
     }
