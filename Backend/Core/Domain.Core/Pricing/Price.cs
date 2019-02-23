@@ -3,6 +3,12 @@
     public class Price : BaseEntity
     {
         public const byte DefaultComissionPercentage = 10;
+        public const decimal DefaultPerMeterPrice = 0.04m;
+        public const decimal DefaultLoadingPrice = 900m;
+        public const decimal DefaultLockedSteeringPrice = 300m;
+        public const decimal DefaultLockedWheelPrice = 500m;
+        public const decimal DefaultOverturnedPrice = 1500m;
+        public const decimal DefaultDitchPrice = 1000m;
 
         public int PricelistId { get; set; }
 
