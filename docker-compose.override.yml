@@ -1,6 +1,14 @@
 version: '2.1'
 
 services:
+  db.postgres.core:
+    ports:
+      - 5430:5432
+
+  db.postgres.identity:
+    ports:
+      - 5432:5432
+      
   transportsystems.backend.identity.signin:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
