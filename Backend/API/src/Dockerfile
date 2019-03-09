@@ -2,6 +2,10 @@
 #For more information, please see https://aka.ms/containercompat
 
 FROM microsoft/dotnet:2.2-aspnetcore-runtime AS base
+RUN apt-get update \ 
+    && apt-get install -y --no-install-recommends \
+    && apt-get install zip unzip procps -y
+RUN curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l ~/vsdbg
 WORKDIR /app
 EXPOSE 80
 
@@ -27,10 +31,12 @@ COPY ["Backend/External/Business/TransportSystems.Backend.External.Business.cspr
 RUN dotnet restore "Backend/API/src/TransportSystems.Backend.API.csproj"
 COPY . .
 WORKDIR "/src/Backend/API/src"
-RUN dotnet build "TransportSystems.Backend.API.csproj" -c Release -o /app
+ARG buildconfig
+RUN dotnet build "TransportSystems.Backend.API.csproj" -c "$buildconfig" -o /app
 
 FROM build AS publish
-RUN dotnet publish "TransportSystems.Backend.API.csproj" -c Release -o /app
+ARG buildconfig
+RUN dotnet publish "TransportSystems.Backend.API.csproj" -c "$buildconfig" -o /app
 
 FROM base AS final
 WORKDIR /app

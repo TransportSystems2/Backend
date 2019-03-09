@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3.7'
 
 services:
   reverseproxy:
@@ -39,27 +39,30 @@ services:
 
   transportsystems.backend.api:
     build:
+      args:
+        buildconfig: Release
       context: .
       dockerfile: Backend/API/src/Dockerfile
     depends_on:
-      db.postgres.core:
-        condition: service_healthy
+      - db.postgres.core
 
   transportsystems.backend.identity.signin:
     build:
+      args:
+        buildconfig: Release
       context: .
       dockerfile: Backend/Identity/Signin/Dockerfile
     depends_on:
-      db.postgres.identity:
-        condition: service_healthy
+      - db.postgres.identity
 
   transportsystems.backend.identity.manage:
     build:
+      args:
+        buildconfig: Release
       context: .
       dockerfile: Backend/Identity/Manage/Dockerfile
     depends_on:
-      db.postgres.identity:
-        condition: service_healthy
+      - db.postgres.identity
 
 volumes:
   postgres-core-data:

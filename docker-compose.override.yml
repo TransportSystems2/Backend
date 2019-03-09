@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3.7'
 
 services:
   db.postgres.core:
@@ -10,12 +10,18 @@ services:
       - 5432:5432
       
   transportsystems.backend.identity.signin:
+    build:
+      args:
+        buildconfig: Debug
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "80"
 
   transportsystems.backend.api:
+    build:
+      args:
+        buildconfig: Debug
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
@@ -23,6 +29,9 @@ services:
 
 
   transportsystems.backend.identity.manage:
+    build:
+      args:
+        buildconfig: Debug
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
