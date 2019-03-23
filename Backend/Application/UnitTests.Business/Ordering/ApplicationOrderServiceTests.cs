@@ -23,6 +23,7 @@ using TransportSystems.Backend.Core.Domain.Core.Routing;
 using TransportSystems.Backend.Core.Domain.Core.Transport;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Services.Interfaces.Interfaces;
+using TransportSystems.Backend.Core.Services.Interfaces.Ordering;
 using Xunit;
 
 namespace TransportSystems.Backend.Application.UnitTests.Business
@@ -32,7 +33,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
         public ApplicationOrderServiceTestSuite()
         {
             DomainOrderServiceMock = new Mock<IOrderService>();
-            OrderStateServiceMock = new Mock<IApplicationOrderStateService>();
+            DomainOrderStateServiceMock = new Mock<IOrderStateService>();
             CargoServiceMock = new Mock<IApplicationCargoService>();
             RouteServiceMock = new Mock<IApplicationRouteService>();
             CustomerServiceMock = new Mock<IApplicationCustomerService>();
@@ -42,7 +43,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             OrderService = new ApplicationOrderService(
                 TransactionServiceMock.Object,
                 DomainOrderServiceMock.Object,
-                OrderStateServiceMock.Object,
+                DomainOrderStateServiceMock.Object,
                 CargoServiceMock.Object,
                 RouteServiceMock.Object,
                 CustomerServiceMock.Object,
@@ -54,7 +55,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
 
         public Mock<IOrderService> DomainOrderServiceMock { get; }
 
-        public Mock<IApplicationOrderStateService> OrderStateServiceMock { get; }
+        public Mock<IOrderStateService> DomainOrderStateServiceMock { get; }
 
         public Mock<IApplicationCargoService> CargoServiceMock { get; }
 
@@ -101,7 +102,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 new { Status = OrderStatus.ReadyForTrade, Count = 2 }
             };
 
-            Suite.OrderStateServiceMock
+            Suite.DomainOrderStateServiceMock
                 .Setup(m => m.GetCountByCurrentStatus(It.IsAny<OrderStatus>()))
                 .Returns<OrderStatus>(status => Task.FromResult(sourceData.First(item => item.Status.Equals(status)).Count));
 
@@ -126,27 +127,27 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
 
             var domainOrders = new List<Order>
             {
-                new Order { Id = commonId++, CargoId = domainCargos[0].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 2, 11, 55, 3) },
-                new Order { Id = commonId++, CargoId = domainCargos[1].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 3, 12, 55, 3) },
-                new Order { Id = commonId++, CargoId = domainCargos[2].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 4, 13, 55, 3) }
+                new Order { Id = commonId++ },
+                new Order { Id = commonId++ },
+                new Order { Id = commonId++ }
             };
 
             var domainOrdersStates = new List<OrderState>
             {
-                new OrderState { Id = commonId, OrderId = domainOrders[0].Id },
-                new OrderState { Id = commonId, OrderId = domainOrders[1].Id },
-                new OrderState { Id = commonId, OrderId = domainOrders[2].Id }
+                new OrderState { Id = commonId, OrderId = domainOrders[0].Id, CargoId = domainCargos[0].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 2, 11, 55, 3) },
+                new OrderState { Id = commonId, OrderId = domainOrders[1].Id, CargoId = domainCargos[1].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 3, 12, 55, 3) },
+                new OrderState { Id = commonId, OrderId = domainOrders[2].Id, CargoId = domainCargos[2].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 4, 13, 55, 3) }
             };
 
             var routesData = new[]
             {
-                new { Id = domainOrders[0].RouteId, ShortTitle = "Рыбинск - Москва" },
-                new { Id = domainOrders[1].RouteId, ShortTitle = "Москва" },
-                new { Id = domainOrders[2].RouteId, ShortTitle = "Ярославль - Вологда" }
+                new { Id = domainOrdersStates[0].RouteId, ShortTitle = "Рыбинск - Москва" },
+                new { Id = domainOrdersStates[1].RouteId, ShortTitle = "Москва" },
+                new { Id = domainOrdersStates[2].RouteId, ShortTitle = "Ярославль - Вологда" }
             };
 
-            Suite.OrderStateServiceMock
-                .Setup(m => m.GetByCurrentStatus(It.IsAny<OrderStatus>()))
+            Suite.DomainOrderStateServiceMock
+                .Setup(m => m.GetByCurrentStatus(OrderStatus.New))
                 .ReturnsAsync(domainOrdersStates);
             
             Suite.CargoServiceMock
@@ -166,7 +167,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             for (var i = 0; i < domainOrders.Count; i++)
             {
                 Assert.Equal(domainOrders[i].Id, orders.ElementAt(i).Id);
-                Assert.Equal(domainOrders[i].TimeOfDelivery, orders.ElementAt(i).TimeOfDelivery);
+                Assert.Equal(domainOrdersStates[i].TimeOfDelivery, orders.ElementAt(i).TimeOfDelivery);
                 Assert.Equal(routesData[i].ShortTitle, orders.ElementAt(i).Title);
             }
         }
@@ -252,23 +253,183 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             Suite.BillServiceMock
                 .Setup(m => m.CreateDomainBill(bill))
                 .ReturnsAsync(domainBill);
-
             Suite.DomainOrderServiceMock
-                .Setup(m => m.Create(booking.TimeOfDelivery,
-                    domainCustomer.Id,
-                    domainCargo.Id,
-                    domainRoute.Id,
-                    domainBill.Id))
+                .Setup(m => m.Create())
                 .ReturnsAsync(domainOrder);
 
             var result = await Suite.OrderService.CreateOrder(booking);
 
-            Suite.OrderStateServiceMock
-                .Verify(m => m.New(domainOrder.Id));
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.New(
+                    domainOrder.Id,
+                    booking.TimeOfDelivery,
+                    domainCustomer.Id,
+                    domainCargo.Id,
+                    domainRoute.Id,
+                    domainBill.Id));
+
             Suite.OrderValidatorServiceMock
                 .Verify(m => m.Validate(booking, route, bill));
             
             Assert.Equal(domainOrder, result);
+        }
+
+        [Fact]
+        public async void Acept()
+        {
+            var commonId = 1;
+            var orderId = commonId++;
+            var moderatorId = commonId++;
+
+            await Suite.OrderService.Accept(orderId, moderatorId);
+
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.Accept(orderId, moderatorId));
+        }
+
+        [Fact]
+        public async void ReadyToTrade()
+        {
+            var commonId = 1;
+            var orderId = commonId++;
+            var moderatorId = commonId++;
+
+            await Suite.OrderService.ReadyToTrade(orderId, moderatorId);
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.ReadyToTrade(orderId, moderatorId));
+        }
+
+        [Fact]
+        public async void Trade()
+        {
+            var commonId = 1;
+            var orderId = commonId++;
+
+            await Suite.OrderService.Trade(orderId);
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.Trade(orderId));
+
+        }
+
+        [Fact]
+        public async void AssignToDispatcher()
+        {
+            var commonId = 1;
+            var orderId = commonId++;
+            var dispatcherId = commonId++;
+
+            await Suite.OrderService.AssignToDispatcher(orderId, dispatcherId);
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.AssignToDispatcher(orderId, dispatcherId));
+        }
+
+        [Fact]
+        public async void AssignToDriver()
+        {
+            var commonId = 1;
+            var orderId = commonId++;
+            var dispatcherId = commonId++;
+            var driverId = commonId++;
+
+            await Suite.OrderService.AssignToDriver(orderId, dispatcherId, driverId);
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.AssignToDriver(orderId, dispatcherId, driverId));
+        }
+
+        [Fact]
+        public async void ConfirmByDriver()
+        {
+            var commonId = 1;
+            var orderId = commonId++;
+            var driverId = commonId++;
+
+            await Suite.OrderService.ConfirmByDriver(orderId, driverId);
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.ConfirmByDriver(orderId, driverId));
+        }
+
+        [Fact]
+        public async void GoToCustomer()
+        {
+            var commonId = 1;
+            var orderId = commonId++;
+            var driverId = commonId++;
+
+            await Suite.OrderService.GoToCustomer(orderId, driverId);
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.GoToCustomer(orderId, driverId));
+        }
+
+        [Fact]
+        public async void ArriveAtLoadingPlace()
+        {
+            var commonId = 1;
+            var orderId = commonId++;
+            var driverId = commonId++;
+
+            await Suite.OrderService.ArriveAtLoadingPlace(orderId, driverId);
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.ArriveAtLoadingPlace(orderId, driverId));
+        }
+
+        [Fact]
+        public async void LoadTheVehicle()
+        {
+            var commonId = 1;
+            var orderId = commonId++;
+            var driverId = commonId++;
+
+            await Suite.OrderService.LoadTheVehicle(orderId, driverId);
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.LoadTheVehicle(orderId, driverId));
+        }
+
+        [Fact]
+        public async void DeliverTheVehicle()
+        {
+            var commonId = 1;
+            var orderId = commonId++;
+            var driverId = commonId++;
+
+            await Suite.OrderService.DeliverTheVehicle(orderId, driverId);
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.DeliverTheVehicle(orderId, driverId));
+        }
+
+        [Fact]
+        public async void ReceivePayment()
+        {
+            var commonId = 1;
+            var orderId = commonId++;
+            var driverId = commonId++;
+
+            await Suite.OrderService.ReceivePayment(orderId, driverId);
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.ReceivePayment(orderId, driverId));
+        }
+
+        [Fact]
+        public async void Complete()
+        {
+            var commonId = 1;
+            var orderId = commonId++;
+            var driverId = commonId++;
+
+            await Suite.OrderService.Complete(orderId, driverId);
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.Complete(orderId, driverId));
+        }
+
+        [Fact]
+        public async void Cancel()
+        {
+            var commonId = 1;
+            var orderId = commonId++;
+            var driverId = commonId++;
+
+            await Suite.OrderService.Cancel(orderId, driverId);
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.Cancel(orderId, driverId));
         }
     }
 }

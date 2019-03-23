@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNetDistance;
+using System;
 
 namespace TransportSystems.Backend.Application.Models.Ordering
 {
@@ -12,7 +13,7 @@ namespace TransportSystems.Backend.Application.Models.Ordering
         /// </summary>
         public DateTime TimeOfDelivery { get; set; }
 
-        public int Distance { get; set; }
+        public Distance Distance { get; set; }
 
         public decimal Cost { get; set; }
     }

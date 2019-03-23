@@ -27,7 +27,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
             PricelistServiceMock = new Mock<IApplicationPricelistService>();
             CityServiceMock = new Mock<IApplicationCityService>();
 
-            BillService = new ApplicationBillService(
+            Service = new ApplicationBillService(
                 TransactionServiceMock.Object,
                 DomainBillServiceMock.Object,
                 DomainBillItemServiceMock.Object,
@@ -36,7 +36,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
                 CityServiceMock.Object);
         }
 
-        public IApplicationBillService BillService { get; }
+        public IApplicationBillService Service { get; }
 
         public Mock<IBillService> DomainBillServiceMock { get; }
 
@@ -151,7 +151,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
                 .Setup(m => m.Get(domainBill.Id))
                 .Returns(() => { domainBill.TotalCost = (decimal)(11800 * billInfo.DegreeOfDifficulty); return Task.FromResult(domainBill); });
 
-            var result = await Suite.BillService.CreateDomainBill(bill);
+            var result = await Suite.Service.CreateDomainBill(bill);
 
             Suite.DomainBillItemServiceMock
                 .Verify(m => m.Create(
@@ -219,7 +219,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
                 Cost = 15184.35m
             };
 
-            var result = await Suite.BillService.CreateDomainBillItem(domainBillId, billItem);
+            var result = await Suite.Service.CreateDomainBillItem(domainBillId, billItem);
 
             Suite.DomainBillItemServiceMock
                 .Verify(m => m.Create(domainBillId, billItem.Key, billItem.Value, billItem.Price, billItem.Cost));
@@ -260,7 +260,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
                 .Setup(m => m.GetDomainPrice(billInfo.PriceId))
                 .ReturnsAsync(domainPrice);
 
-            var result = await Suite.BillService.CalculateBill(billInfo, basket);
+            var result = await Suite.Service.CalculateBill(billInfo, basket);
 
             Assert.Equal(billInfo, result.Info);
             Assert.Equal(6, result.Items.Count);
@@ -352,7 +352,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
                 .Setup(m => m.GetDomainPrice(billInfo.PriceId))
                 .ReturnsAsync(domainPrice);
 
-            var result = await Suite.BillService.CalculateBill(billInfo, basket);
+            var result = await Suite.Service.CalculateBill(billInfo, basket);
 
             Assert.Equal(billInfo, result.Info);
             Assert.Equal(2, result.Items.Count);
@@ -374,7 +374,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
                 .Setup(m => m.GetDomainPrice(billInfo.PriceId))
                 .Returns(Task.FromResult<Price>(null));
 
-            await Assert.ThrowsAsync<EntityNotFoundException>("Price", () => Suite.BillService.CalculateBill(billInfo, basket));
+            await Assert.ThrowsAsync<EntityNotFoundException>("Price", () => Suite.Service.CalculateBill(billInfo, basket));
         }
 
         [Fact]
@@ -385,7 +385,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
             var price = 123.45m;
             var degreeOfDifficulty = 1.1f;
 
-            var result = await Suite.BillService.CalculateBillItem(key, value, price, degreeOfDifficulty);
+            var result = await Suite.Service.CalculateBillItem(key, value, price, degreeOfDifficulty);
 
             var adjustedPrice = price * (decimal)degreeOfDifficulty;
             var cost = value * adjustedPrice;
@@ -423,11 +423,43 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
                 .Setup(m => m.GetDomainPrice(domainCity.PricelistId, catalogItemId))
                 .ReturnsAsync(domainPrice);
 
-            var result = await Suite.BillService.GetBillInfo(coordinate, catalogItemId);
+            var result = await Suite.Service.GetBillInfo(coordinate, catalogItemId);
 
             Assert.Equal(domainPrice.Id, result.PriceId);
             Assert.Equal(domainPrice.CommissionPercentage, result.CommissionPercentage);
             Assert.Equal(Bill.DefaultDegreeOfDifficulty, result.DegreeOfDifficulty);
+        }
+
+        [Fact]
+        public async Task GetTotalCost()
+        {
+            var commonId = 1;
+
+            var domainBill = new Bill
+            {
+                Id = commonId++,
+                TotalCost = 100m
+            };
+
+            Suite.DomainBillServiceMock
+                .Setup(m => m.Get(domainBill.Id))
+                .ReturnsAsync(domainBill);
+
+            var result = await Suite.Service.GetTotalCost(domainBill.Id);
+
+            Assert.Equal(domainBill.TotalCost, result);
+        }
+
+        [Fact]
+        public async Task GetTotalCostWhenBillIdDoesNotExist()
+        {
+            var notexistentBillId = 1;
+
+            Suite.DomainBillServiceMock
+                .Setup(m => m.Get(notexistentBillId))
+                .Returns(Task.FromResult<Bill>(null));
+
+            await Assert.ThrowsAsync<EntityNotFoundException>("Bill", () => Suite.Service.GetTotalCost(notexistentBillId));
         }
     }
 }

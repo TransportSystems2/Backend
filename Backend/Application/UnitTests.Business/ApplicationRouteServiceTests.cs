@@ -31,7 +31,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             DomainRouteLegServiceMock = new Mock<IRouteLegService>();
             AddressServiceMock = new Mock<IApplicationAddressService>();
 
-            RouteService = new ApplicationRouteService(
+            Service = new ApplicationRouteService(
                 TransactionServiceMock.Object,
                 DirectionServiceMock.Object,
                 DomainRouteServiceMock.Object,
@@ -39,7 +39,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 AddressServiceMock.Object);
         }
 
-        public IApplicationRouteService RouteService { get; }
+        public IApplicationRouteService Service { get; }
 
         public Mock<IDirectionService> DirectionServiceMock { get; } 
 
@@ -129,7 +129,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 .Setup(m => m.Create(route.Comment))
                 .ReturnsAsync(domainRoute);
 
-            var result = await Suite.RouteService.CreateDomainRoute(route);
+            var result = await Suite.Service.CreateDomainRoute(route);
             
             Suite.DomainRouteServiceMock
                 .Verify(m => m.Create(route.Comment));
@@ -248,7 +248,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 .Setup(m => m.GetNearestAddress(secondWaypointCoordinate, It.IsAny<IEnumerable<AddressAM>>()))
                 .ReturnsAsync(secondWaypointAddress);
 
-            var result = await Suite.RouteService.GetRoute(rootAddress, waypoints);
+            var result = await Suite.Service.GetRoute(rootAddress, waypoints);
 
             Assert.Equal(3, result.Legs.Count);
 
@@ -339,7 +339,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 .Setup(m => m.GetNearestAddress(coordinate, It.IsAny<IEnumerable<AddressAM>>()))
                 .ReturnsAsync(new AddressAM { Latitude = 1, Longitude = 1 });
 
-            var result = await Suite.RouteService.GetPossibleRoutes(rootAddresses, waypoints);
+            var result = await Suite.Service.GetPossibleRoutes(rootAddresses, waypoints);
 
             Assert.Equal(rootAddresses.Count, result.Count);
         }
@@ -418,7 +418,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 .Setup(m => m.GetNearestAddress(secondWaypointCoordinate, It.IsAny<IEnumerable<AddressAM>>()))
                 .ReturnsAsync(secondWaypointAddress);
 
-            var result = await Suite.RouteService.FromExternalRoute(rootAddress, rootAddress, waypoints, externalRoute);
+            var result = await Suite.Service.FromExternalRoute(rootAddress, rootAddress, waypoints, externalRoute);
 
             Assert.Equal(3, result.Legs.Count);
 
@@ -490,7 +490,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 .Setup(m => m.GetShortTitle(routeLegs.First().EndAddressId))
                 .ReturnsAsync(endAddressShortTitle);
 
-            var shortName = await Suite.RouteService.GetShortTitle(route.Id);
+            var shortName = await Suite.Service.GetShortTitle(route.Id);
 
             Assert.Equal("Москва", shortName);
         }
@@ -532,7 +532,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 .Setup(m => m.GetShortTitle(routeLegs.First().EndAddressId))
                 .ReturnsAsync(endAddressShortTitle);
 
-            var shortTitle = await Suite.RouteService.GetShortTitle(route.Id);
+            var shortTitle = await Suite.Service.GetShortTitle(route.Id);
 
             var expectedShortTitle = string.Join(" - ", startAddressShortTitle, endAddressShortTitle);
             Assert.Equal(expectedShortTitle, shortTitle);
@@ -575,7 +575,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 .Setup(m => m.GetShortTitle(4))
                 .ReturnsAsync(endAddressShortTitle);
 
-            var shortTitle = await Suite.RouteService.GetShortTitle(route.Id);
+            var shortTitle = await Suite.Service.GetShortTitle(route.Id);
 
             var expectedShortTitle = string.Join(" - ", startAddressShortTitle, middleAddressShortTitle, endAddressShortTitle);
             Assert.Equal(expectedShortTitle, shortTitle);
@@ -616,7 +616,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 }
             };
 
-            var result = Suite.RouteService.GetRootAddress(route);
+            var result = Suite.Service.GetRootAddress(route);
 
             Assert.Equal(rootAddress, result);
         }
@@ -655,7 +655,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 }
             };
 
-            var result = Suite.RouteService.GetTotalDistance(route);
+            var result = Suite.Service.GetTotalDistance(route);
 
             Assert.Equal(83, result.ToKilometers());
         }
@@ -694,7 +694,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 }
             };
 
-            var result = Suite.RouteService.GetFeedDistance(route);
+            var result = Suite.Service.GetFeedDistance(route);
 
             Assert.Equal(Distance.FromKilometers(30), result);
         }
@@ -733,9 +733,24 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                 }
             };
 
-            var result = await Suite.RouteService.GetFeedDuration(route);
+            var result = await Suite.Service.GetFeedDuration(route);
 
             Assert.Equal(route.Legs[0].Duration, result);
+        }
+
+        [Fact]
+        public async Task GetDistance()
+        {
+            var routeId = 1;
+            var totalDistance = Distance.FromKilometers(100);
+
+            Suite.DomainRouteLegServiceMock
+                .Setup(m => m.GetDistance(routeId, RouteLegKind.All))
+                .ReturnsAsync(totalDistance);
+
+            var result = await Suite.Service.GetTotalDistance(routeId);
+
+            Assert.Equal(totalDistance, result);
         }
     }
 }

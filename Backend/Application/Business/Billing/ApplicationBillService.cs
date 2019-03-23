@@ -166,5 +166,17 @@ namespace TransportSystems.Backend.Application.Business.Billing
                 CommissionPercentage = domainPrice.CommissionPercentage
             };
         }
+
+        public async Task<decimal> GetTotalCost(int billId)
+        {
+            var domainBill = await DomainBillService.Get(billId);
+
+            if (domainBill == null)
+            {
+                throw new EntityNotFoundException($"BillId:{billId} doesn't exist.", "Bill");
+            }
+
+            return domainBill.TotalCost;
+        }
     }
 }

@@ -304,17 +304,7 @@ namespace TransportSystems.Backend.API.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     AddedDate = table.Column<DateTime>(nullable: false),
-                    ModifiedDate = table.Column<DateTime>(nullable: false),
-                    TimeOfDelivery = table.Column<DateTime>(nullable: false),
-                    ModeratorId = table.Column<int>(nullable: false),
-                    CustomerId = table.Column<int>(nullable: false),
-                    PathId = table.Column<int>(nullable: false),
-                    RouteId = table.Column<int>(nullable: false),
-                    CargoId = table.Column<int>(nullable: false),
-                    CompanyId = table.Column<int>(nullable: false),
-                    DispatcherId = table.Column<int>(nullable: false),
-                    DriverId = table.Column<int>(nullable: false),
-                    BillId = table.Column<int>(nullable: false)
+                    ModifiedDate = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -330,7 +320,17 @@ namespace TransportSystems.Backend.API.Migrations
                     AddedDate = table.Column<DateTime>(nullable: false),
                     ModifiedDate = table.Column<DateTime>(nullable: false),
                     OrderId = table.Column<int>(nullable: false),
-                    Status = table.Column<int>(nullable: false)
+                    Status = table.Column<int>(nullable: false),
+                    TimeOfDelivery = table.Column<DateTime>(nullable: false),
+                    ModeratorId = table.Column<int>(nullable: false),
+                    CustomerId = table.Column<int>(nullable: false),
+                    PathId = table.Column<int>(nullable: false),
+                    RouteId = table.Column<int>(nullable: false),
+                    CargoId = table.Column<int>(nullable: false),
+                    CompanyId = table.Column<int>(nullable: false),
+                    DispatcherId = table.Column<int>(nullable: false),
+                    DriverId = table.Column<int>(nullable: false),
+                    BillId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {

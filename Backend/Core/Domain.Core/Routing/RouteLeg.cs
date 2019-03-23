@@ -6,22 +6,28 @@ namespace TransportSystems.Backend.Core.Domain.Core.Routing
     /// <summary>
     /// Leg of a route
     /// </summary>
+    [Flags]
     public enum RouteLegKind
     {
         /// <summary>
         /// Feeding a vhicle to client (from garage)
         /// </summary>
-        Feed = 0,
+        Feed = 1,
 
         /// <summary>
         /// Transportation of client cargo
         /// </summary>
-        Transportation = 1,
+        Transportation = 2,
 
         /// <summary>
         /// Way back to garage
         /// </summary>
-        WayBack = 2
+        WayBack = 4,
+
+        /// <summary>
+        /// All
+        /// </summary>
+        All = Feed | Transportation | WayBack
     }
 
     public class RouteLeg : BaseEntity
