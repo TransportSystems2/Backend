@@ -281,7 +281,6 @@ namespace TransportSystems.Backend.API
             services.AddSingleton(identityUsersAPI);
         }
 
-
         protected virtual void ConfigureApplications(IServiceCollection services)
         {
             services.AddScoped<IMappingService, ApplicationMappingService>();
@@ -297,7 +296,7 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IApplicationCityService, ApplicationCityService>();
             services.AddScoped<IApplicationRouteService, ApplicationRouteService>();
             services.AddScoped<IApplicationOrderService, ApplicationOrderService>();
-            services.AddScoped<IApplicationOrderStateService, ApplicationOrderStateService>();
+            services.AddScoped<IApplicationOrderValidatorService, ApplicationOrderValidatorService>();
             services.AddScoped<IApplicationCustomerService, ApplicationCustomerService>();
             services.AddScoped<IApplicationPrognosisService, ApplicationPrognosisService>();
         }

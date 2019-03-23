@@ -41,7 +41,8 @@ namespace TransportSystems.Backend.Application.Business.Organization
                 try
                 {
                     var domainAddress = await AddressService.CreateDomainAddress(AddressKind.City, address);
-                    var domainPricelist = await PricelistService.CreateDomainPricelist();
+                    var priceListBlank = await PricelistService.GetPricelistBlank();
+                    var domainPricelist = await PricelistService.CreateDomainPricelist(priceListBlank);
                     var domainCity = await DomainCityService.Create(domain, domainAddress.Id, domainPricelist.Id);
 
                     transaction.Commit();

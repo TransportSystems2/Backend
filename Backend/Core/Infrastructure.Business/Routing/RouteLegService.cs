@@ -54,7 +54,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Routing
             return leg;
         }
 
-        public async Task<ICollection<RouteLeg>> GetByRoute(int routeId, RouteLegKind kind)
+        public async Task<ICollection<RouteLeg>> GetByRoute(int routeId, RouteLegKind kind = RouteLegKind.All)
         {
             if (!await RouteService.IsExist(routeId))
             {
@@ -62,6 +62,18 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Routing
             }
 
             return await Repository.GetByRoute(routeId, kind);
+        }
+
+        public async Task<Distance> GetDistance(int routeId, RouteLegKind kind = RouteLegKind.All)
+        {
+            if (!await RouteService.IsExist(routeId))
+            {
+                throw new EntityNotFoundException($"RouteId:{routeId} doesn't exist.", "Route");
+            }
+
+            var legs = await Repository.GetByRoute(routeId, kind);
+
+            return legs.Sum(l => l.Distance); ;
         }
 
         protected override async Task<bool> DoVerifyEntity(RouteLeg entity)

@@ -8,72 +8,72 @@ namespace TransportSystems.Backend.Core.Domain.Core.Ordering
         /// <summary>
         /// Новый
         /// </summary>
-        New = 0,
+        New = 1,
 
         /// <summary>
         /// Принят
         /// </summary>
-        Accepted = 1,
+        Accepted = 2,
 
         /// <summary>
         /// Готов для торговли
         /// </summary>
-        ReadyForTrade = 2,
+        ReadyForTrade = 4,
 
         /// <summary>
         /// Отправлен на торги
         /// </summary>
-        SentToTrading = 4,
+        SentToTrading = 8,
 
         /// <summary>
         /// Выдан диспетчеру
         /// </summary>
-        AssignedDispatcher = 8,
+        AssignedDispatcher = 16,
 
         /// <summary>
         /// Выдан водителю
         /// </summary>
-        AssignedDriver = 16,
+        AssignedDriver = 32,
 
         /// <summary>
         /// Подтвержден водителем
         /// </summary>
-        ConfirmedByDriver = 32,
+        ConfirmedByDriver = 64,
 
         /// <summary>
         /// На пути к клиенту
         /// </summary>
-        WentToCustomer = 64,
+        WentToCustomer = 128,
 
         /// <summary>
         /// Прибыл на место погрузки
         /// </summary>
-        ArrivedAtLoadingPlace = 128,
+        ArrivedAtLoadingPlace = 256,
 
         /// <summary>
         /// Транспортное средство загруженно
         /// </summary>
-        VehicleIsLoaded = 256,
+        VehicleIsLoaded = 512,
 
         /// <summary>
         /// Транспортное средство доставлено
         /// </summary>
-        VehicleIsDelivered = 512,
+        VehicleIsDelivered = 1024,
 
         /// <summary>
         /// Оплата получена
         /// </summary>
-        PaymentIsReceived = 1024,
+        PaymentIsReceived = 2048,
 
         /// <summary>
         /// Выполнен
         /// </summary>
-        Completed = 2048,
+        Completed = 4096,
 
         /// <summary>
         /// Отменен
         /// </summary>
-        Canceled = 4096,
+        Canceled = 8192,
 
         /// <summary>
         /// Выполняется

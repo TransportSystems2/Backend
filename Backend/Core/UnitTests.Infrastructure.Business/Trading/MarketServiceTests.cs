@@ -53,26 +53,27 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Trading
         public async void TradeOrderResultStartOfTradingOnLotServiceAndNotifytingOfDispatchers()
         {
             var suite = new MarketServiceSuite();
+            var commonId = 1;
 
-            var order = new Order { Id = 1, CompanyId = 1 };
-            var lot = new Lot { Id = 1, OrderId = order.Id };
+            var orderState = new OrderState { Id = commonId++, OrderId = commonId++, CompanyId = commonId };
+            var lot = new Lot { Id = commonId, OrderId = orderState.OrderId };
             var dispatchers = new List<Dispatcher>
             {
-                new Dispatcher { Id = 1 },
-                new Dispatcher { Id = 2 }
+                new Dispatcher { Id = commonId++ },
+                new Dispatcher { Id = commonId++ }
             };
 
             suite.LotServiceMock
-                .Setup(m => m.GetByOrder(order.Id))
+                .Setup(m => m.GetByOrder(orderState.OrderId))
                 .ReturnsAsync(lot);
-            suite.OrderServiceMock
-                .Setup(m => m.Get(order.Id))
-                .ReturnsAsync(order);
+            suite.OrderStateServiceMock
+                .Setup(m => m.Get(orderState.Id))
+                .ReturnsAsync(orderState);
             suite.DispatcherServiceMock
-                .Setup(m => m.GetByCompany(order.CompanyId))
+                .Setup(m => m.GetByCompany(orderState.CompanyId))
                 .ReturnsAsync(dispatchers);
 
-            await suite.MarketService.Trade(order.Id);
+            await suite.MarketService.Trade(orderState.Id);
 
             suite.LotServiceMock
                 .Verify(m => m.Trade(lot.Id), Times.Once);

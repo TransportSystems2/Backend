@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Application.Interfaces;
 using TransportSystems.Backend.Application.Models.Booking;
+using TransportSystems.Backend.Application.Models.Ordering;
+using TransportSystems.Backend.Core.Domain.Core.Ordering;
 
 namespace TransportSystems.API.Controllers
 {
@@ -21,6 +24,18 @@ namespace TransportSystems.API.Controllers
             await Service.CreateOrder(booking);
 
             return Ok();
+        }
+
+        [HttpGet("groups")]
+        public Task<ICollection<OrderGroupAM>> GetGroups(OrderStatus[] statuses)
+        {
+            return Service.GetOrderGroupsByStatuses(statuses);
+        }
+
+        [HttpGet("orders_info_by_status")]
+        public Task<ICollection<OrderInfoAM>> GetOrdersInfoByStatus(OrderStatus status)
+        {
+            return Service.GetOrdersByStatus(status);
         }
     }
 }
