@@ -1,11 +1,15 @@
 #Depending on the operating system of the host machines(s) that will build or run the containers, the image specified in the FROM statement may need to be changed.
 #For more information, please see https://aka.ms/containercompat
 
-FROM microsoft/dotnet:2.1-aspnetcore-runtime AS base
+FROM microsoft/dotnet:2.2-aspnetcore-runtime AS base
+RUN apt-get update \ 
+    && apt-get install -y --no-install-recommends \
+    && apt-get install zip unzip procps -y
+RUN curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l ~/vsdbg
 WORKDIR /app
 EXPOSE 80
 
-FROM microsoft/dotnet:2.1-sdk AS build
+FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /src
 COPY ["Backend/API/src/TransportSystems.Backend.API.csproj", "Backend/API/src/"]
 COPY ["Backend/Core/Infrastructure.Http/TransportSystems.Backend.Core.Infrastructure.Http.csproj", "Backend/Core/Infrastructure.Http/"]
@@ -27,10 +31,12 @@ COPY ["Backend/External/Business/TransportSystems.Backend.External.Business.cspr
 RUN dotnet restore "Backend/API/src/TransportSystems.Backend.API.csproj"
 COPY . .
 WORKDIR "/src/Backend/API/src"
-RUN dotnet build "TransportSystems.Backend.API.csproj" -c Release -o /app
+ARG buildconfig
+RUN dotnet build "TransportSystems.Backend.API.csproj" -c "$buildconfig" -o /app
 
 FROM build AS publish
-RUN dotnet publish "TransportSystems.Backend.API.csproj" -c Release -o /app
+ARG buildconfig
+RUN dotnet publish "TransportSystems.Backend.API.csproj" -c "$buildconfig" -o /app
 
 FROM base AS final
 WORKDIR /app
