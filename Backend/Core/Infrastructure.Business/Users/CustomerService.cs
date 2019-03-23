@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Domain.Interfaces.Users;
+using TransportSystems.Backend.Core.Services.Interfaces.Organization;
 using TransportSystems.Backend.Core.Services.Interfaces.Users;
 
 namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
@@ -18,9 +20,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
 
         public override Task<string[]> GetSpecificRoles()
         {
-            var specificRoles = new string[] { UserRole.CustomerRoleName };
-
-            return Task.FromResult(specificRoles);
+            var result = new string[] { UserRole.CustomerRoleName };
+            
+            return Task.FromResult(result);
         }
     }
 }
