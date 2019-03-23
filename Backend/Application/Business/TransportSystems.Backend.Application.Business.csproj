@@ -17,8 +17,4 @@
     <ProjectReference Include="..\Interfaces\TransportSystems.Backend.Application.Interfaces.csproj" />
     <ProjectReference Include="..\..\External\Interfaces\TransportSystems.Backend.External.Interfaces.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Routing\" />
-  </ItemGroup>
 </Project>

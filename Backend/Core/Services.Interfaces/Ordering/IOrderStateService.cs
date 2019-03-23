@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Ordering;
 
@@ -6,7 +7,13 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Ordering
 {
     public interface IOrderStateService : IDomainService<OrderState>
     {
-        Task New(int orderId);
+        Task New(
+            int orderId,
+            DateTime timeOfDelivery,
+            int customerId,
+            int cargoId,
+            int routeId,
+            int billId);
 
         Task Accept(int orderId, int moderatorId);
 

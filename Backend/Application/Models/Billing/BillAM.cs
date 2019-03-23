@@ -11,6 +11,8 @@ namespace TransportSystems.Backend.Application.Models.Billing
 
         public BillInfoAM Info { get; set; }
 
+        public BasketAM Basket { get; set; }
+
         public List<BillItemAM> Items { get; }
 
         public decimal TotalCost { get; set; }

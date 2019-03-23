@@ -53,7 +53,8 @@ namespace TransportSystems.Backend.Application.Business.Billing
 
             var result = new BillAM
             {
-                Info = billInfo
+                Info = billInfo,
+                Basket = basket
             };
 
             if (basket.Distance.ToMeters() > 0)
@@ -113,9 +114,10 @@ namespace TransportSystems.Backend.Application.Business.Billing
             return Task.FromResult(result);
         }
 
-        public async Task<Bill> CreateDomainBill(BillInfoAM billInfo, BasketAM basket)
+        public async Task<Bill> CreateDomainBill(BillAM bill)
         {
-            var bill = await CalculateBill(billInfo, basket);
+            var basket = bill.Basket;
+            var billInfo = bill.Info;
 
             var domainBasket = await DomainBasketService.Create(
                 basket.Distance,
@@ -163,6 +165,18 @@ namespace TransportSystems.Backend.Application.Business.Billing
                 PriceId = domainPrice.Id,
                 CommissionPercentage = domainPrice.CommissionPercentage
             };
+        }
+
+        public async Task<decimal> GetTotalCost(int billId)
+        {
+            var domainBill = await DomainBillService.Get(billId);
+
+            if (domainBill == null)
+            {
+                throw new EntityNotFoundException($"BillId:{billId} doesn't exist.", "Bill");
+            }
+
+            return domainBill.TotalCost;
         }
     }
 }

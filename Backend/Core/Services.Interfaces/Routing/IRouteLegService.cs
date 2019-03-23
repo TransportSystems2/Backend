@@ -16,6 +16,8 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Routing
             TimeSpan duration,
             Distance distance);
 
-        Task<ICollection<RouteLeg>> GetByRoute(int routeId, RouteLegKind kind);
+        Task<ICollection<RouteLeg>> GetByRoute(int routeId, RouteLegKind kind = RouteLegKind.All);
+
+        Task<Distance> GetDistance(int routeId, RouteLegKind kind = RouteLegKind.All);
     }
 }

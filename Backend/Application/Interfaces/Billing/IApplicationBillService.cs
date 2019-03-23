@@ -7,7 +7,9 @@ namespace TransportSystems.Backend.Application.Interfaces.Billing
 {
     public interface IApplicationBillService : IApplicationTransactionService
     {
-        Task<Bill> CreateDomainBill(BillInfoAM billInfo, BasketAM basket);
+        Task<decimal> GetTotalCost(int billId);
+
+        Task<Bill> CreateDomainBill(BillAM bill);
 
         Task<BillItem> CreateDomainBillItem(int billId, BillItemAM billItem);
 
