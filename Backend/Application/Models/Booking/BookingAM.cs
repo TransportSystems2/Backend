@@ -19,8 +19,6 @@ namespace TransportSystems.Backend.Application.Models.Booking
 
         public CargoAM Cargo { get; set; }
 
-        public BillInfoAM BillInfo { get; set; }
-
-        public BasketAM Basket { get; set; }
+        public BillAM Bill { get; set; }
     }
 }

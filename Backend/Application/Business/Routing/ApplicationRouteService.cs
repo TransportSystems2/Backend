@@ -176,14 +176,19 @@ namespace TransportSystems.Backend.Application.Business
             return string.Join(" - ", normalizedShortTitles);
         }
 
-        public AddressAM GetRootAddress(RouteAM route)
+        public async Task<Distance> GetTotalDistance(int routeId)
         {
-            return GetLeg(route, RouteLegKind.Feed)?.StartAddress;
+            return await DomainRouteLegService.GetDistance(routeId);
         }
 
         public Distance GetTotalDistance(RouteAM route)
         {
             return route.Legs.Select(l => l.Distance).Sum();
+        }
+
+        public AddressAM GetRootAddress(RouteAM route)
+        {
+            return GetLeg(route, RouteLegKind.Feed)?.StartAddress;
         }
 
         public Distance GetFeedDistance(RouteAM route)

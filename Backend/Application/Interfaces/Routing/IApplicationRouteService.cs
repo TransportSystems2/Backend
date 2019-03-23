@@ -25,6 +25,8 @@ namespace TransportSystems.Backend.Application.Interfaces.Routing
 
         Distance GetTotalDistance(RouteAM route);
 
+        Task<Distance> GetTotalDistance(int routeId);
+
         Distance GetFeedDistance(RouteAM route);
 
         Task<TimeSpan> GetFeedDuration(RouteAM route);

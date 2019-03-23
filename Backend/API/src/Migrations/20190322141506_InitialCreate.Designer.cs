@@ -10,7 +10,7 @@ using TransportSystems.Backend.Core.Infrastructure.Database;
 namespace TransportSystems.Backend.API.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20190117152152_InitialCreate")]
+    [Migration("20190322141506_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -18,7 +18,7 @@ namespace TransportSystems.Backend.API.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
-                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
+                .HasAnnotation("ProductVersion", "2.2.0-rtm-35687")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Billing.Basket", b =>
@@ -180,6 +180,20 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<DateTime>("AddedDate");
 
+                    b.Property<DateTime>("ModifiedDate");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Ordering.OrderState", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("AddedDate");
+
                     b.Property<int>("BillId");
 
                     b.Property<int>("CargoId");
@@ -196,29 +210,15 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<DateTime>("ModifiedDate");
 
+                    b.Property<int>("OrderId");
+
                     b.Property<int>("PathId");
 
                     b.Property<int>("RouteId");
 
-                    b.Property<DateTime>("TimeOfDelivery");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Ordering.OrderState", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("AddedDate");
-
-                    b.Property<DateTime>("ModifiedDate");
-
-                    b.Property<int>("OrderId");
-
                     b.Property<int>("Status");
+
+                    b.Property<DateTime>("TimeOfDelivery");
 
                     b.HasKey("Id");
 
@@ -585,6 +585,8 @@ namespace TransportSystems.Backend.API.Migrations
 
                             b1.Property<double>("Meters");
 
+                            b1.HasKey("BasketId");
+
                             b1.ToTable("Baskets");
 
                             b1.HasOne("TransportSystems.Backend.Core.Domain.Core.Billing.Basket")
@@ -601,6 +603,8 @@ namespace TransportSystems.Backend.API.Migrations
                             b1.Property<int>("RouteLegId");
 
                             b1.Property<double>("Meters");
+
+                            b1.HasKey("RouteLegId");
 
                             b1.ToTable("RouteLegs");
 

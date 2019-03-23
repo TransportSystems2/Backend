@@ -1,6 +1,7 @@
 ﻿using DotNetDistance;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Routing;
 using TransportSystems.Backend.Core.Domain.Interfaces.Routing;
@@ -89,6 +90,30 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Routin
 
             Suite.RouteLegRepositoryMock
                 .Verify(m => m.GetByRoute(routeId, routeLegKind));
+        }
+
+        [Fact]
+        public async Task GetDistanceByRoute()
+        {
+            var commonId = 1;
+            var routeId = commonId++;
+            var routeLegKind = RouteLegKind.Feed;
+            var legs = new List<RouteLeg>
+            {
+                new RouteLeg {Id = commonId++, RouteId = routeId, Distance = Distance.FromKilometers(30), Kind = RouteLegKind.Feed },
+                new RouteLeg {Id = commonId++, RouteId = routeId, Distance = Distance.FromKilometers(20), Kind = RouteLegKind.Feed }
+            };
+
+            Suite.RouteServiceMock
+                .Setup(m => m.IsExist(routeId))
+                .ReturnsAsync(true);
+            Suite.RouteLegRepositoryMock
+                .Setup(m => m.GetByRoute(routeId, routeLegKind))
+                .ReturnsAsync(legs);
+
+            var result = await Suite.RouteLegService.GetDistance(routeId, routeLegKind);
+
+            Assert.Equal(legs.Sum(l => l.Distance), result);
         }
     }
 }

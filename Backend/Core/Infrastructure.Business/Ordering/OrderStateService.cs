@@ -1,11 +1,15 @@
-﻿using System;
+﻿using Common.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Ordering;
 using TransportSystems.Backend.Core.Domain.Interfaces.Ordering;
 using TransportSystems.Backend.Core.Services.Interfaces;
+using TransportSystems.Backend.Core.Services.Interfaces.Billing;
 using TransportSystems.Backend.Core.Services.Interfaces.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Ordering;
+using TransportSystems.Backend.Core.Services.Interfaces.Routing;
+using TransportSystems.Backend.Core.Services.Interfaces.Transport;
 using TransportSystems.Backend.Core.Services.Interfaces.Users;
 
 namespace TransportSystems.Backend.Core.Infrastructure.Business
@@ -17,13 +21,21 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             IOrderService orderService,
             IModeratorService moderatorService,
             IDispatcherService dispatcherService,
-            IDriverService driverService)
+            IDriverService driverService,
+            ICustomerService customerService,
+            ICargoService cargoService,
+            IRouteService routeService,
+            IBillService billService)
             : base(repository)
         {
             OrderService = orderService;
             ModeratorService = moderatorService;
             DispatcherService = dispatcherService;
             DriverService = driverService;
+            CustomerService = customerService;
+            CargoService = cargoService;
+            RouteService = routeService;
+            BillService = billService;
         }
 
         protected new IOrderStateRepository Repository => (IOrderStateRepository)base.Repository;
@@ -36,9 +48,22 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
 
         protected IDriverService DriverService { get; }
 
-        public Task<OrderState> GetCurrentState(int orderId)
+        protected ICustomerService CustomerService { get; }
+
+        protected ICargoService CargoService { get; }
+
+        protected IRouteService RouteService { get; }
+
+        protected IBillService BillService { get; }
+
+        public async Task<OrderState> GetCurrentState(int orderId)
         {
-            return Repository.GetCurrentState(orderId);
+            if (!await OrderService.IsExist(orderId))
+            {
+                throw new EntityNotFoundException($"OrderId:{orderId} doesn't exist", "Order");
+            }
+
+            return await Repository.GetCurrentState(orderId);
         }
 
         public Task<ICollection<OrderState>> GetByCurrentStatus(OrderStatus status)
@@ -51,12 +76,17 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             return Repository.GetCountStatesByCurrentStatus(status);
         }
 
-        public async Task New(int orderId)
+        public async Task New(
+            int orderId,
+            DateTime timeOfDelivery,
+            int customerId,
+            int cargoId,
+            int routeId,
+            int billId)
         {
-            var order = await OrderService.Get(orderId);
-            if (order == null)
+            if (timeOfDelivery.ToUniversalTime() < DateTime.UtcNow)
             {
-                throw new EntityNotFoundException($"OrderId:{orderId} not found", "Order");
+                throw new ArgumentException($"Time of delivery can't be lower that NowTime", nameof(timeOfDelivery).FirstCharToUpper());
             }
 
             var currentState = await GetCurrentState(orderId);
@@ -65,15 +95,52 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new OrderStatusException("Status the new can be set only to order without currentState or canceled status.");
             }
 
-            await SetCurrentStatus(orderId, OrderStatus.New);
+            if (timeOfDelivery == null)
+            {
+                throw new ArgumentNullException(nameof(timeOfDelivery).FirstCharToUpper());
+            }
+
+            if (!await CustomerService.IsExist(customerId))
+            {
+                throw new EntityNotFoundException($"CustomerId:{customerId} doesn't exist", "Customer");
+            }
+
+            if (!await CargoService.IsExist(cargoId))
+            {
+                throw new EntityNotFoundException($"CargoId:{cargoId} doesn't exist", "Cargo");
+            }
+
+            if (!await RouteService.IsExist(routeId))
+            {
+                throw new EntityNotFoundException($"RouteId:{routeId} doesn't exist", "Route");
+            }
+
+            if (!await BillService.IsExist(billId))
+            {
+                throw new EntityNotFoundException($"BillId:{billId} doesn't exist", "Bill");
+            }
+
+            if (currentState == null)
+            {
+                currentState = new OrderState { OrderId = orderId};
+            }
+
+            currentState.Status = OrderStatus.New;
+            currentState.TimeOfDelivery = timeOfDelivery;
+            currentState.CustomerId = customerId;
+            currentState.CargoId = cargoId;
+            currentState.RouteId = routeId;
+            currentState.BillId = billId;
+
+            await AddNewState(currentState);
         }
 
         public async Task Accept(int orderId, int moderatorId)
         {
-            var order = await OrderService.Get(orderId);
-            if (order == null)
+            var currentState = await GetCurrentState(orderId);
+            if (currentState.Status != OrderStatus.New)
             {
-                throw new EntityNotFoundException($"OrderId:{orderId} not found", "Order");
+                throw new OrderStatusException("Only new orders can be accepted");
             }
 
             if (!await ModeratorService.IsExist(moderatorId))
@@ -81,24 +148,16 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new EntityNotFoundException($"ModeratorId:{moderatorId} not found", "Moderator");
             }
 
-            if ((await GetCurrentState(orderId)).Status != OrderStatus.New)
-            {
-                throw new OrderStatusException("Only new orders can be accepted");
-            }
+            currentState.Status = OrderStatus.Accepted;
+            currentState.ModeratorId = moderatorId;
 
-            await SetCurrentStatus(orderId, OrderStatus.Accepted);
-            await OrderService.AssignModerator(orderId, moderatorId);
+            await AddNewState(currentState);
         }
 
         public async Task ReadyToTrade(int orderId, int moderatorId)
         {
-            var order = await OrderService.Get(orderId);
-            if (order == null)
-            {
-                throw new EntityNotFoundException($"OrderId:{orderId} not found", "Order");
-            }
-
-            if ((await GetCurrentState(orderId)).Status != OrderStatus.Accepted)
+            var currentState = await GetCurrentState(orderId);
+            if (currentState.Status != OrderStatus.Accepted)
             {
                 throw new OrderStatusException("Only accepted orders can be read for trade");
             }
@@ -108,60 +167,51 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new EntityNotFoundException($"ModeratorId:{moderatorId} not found", "Moderator");
             }
 
-            if (!order.ModeratorId.Equals(moderatorId))
+            if (!currentState.ModeratorId.Equals(moderatorId))
             {
-                throw new AccessViolationException($"Only a order moderator can change the order state. Order moderatorId:{order.ModeratorId}, function moderatorId:{moderatorId}");
+                throw new AccessViolationException($"Only an order moderator can change the order state. Order moderatorId:{currentState.ModeratorId}, function moderatorId:{moderatorId}");
             }
 
-            await SetCurrentStatus(orderId, OrderStatus.ReadyForTrade);
+            currentState.Status = OrderStatus.ReadyForTrade;
+            await AddNewState(currentState);
         } 
 
         public async Task Trade(int orderId)
         {
-            var order = await OrderService.Get(orderId);
-            if (order == null)
-            {
-                throw new EntityNotFoundException("Order");
-            }
-
             var currentState = await GetCurrentState(orderId);
             if (currentState.Status != OrderStatus.ReadyForTrade)
             {
                 throw new OrderStatusException("Only read for trade orders can be traded");
             }
 
-            await SetCurrentStatus(orderId, OrderStatus.SentToTrading);
+            currentState.Status = OrderStatus.SentToTrading;
+            await AddNewState(currentState);
         }
 
         public async Task AssignToDispatcher(int orderId, int dispatcherId)
         {
-            var order = await OrderService.Get(orderId);
-            if (order == null)
-            {
-                throw new EntityNotFoundException($"OrderId:{orderId} not found", "Order");
-            }
-
-            if (!await DispatcherService.IsExist(dispatcherId))
-            {
-                throw new EntityNotFoundException($"DispatcherId:{dispatcherId} not found", "Dispatcher");
-            }
-
             var currentState = await GetCurrentState(orderId);
             if ((currentState.Status != OrderStatus.Accepted) && (currentState.Status != OrderStatus.SentToTrading))
             {
                 throw new OrderStatusException("Only accepted or traded orders can be assigned to dispatcher");
             }
 
-            await SetCurrentStatus(orderId, OrderStatus.AssignedDispatcher);
-            await OrderService.AssignDispatcher(orderId, dispatcherId);
+            if (!await DispatcherService.IsExist(dispatcherId))
+            {
+                throw new EntityNotFoundException($"DispatcherId:{dispatcherId} not found", "Dispatcher");
+            }
+
+            currentState.Status = OrderStatus.AssignedDispatcher;
+            currentState.DispatcherId = dispatcherId;
+            await AddNewState(currentState);
         }
 
         public async Task AssignToDriver(int orderId, int dispatcherId, int driverId)
         {
-            var order = await OrderService.Get(orderId);
-            if (order == null)
+            var currentState = await GetCurrentState(orderId);
+            if (currentState.Status != OrderStatus.AssignedDispatcher)
             {
-                throw new EntityNotFoundException($"OrderId:{orderId} not found", "Order");
+                throw new OrderStatusException("Only assigned to dispatcher orders can be assigned to driver");
             }
 
             if (!await DispatcherService.IsExist(dispatcherId))
@@ -169,7 +219,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new EntityNotFoundException($"DispatcherId:{dispatcherId} not found", "Dispatcher");
             }
 
-            if (order.DispatcherId != dispatcherId)
+            if (currentState.DispatcherId != dispatcherId)
             {
                 throw new AccessViolationException("Only a order dispatcher can assign a order to driver");
             }
@@ -179,239 +229,204 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
             }
 
-            if ((await GetCurrentState(orderId)).Status != OrderStatus.AssignedDispatcher)
-            {
-                throw new OrderStatusException("Only assigned to dispatcher orders can be assigned to driver");
-            }
-
-            await SetCurrentStatus(orderId, OrderStatus.AssignedDriver);
-            await OrderService.AssignDriver(orderId, driverId);
+            currentState.Status = OrderStatus.AssignedDriver;
+            currentState.DriverId = driverId;
+            await AddNewState(currentState);
         }
 
         public async Task ConfirmByDriver(int orderId, int driverId)
         {
-            var order = await OrderService.Get(orderId);
-            if (order == null)
-            {
-                throw new EntityNotFoundException($"OrderId:{orderId} not found", "Order");
-            }
-
-            if (!await DriverService.IsExist(driverId))
-            {
-                throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
-            }
-
-            if (order.DriverId != driverId)
-            {
-                throw new AccessViolationException("Only a order driver can confirm the order");
-            }
-
-            if ((await GetCurrentState(orderId)).Status != OrderStatus.AssignedDriver)
+            var currentState = await GetCurrentState(orderId);
+            if (currentState.Status != OrderStatus.AssignedDriver)
             {
                 throw new OrderStatusException("Only AssignedDriver orders can be confirmed by driver");
             }
 
-            await SetCurrentStatus(orderId, OrderStatus.ConfirmedByDriver);
+            if (!await DriverService.IsExist(driverId))
+            {
+                throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
+            }
+
+            if (currentState.DriverId != driverId)
+            {
+                throw new AccessViolationException("Only a order driver can confirm the order");
+            }
+
+            currentState.Status = OrderStatus.ConfirmedByDriver;
+            await AddNewState(currentState);
         }
 
         public async Task GoToCustomer(int orderId, int driverId)
         {
-            var order = await OrderService.Get(orderId);
-            if (order == null)
+            var currentState = await GetCurrentState(orderId);
+            if (currentState.Status != OrderStatus.ConfirmedByDriver)
             {
-                throw new EntityNotFoundException($"OrderId:{orderId} not found", "Order");
+                throw new OrderStatusException("Only ConfirmedByDriver orders can be gone to customer");
             }
-
+            
             if (!await DriverService.IsExist(driverId))
             {
                 throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
             }
 
-            if (order.DriverId != driverId)
+            if (currentState.DriverId != driverId)
             {
                 throw new AccessViolationException("Only an owner driver can go to customer");
             }
 
-            if ((await GetCurrentState(orderId)).Status != OrderStatus.ConfirmedByDriver)
-            {
-                throw new OrderStatusException("Only ConfirmedByDriver orders can be gone to customer");
-            }
-
-            await SetCurrentStatus(orderId, OrderStatus.WentToCustomer);
+            currentState.Status = OrderStatus.WentToCustomer;
+            await AddNewState(currentState);
         }
 
         public async Task ArriveAtLoadingPlace(int orderId, int driverId)
         {
-            var order = await OrderService.Get(orderId);
-            if (order == null)
+            var currentState = await GetCurrentState(orderId);
+            if (currentState.Status != OrderStatus.WentToCustomer)
             {
-                throw new EntityNotFoundException($"OrderId:{orderId} not found", "Order");
+                throw new OrderStatusException("Only WentToCustomer orders can be arrived at loading place");
             }
-
+            
             if (!await DriverService.IsExist(driverId))
             {
                 throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
             }
 
-            if (order.DriverId != driverId)
+            if (currentState.DriverId != driverId)
             {
                 throw new AccessViolationException("Only an owner driver can arrive at loading place");
             }
 
-            if ((await GetCurrentState(orderId)).Status != OrderStatus.WentToCustomer)
-            {
-                throw new OrderStatusException("Only WentToCustomer orders can be arrived at loading place");
-            }
-
-            await SetCurrentStatus(orderId, OrderStatus.ArrivedAtLoadingPlace);
+            currentState.Status = OrderStatus.ArrivedAtLoadingPlace;
+            await AddNewState(currentState);
         }
 
         public async Task LoadTheVehicle(int orderId, int driverId)
         {
-            var order = await OrderService.Get(orderId);
-            if (order == null)
-            {
-                throw new EntityNotFoundException($"OrderId:{orderId} not found", "Order");
-            }
-
-            if (!await DriverService.IsExist(driverId))
-            {
-                throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
-            }
-
-            if (order.DriverId != driverId)
-            {
-                throw new AccessViolationException("Only an owner driver can load a vehicle");
-            }
-
-            if ((await GetCurrentState(orderId)).Status != OrderStatus.ArrivedAtLoadingPlace)
+            var currentState = await GetCurrentState(orderId);
+            if (currentState.Status != OrderStatus.ArrivedAtLoadingPlace)
             {
                 throw new OrderStatusException("Only ArrivedAtLoadingPlace orders can be loaded");
             }
 
-            await SetCurrentStatus(orderId, OrderStatus.VehicleIsLoaded);
+            if (!await DriverService.IsExist(driverId))
+            {
+                throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
+            }
+
+            if (currentState.DriverId != driverId)
+            {
+                throw new AccessViolationException("Only an owner driver can load a vehicle");
+            }
+
+            currentState.Status = OrderStatus.VehicleIsLoaded;
+            await AddNewState(currentState);
         }
 
         public async Task DeliverTheVehicle(int orderId, int driverId)
         {
-            var order = await OrderService.Get(orderId);
-            if (order == null)
+            var currentState = await GetCurrentState(orderId);
+            if (currentState.Status != OrderStatus.VehicleIsLoaded)
             {
-                throw new EntityNotFoundException($"OrderId:{orderId} not found", "Order");
+                throw new OrderStatusException("Only VehicleIsLoaded orders can be delivered");
             }
-
+            
             if (!await DriverService.IsExist(driverId))
             {
                 throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
             }
 
-            if (order.DriverId != driverId)
+            if (currentState.DriverId != driverId)
             {
                 throw new AccessViolationException("Only an owner driver can deliver an vehicle");
             }
 
-            if ((await GetCurrentState(orderId)).Status != OrderStatus.VehicleIsLoaded)
-            {
-                throw new OrderStatusException("Only VehicleIsLoaded orders can be delivered");
-            }
-
-            await SetCurrentStatus(orderId, OrderStatus.VehicleIsDelivered);
+            currentState.Status = OrderStatus.VehicleIsDelivered;
+            await AddNewState(currentState);
         }
 
         public async Task ReceivePayment(int orderId, int driverId)
         {
-            var order = await OrderService.Get(orderId);
-            if (order == null)
+            var currentState = await GetCurrentState(orderId);
+            if (currentState.Status != OrderStatus.VehicleIsDelivered)
             {
-                throw new EntityNotFoundException($"OrderId:{orderId} not found", "Order");
+                throw new OrderStatusException("Only VehicleIsDelivered orders can be paymented");
             }
-
+            
             if (!await DriverService.IsExist(driverId))
             {
                 throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
             }
 
-            if (order.DriverId != driverId)
+            if (currentState.DriverId != driverId)
             {
                 throw new AccessViolationException("Only an owner driver can deliver an vehicle");
             }
 
-            if ((await GetCurrentState(orderId)).Status != OrderStatus.VehicleIsDelivered)
-            {
-                throw new OrderStatusException("Only VehicleIsDelivered orders can be paymented");
-            }
-
-            await SetCurrentStatus(orderId, OrderStatus.PaymentIsReceived);
+            currentState.Status = OrderStatus.PaymentIsReceived;
+            await AddNewState(currentState);
         }
 
         public async Task Complete(int orderId, int driverId)
         {
-            var order = await OrderService.Get(orderId);
-            if (order == null)
+            var currentState = await GetCurrentState(orderId);
+            if (currentState.Status != OrderStatus.PaymentIsReceived)
             {
-                throw new EntityNotFoundException("Order");
+                throw new OrderStatusException("Only paymend orders can be completed");
             }
-
+            
             if (!await DriverService.IsExist(driverId))
             {
                 throw new EntityNotFoundException("Driver");
             }
 
-            if (order.DriverId != driverId)
+            if (currentState.DriverId != driverId)
             {
                 throw new AccessViolationException("Only owner driver can to complete order");
             }
 
-            if ((await GetCurrentState(orderId)).Status != OrderStatus.PaymentIsReceived)
-            {
-                throw new OrderStatusException("Only paymend orders can be completed");
-            }
-
-            await SetCurrentStatus(orderId, OrderStatus.Completed);
+            currentState.Status = OrderStatus.Completed;
+            await AddNewState(currentState);
         }
 
         public async Task Cancel(int orderId, int driverId)
         {
-            var order = await OrderService.Get(orderId);
-            if (order == null)
-            {
-                throw new EntityNotFoundException("Order");
-            }
-
-            if (!await DriverService.IsExist(driverId))
-            {
-                throw new EntityNotFoundException("Driver");
-            }
-
-            if (order.DriverId != driverId)
-            {
-                throw new AccessViolationException("Only owner driver can to cancel order");
-            }
-
             var currentState = await GetCurrentState(orderId);
             if (!OrderStatus.IsCarriedOut.HasFlag(currentState.Status))
             {
                 throw new OrderStatusException("Only executing orders can be canceled");
             }
+            
+            if (!await DriverService.IsExist(driverId))
+            {
+                throw new EntityNotFoundException("Driver");
+            }
 
-            await SetCurrentStatus(orderId, OrderStatus.AssignedDispatcher);
+            if (currentState.DriverId != driverId)
+            {
+                throw new AccessViolationException("Only owner driver can to cancel order");
+            }
+
+            currentState.Status = OrderStatus.AssignedDispatcher;
+            currentState.DriverId = 0;
+            await AddNewState(currentState);
         }
 
-        protected async Task SetCurrentStatus(int orderId, OrderStatus status)
+        protected async Task AddNewState(OrderState newState)
         {
-            var state = new OrderState
-            {
-                OrderId = orderId,
-                Status = status
-            };
+            await Verify(newState);
 
-            await Repository.Add(state);
+            await Repository.Add(newState);
             await Repository.Save();
         }
 
-        protected override Task<bool> DoVerifyEntity(OrderState entity)
+        protected override async Task<bool> DoVerifyEntity(OrderState entity)
         {
-            return Task.FromResult(true);
+            if (!await OrderService.IsExist(entity.OrderId))
+            {
+                throw new EntityNotFoundException($"OrderId:{entity.OrderId} doesn't exist", "Order");
+            }
+
+            return true;
         }
     }
 }

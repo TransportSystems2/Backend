@@ -16,7 +16,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Database.Routing
 
         public async Task<ICollection<RouteLeg>> GetByRoute(int routeId, RouteLegKind kind)
         {
-            return await Entities.Where(l => l.RouteId.Equals(routeId) && l.Kind.Equals(kind)).ToListAsync();
+            return await Entities.Where(l => l.RouteId.Equals(routeId) && kind.HasFlag(l.Kind)).ToListAsync();
         }
     }
 }

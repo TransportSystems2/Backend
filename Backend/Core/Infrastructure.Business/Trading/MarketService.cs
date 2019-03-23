@@ -41,17 +41,16 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Trading
         {
             var ordersState = await OrderStateService.GetByCurrentStatus(OrderStatus.ReadyForTrade);
 
-            await Task.WhenAll(ordersState.Select(state => Trade(state.OrderId)));
+            await Task.WhenAll(ordersState.Select(state => Trade(state.Id)));
         }
 
-        public async Task Trade(int orderId)
+        public async Task Trade(int orderStateId)
         {
-            var lot = await LotService.GetByOrder(orderId);
+            var orderState = await OrderStateService.Get(orderStateId);
+            var lot = await LotService.GetByOrder(orderState.OrderId);
             await LotService.Trade(lot.Id);
-
-            var order = await OrderService.Get(orderId);
             
-            var dispatchers = await DispatcherService.GetByCompany(order.CompanyId);
+            var dispatchers = await DispatcherService.GetByCompany(orderState.CompanyId);
 
             var notify = new Notify(
                 dispatchers,

@@ -7,11 +7,14 @@ namespace TransportSystems.Backend.Application.Interfaces.Pricing
 {
     public interface IApplicationPricelistService : IApplicationTransactionService
     {
-        Task<PricelistAM> CreatePricelistBlank(
+        Task<PricelistAM> GetPricelistBlank(
             CatalogKind catalogKind = CatalogKind.Cargo,
-            CatalogItemKind catalogItemKind = CatalogItemKind.Weight);
+            CatalogItemKind catalogItemKind = CatalogItemKind.Weight,
+            bool withDefaultPrices = true);
 
-        Task<Pricelist> CreateDomainPricelist();
+        Task<Pricelist> CreateDomainPricelist(PricelistAM pricelist);
+
+        void FillPricesByDefault(PriceAM price);
 
         Task<Price> CreateDomainPrice(int pricelistId, PriceAM price);
 
