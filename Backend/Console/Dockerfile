@@ -1,7 +1,7 @@
-FROM microsoft/dotnet:2.1-runtime AS base
+FROM microsoft/dotnet:2.2-runtime AS base
 WORKDIR /app
 
-FROM microsoft/dotnet:2.1-sdk AS build
+FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /src
 COPY Backend/Console/TransportSystems.Backend.Console.csproj Backend/Console/
 COPY Backend/Identity/API/TransportSystems.Backend.Identity.API.csproj Backend/Identity/API/

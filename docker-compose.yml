@@ -1,24 +1,17 @@
-version: '2.1'
+version: '3.7'
 
 services:
   reverseproxy:
     image: nginx:alpine
-    networks:
-      - gosevakuator_default
     ports:
-      - "80:80"
-      - "82:82"
+      - 82:82
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     restart: always
 
   db.postgres.core:
     image: postgres:alpine
-    networks:
-      - gosevakuator_default
     restart: always
-    ports:
-      - 5430:5432
     environment:
       POSTGRES_USER: apiservice
       POSTGRES_DB: ts_data
@@ -32,11 +25,7 @@ services:
 
   db.postgres.identity:
     image: postgres:alpine
-    networks:
-      - gosevakuator_default
     restart: always
-    ports:
-      - 5432:5432
     environment:
       POSTGRES_USER: identityservice
       POSTGRES_DB: ts_identity
@@ -49,43 +38,34 @@ services:
       retries: 5
 
   transportsystems.backend.api:
-    image: transportsystemsbackendapi
-    networks:
-      - gosevakuator_default
     build:
+      args:
+        buildconfig: Release
       context: .
       dockerfile: Backend/API/src/Dockerfile
     depends_on:
-      db.postgres.core:
-        condition: service_healthy
+      - db.postgres.core
 
   transportsystems.backend.identity.signin:
-    image: transportsystemsbackendidentitysignin
-    networks:
-      - gosevakuator_default
     build:
+      args:
+        buildconfig: Release
       context: .
       dockerfile: Backend/Identity/Signin/Dockerfile
     depends_on:
-      db.postgres.identity:
-        condition: service_healthy
+      - db.postgres.identity
 
   transportsystems.backend.identity.manage:
-    image: transportsystemsbackendidentitymanage
-    networks:
-      - gosevakuator_default
     build:
+      args:
+        buildconfig: Release
       context: .
       dockerfile: Backend/Identity/Manage/Dockerfile
     depends_on:
-      db.postgres.identity:
-        condition: service_healthy
+      - db.postgres.identity
 
 volumes:
   postgres-core-data:
     external: true
   postgres-identity-data:
-    external: true
-networks:
-  gosevakuator_default:
     external: true
