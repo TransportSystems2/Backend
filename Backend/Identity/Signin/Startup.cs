@@ -49,7 +49,7 @@ namespace TransportSystems.Backend.Identity.Signin
             });
 
             services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddIdentityServer(options =>
             {

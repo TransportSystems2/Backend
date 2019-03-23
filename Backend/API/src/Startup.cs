@@ -118,7 +118,7 @@ namespace TransportSystems.Backend.API
             });
 
             services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             ConfigureSwagger(services);
             ConfigureMapper(services);
@@ -203,9 +203,10 @@ namespace TransportSystems.Backend.API
 
         protected virtual void ConfigureApplicationContext(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationContext>(
-                options => options.UseNpgsql(Configuration.GetConnectionString("db"),
-                b => b.MigrationsAssembly("TransportSystems.Backend.API")));
+            var connectionString = Configuration.GetConnectionString("db");
+            var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+            services.AddDbContext<ApplicationContext>(options =>
+                options.UseNpgsql(connectionString, b => b.MigrationsAssembly(migrationsAssembly)));
         }
 
         protected virtual void ConfigureCustomRepositories(IServiceCollection services)
