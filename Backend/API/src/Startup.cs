@@ -275,7 +275,7 @@ namespace TransportSystems.Backend.API
 
             services.AddScoped<ICustomerService, CustomerService>();
 
-            var identityUri = Configuration.GetConnectionString("identity");
+            var identityUri = Configuration.GetConnectionString("manage");
             var identityUsersAPI = IdentityUsersAPIFactory<IIdentityUsersAPI>.Create(identityUri);
             services.AddSingleton(identityUsersAPI);
         }

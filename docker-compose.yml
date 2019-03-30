@@ -45,6 +45,8 @@ services:
       dockerfile: Backend/API/src/Dockerfile
     depends_on:
       - db.postgres.core
+      - transportsystems.backend.identity.signin
+      - transportsystems.backend.identity.manage
 
   transportsystems.backend.identity.signin:
     build:
@@ -63,6 +65,7 @@ services:
       dockerfile: Backend/Identity/Manage/Dockerfile
     depends_on:
       - db.postgres.identity
+      - transportsystems.backend.identity.signin
 
 volumes:
   postgres-core-data:
