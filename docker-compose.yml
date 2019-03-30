@@ -43,6 +43,7 @@ services:
         buildconfig: Release
       context: .
       dockerfile: Backend/API/src/Dockerfile
+    restart: always
     environment:
       ConnectionStrings:db: Host=db.postgres.core;Port=5432;Database=ts_data;Username=apiservice
       ConnectionStrings:identity: http://transportsystems.backend.identity.signin
@@ -58,6 +59,7 @@ services:
         buildconfig: Release
       context: .
       dockerfile: Backend/Identity/Signin/Dockerfile
+    restart: always
     environment:
       ConnectionStrings:db: Host=db.postgres.identity;Port=5432;Database=ts_identity;Username=identityservice
     depends_on:
@@ -69,6 +71,7 @@ services:
         buildconfig: Release
       context: .
       dockerfile: Backend/Identity/Manage/Dockerfile
+    restart: always
     environment:
       ConnectionStrings:db: Host=db.postgres.identity;Port=5432;Database=ts_identity;Username=identityservice
       ConnectionStrings:identity: http://transportsystems.backend.identity.signin
