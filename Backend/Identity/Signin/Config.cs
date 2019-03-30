@@ -88,6 +88,7 @@ namespace TransportSystems.Backend.Identity.Signin
 
                 new Client
                 {
+                    ClientName = "phone_number_authentication",
                     ClientId = "phone_number_authentication",
                     AllowedGrantTypes = 
                     {
@@ -109,6 +110,11 @@ namespace TransportSystems.Backend.Identity.Signin
                         "myapi",
                         "TSAPI",
                         "custom.profile"
+                    },
+
+                    RedirectUris = 
+                    {
+                        "http://localhost:82"
                     },
 
                     AllowOfflineAccess = true
