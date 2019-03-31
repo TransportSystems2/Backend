@@ -3,11 +3,11 @@ version: '3.7'
 services:
   db.postgres.core:
     ports:
-      - 5430:5432
+      - 6430:5432
 
   db.postgres.identity:
     ports:
-      - 5432:5432
+      - 6432:5432
       
   transportsystems.backend.identity.signin:
     build:
