@@ -10,8 +10,8 @@ using TransportSystems.Backend.Core.Infrastructure.Database;
 namespace TransportSystems.Backend.API.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20190322141506_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20190330064950_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -252,11 +252,7 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<DateTime>("AddedDate");
 
-                    b.Property<int>("GarageId");
-
                     b.Property<bool>("IsPrivate");
-
-                    b.Property<int>("ModeratorId");
 
                     b.Property<DateTime>("ModifiedDate");
 
@@ -278,9 +274,9 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<int>("CityId");
 
-                    b.Property<DateTime>("ModifiedDate");
+                    b.Property<int>("CompanyId");
 
-                    b.Property<int>("OwnerCompanyId");
+                    b.Property<DateTime>("ModifiedDate");
 
                     b.Property<int>("PricelistId");
 
@@ -491,8 +487,6 @@ namespace TransportSystems.Backend.API.Migrations
                     b.Property<int>("CapacityCatalogItemId");
 
                     b.Property<int>("CompanyId");
-
-                    b.Property<int>("GarageId");
 
                     b.Property<int>("KindCatalogItemId");
 

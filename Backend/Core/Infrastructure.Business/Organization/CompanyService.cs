@@ -1,32 +1,52 @@
-﻿using System;
-
-using TransportSystems.Backend.Core.Domain.Core.Organization;
+﻿using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Core.Domain.Interfaces.Organization;
 using TransportSystems.Backend.Core.Services.Interfaces.Organization;
-using TransportSystems.Backend.Core.Services.Interfaces;
 using System.Threading.Tasks;
+using System;
+using TransportSystems.Backend.Core.Services.Interfaces;
 
 namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
 {
     public class CompanyService : DomainService<Company>, ICompanyService
     {
-
-        public CompanyService(ICompanyRepository repository, IGarageService garageService)
+        public CompanyService(ICompanyRepository repository)
             : base(repository)
         {
-            GarageService = garageService;
         }
 
         protected new ICompanyRepository Repository => (ICompanyRepository)base.Repository;
 
-        protected IGarageService GarageService { get; }
-
-        public async Task<Company> Create(int garageId, string name)
+        public Task AssignModerator(int companyId)
         {
-            var companyModel = new Company { GarageId = garageId, Name = name };
+            throw new System.NotImplementedException();
+        }
+
+        public async Task<Company> Create(string name, bool isPrivate = true)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException("Name");
+            }
+
+            if (await Repository.GetByName(name) != null)
+            {
+                throw new EntityAlreadyExistsException($"Company this same name: {name}, alredy exists.", "Name");
+            }
+
+            var companyModel = new Company { Name = name, IsPrivate = isPrivate };
             await AddCompany(companyModel);
 
             return companyModel;
+        }
+
+        public async Task<Company> GetByName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException($"Name is empty or null", "Name");
+            }
+
+            return await Repository.GetByName(name);
         }
 
         protected async Task AddCompany(Company company)
@@ -39,11 +59,6 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
 
         protected override async Task<bool> DoVerifyEntity(Company entity)
         {
-            if (!await GarageService.IsExist(entity.GarageId))
-            {
-                throw new EntityNotFoundException($"GarageId:{entity.GarageId} not found", "Garage");
-            }
-
             return true;
         }
     }

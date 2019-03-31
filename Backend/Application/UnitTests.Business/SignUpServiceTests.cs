@@ -22,6 +22,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
         public SignUpServiceTestsSuite()
         {
             DomainDriverServiceMock = new Mock<IDriverService>();
+            DomainModeratorServiceMock = new Mock<IModeratorService>();
             DomainDispatcherServiceMock = new Mock<IDispatcherService>();
             DomainCompanyServiceMock = new Mock<ICompanyService>();
             DomainGarageServiceMock = new Mock<IGarageService>();
@@ -30,6 +31,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             SignUpService = new SignUpService(
                 TransactionServiceMock.Object,
                 DomainDriverServiceMock.Object,
+                DomainModeratorServiceMock.Object,
                 DomainDispatcherServiceMock.Object,
                 DomainCompanyServiceMock.Object,
                 DomainGarageServiceMock.Object,
@@ -39,6 +41,8 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
         public ISignUpService SignUpService { get; }
 
         public Mock<IDriverService> DomainDriverServiceMock { get; }
+
+        public Mock<IModeratorService> DomainModeratorServiceMock { get; }
 
         public Mock<IDispatcherService> DomainDispatcherServiceMock { get; }
 
@@ -54,17 +58,19 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
         [Fact]
         public async void SignUpDriverCompany()
         {
-            var ApplicationVehicle = new VehicleAM
+            var commonId = 1;
+
+            var vehicle = new VehicleAM
             {
                 RegistrationNumber = "К100ЕЕ77",
-                BrandCatalogItemId = 0,
-                CapacityCatalogItemId = 1,
-                KindCatalogItemId = 2
+                BrandCatalogItemId = commonId++,
+                CapacityCatalogItemId = commonId++,
+                KindCatalogItemId = commonId++
             };
 
-            var ApplicationDriver = new DriverAM
+            var driver = new DriverAM
             {
-                IdentityUserId = 6,
+                IdentityUserId = commonId++,
                 FirstName = "Петя",
                 LastName = "Лиссерман"
             };
@@ -80,30 +86,41 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             var driverCompanyModel = new DriverCompanyAM
             {
                 GarageAddress = garageAddress,
-                CompanyName = "Транспортные Системы",
-                Vehicle = ApplicationVehicle,
-                Driver = ApplicationDriver
+                CompanyName = "ГосЭвакуатор",
+                Vehicle = vehicle,
+                Driver = driver
             };
 
-            var domainCompany = new Company { Id = 1 };
-            var domainVehicle = new Vehicle { Id = 2 };
-            var domainDriver = new Driver { Id = 3 };
-            var domainGarage = new Garage { Id = 4 };
-
-            Suite.DomainGarageServiceMock
-                 .Setup(m => m.GetByAddress(garageAddress.Country, garageAddress.Province, garageAddress.Locality, garageAddress.District))
-                 .ReturnsAsync(domainGarage);
+            var domainCompany = new Company { Id = commonId++ };
+            var domainVehicle = new Vehicle { Id = commonId++ };
+            var domainModerator = new Moderator { Id = commonId++ };
+            var domainDriver = new Driver { Id = commonId++ };
+            var domainGarage = new Garage { Id = commonId++ };
 
             Suite.DomainCompanyServiceMock
-                 .Setup(m => m.Create(domainGarage.Id, driverCompanyModel.CompanyName))
+                 .Setup(m => m.Create(driverCompanyModel.CompanyName, true))
                  .ReturnsAsync(domainCompany);
 
+            Suite.DomainGarageServiceMock
+                 .Setup(m => m.GetByAddress(
+                     garageAddress.Country,
+                     garageAddress.Province,
+                     garageAddress.Locality,
+                     garageAddress.District))
+                 .ReturnsAsync(domainGarage);
+
             Suite.VehicleServiceMock
-                 .Setup(m => m.CreateDomainVehicle(domainCompany.Id, ApplicationVehicle))
+                 .Setup(m => m.CreateDomainVehicle(
+                     domainCompany.Id,
+                     vehicle))
                  .ReturnsAsync(domainVehicle);
 
             Suite.DomainDriverServiceMock
-                 .Setup(m => m.Create(ApplicationDriver.FirstName, ApplicationDriver.LastName, ApplicationDriver.PhoneNumber, domainCompany.Id))
+                 .Setup(m => m.Create(
+                     driver.FirstName,
+                     driver.LastName,
+                     driver.PhoneNumber,
+                     domainCompany.Id))
                  .ReturnsAsync(domainDriver);
 
             Suite.TransactionServiceMock
@@ -113,27 +130,48 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             await Suite.SignUpService.SignUpDriverCompany(driverCompanyModel);
 
             Suite.DomainGarageServiceMock
-                 .Verify(m => m.GetByAddress(garageAddress.Country, garageAddress.Province, garageAddress.Locality, garageAddress.District), Times.Once);
+                 .Verify(m => m.GetByAddress(
+                     garageAddress.Country,
+                     garageAddress.Province,
+                     garageAddress.Locality,
+                     garageAddress.District));
 
             Suite.DomainCompanyServiceMock
-                 .Verify(m => m.Create(domainGarage.Id, driverCompanyModel.CompanyName), Times.Once);
+                 .Verify(m => m.Create(driverCompanyModel.CompanyName, true));
 
             Suite.VehicleServiceMock
                  .Verify(m => m.CreateDomainVehicle(
                      domainCompany.Id,
-                     It.Is<VehicleAM>(v => v == ApplicationVehicle)), Times.Once);
-            
+                     It.Is<VehicleAM>(v => v == vehicle)), Times.Once);
+
+            Suite.DomainModeratorServiceMock
+                  .Verify(m => m.Create(
+                      driver.FirstName,
+                      driver.LastName,
+                      driver.PhoneNumber,
+                      domainCompany.Id));
+
             Suite.DomainDispatcherServiceMock
-                 .Verify(m => m.Create(ApplicationDriver.FirstName, ApplicationDriver.LastName, ApplicationDriver.PhoneNumber, domainCompany.Id), Times.Once);
+                 .Verify(m => m.Create(
+                     driver.FirstName,
+                     driver.LastName,
+                     driver.PhoneNumber,
+                     domainCompany.Id));
 
             Suite.DomainDriverServiceMock
-                 .Verify(m => m.Create(ApplicationDriver.FirstName, ApplicationDriver.LastName, ApplicationDriver.PhoneNumber, domainCompany.Id), Times.Once);
+                 .Verify(m => m.Create(
+                     driver.FirstName,
+                     driver.LastName,
+                     driver.PhoneNumber,
+                     domainCompany.Id));
 
             Suite.DomainDriverServiceMock
-                 .Verify(m => m.AssignVehicle(domainDriver.Id, domainVehicle.Id), Times.Once);
+                 .Verify(m => m.AssignVehicle(
+                     domainDriver.Id,
+                     domainVehicle.Id));
 
             Suite.TransactionMock
-                 .Verify(m => m.Commit(), Times.Once);
+                 .Verify(m => m.Commit());
 
             Suite.TransactionMock
                  .Verify(m => m.Rollback(), Times.Never);
@@ -142,11 +180,13 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
         [Fact]
         public async Task SignUpDispatcherDriver()
         {
-            var ApplicationDispatcher = new DispatcherAM
+            var commonId = 1;
+            var dispatcher = new DispatcherAM
             {
-                IdentityUserId = 6,
+                IdentityUserId = commonId++,
                 FirstName = "Петя",
-                LastName = "Лиссерман"
+                LastName = "Лиссерман",
+                PhoneNumber = "+79998887766"
             };
 
             var garageAddress = new AddressAM
@@ -161,23 +201,23 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             {
                 GarageAddress = garageAddress,
                 CompanyName = "Транспортные Системы",
-                Dispatcher = ApplicationDispatcher
+                Dispatcher = dispatcher
             };
 
-            var domainCompany = new Company { Id = 1 };
-            var domainDispatcher = new Dispatcher { Id = 3 };
-            var domainGarage = new Garage { Id = 4 };
-
-            Suite.DomainGarageServiceMock
-                 .Setup(m => m.GetByAddress(garageAddress.Country, garageAddress.Province, garageAddress.Locality, garageAddress.District))
-                 .ReturnsAsync(domainGarage);
+            var domainCompany = new Company { Id = commonId++ };
+            var domainModerator = new Moderator { Id = commonId++ };
+            var domainDispatcher = new Dispatcher { Id = commonId++ };
 
             Suite.DomainCompanyServiceMock
-                 .Setup(m => m.Create(domainGarage.Id, dispatcherCompanyModel.CompanyName))
+                 .Setup(m => m.Create(dispatcherCompanyModel.CompanyName, true))
                  .ReturnsAsync(domainCompany);
-
+            
             Suite.DomainDispatcherServiceMock
-                 .Setup(m => m.Create(ApplicationDispatcher.FirstName, ApplicationDispatcher.LastName, ApplicationDispatcher.PhoneNumber, domainCompany.Id))
+                 .Setup(m => m.Create(
+                     dispatcher.FirstName, 
+                     dispatcher.LastName,
+                     dispatcher.PhoneNumber,
+                     domainCompany.Id))
                  .ReturnsAsync(domainDispatcher);
 
             Suite.TransactionServiceMock
@@ -187,16 +227,31 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             await Suite.SignUpService.SignUpDispatcherCompany(dispatcherCompanyModel);
 
             Suite.DomainGarageServiceMock
-                 .Verify(m => m.GetByAddress(garageAddress.Country, garageAddress.Province, garageAddress.Locality, garageAddress.District), Times.Once);
+                 .Verify(m => m.GetByAddress(
+                     garageAddress.Country,
+                     garageAddress.Province,
+                     garageAddress.Locality,
+                     garageAddress.District));
 
             Suite.DomainCompanyServiceMock
-                 .Verify(m => m.Create(domainGarage.Id, dispatcherCompanyModel.CompanyName), Times.Once);
+                 .Verify(m => m.Create(dispatcherCompanyModel.CompanyName, true));
+
+            Suite.DomainModeratorServiceMock
+                 .Verify(m => m.Create(
+                     dispatcher.FirstName,
+                     dispatcher.LastName,
+                     dispatcher.PhoneNumber,
+                     domainCompany.Id));
 
             Suite.DomainDispatcherServiceMock
-                 .Verify(m => m.Create(ApplicationDispatcher.FirstName, ApplicationDispatcher.LastName, ApplicationDispatcher.PhoneNumber, domainCompany.Id), Times.Once);
+                 .Verify(m => m.Create(
+                     dispatcher.FirstName,
+                     dispatcher.LastName,
+                     dispatcher.PhoneNumber,
+                     domainCompany.Id));
 
             Suite.TransactionMock
-                 .Verify(m => m.Commit(), Times.Once);
+                 .Verify(m => m.Commit());
 
             Suite.TransactionMock
                  .Verify(m => m.Rollback(), Times.Never);

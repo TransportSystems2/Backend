@@ -15,11 +15,13 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
     public class GarageService : DomainService<Garage>, IGarageService
     {
         public GarageService(IGarageRepository repository,
+            ICompanyService companyService,
             ICityService cityService,
             IAddressService addressService,
             IPricelistService pricelistService)
             : base(repository)
         {
+            CompanyService = companyService;
             CityService = cityService;
             AddressService = addressService;
             PricelistService = pricelistService;
@@ -27,16 +29,19 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
 
         protected new IGarageRepository Repository => (IGarageRepository)base.Repository;
 
+        protected ICompanyService CompanyService { get; }
+
         protected ICityService CityService { get; }
 
         protected IAddressService AddressService { get; }
 
         protected IPricelistService PricelistService { get; }
 
-        public async Task<Garage> Create(int cityId, int addressId, int pricelistId)
+        public async Task<Garage> Create(int companyId, int cityId, int addressId, int pricelistId)
         {
             var garage = new Garage
             {
+                CompanyId = companyId,
                 CityId = cityId,
                 AddressId = addressId,
                 PricelistId = pricelistId
@@ -93,24 +98,23 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
         {
             var garagesAddresses = await AddressService.GetByGeocoding(AddressKind.Garage, country, province, locality, district);
             var firstGarageAddress = garagesAddresses.FirstOrDefault();
-            if (firstGarageAddress == null)
+
+            Garage result = null;
+            if (firstGarageAddress != null)
             {
-                throw new EntityNotFoundException(
-                    $"not found garage addresses with address." +
-                    $" Country: {country}" +
-                    $" Province: {province}" +
-                    $" Locality: {locality}" +
-                    $" District: {district}",
-                    "GarageAddress");
+                result = await Repository.GetByAddress(firstGarageAddress.Id);
             }
 
-            var garage = await Repository.GetByAddress(firstGarageAddress.Id);
-
-            return garage;
+            return result;
         }
 
         protected override async Task<bool> DoVerifyEntity(Garage entity)
         {
+            if (!await CompanyService.IsExist(entity.CompanyId))
+            {
+                throw new EntityNotFoundException($"CompanyId:{entity.CompanyId} not found", "Company");
+            }
+
             if (!await CityService.IsExist(entity.CityId))
             {
                 throw new EntityNotFoundException($"CityId:{entity.CityId} not found", "City");

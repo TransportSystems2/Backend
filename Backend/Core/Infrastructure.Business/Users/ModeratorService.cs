@@ -9,7 +9,10 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
 {
     public class ModeratorService : EmployeeService<Moderator>, IModeratorService
     {
-        public ModeratorService(IModeratorRepository repository, IIdentityUserService identityUserService, ICompanyService companyService)
+        public ModeratorService(
+            IModeratorRepository repository,
+            IIdentityUserService identityUserService,
+            ICompanyService companyService)
             : base(repository, identityUserService, companyService)
         {
         }

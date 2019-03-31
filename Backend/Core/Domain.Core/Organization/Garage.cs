@@ -8,6 +8,6 @@
 
         public int PricelistId { get; set; }
 
-        public int OwnerCompanyId { get; set; }
+        public int CompanyId { get; set; }
     }
 }

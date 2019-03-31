@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace TransportSystems.Backend.API.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -171,9 +171,7 @@ namespace TransportSystems.Backend.API.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     AddedDate = table.Column<DateTime>(nullable: false),
                     ModifiedDate = table.Column<DateTime>(nullable: false),
-                    GarageId = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
-                    ModeratorId = table.Column<int>(nullable: false),
                     IsPrivate = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
@@ -240,7 +238,7 @@ namespace TransportSystems.Backend.API.Migrations
                     AddressId = table.Column<int>(nullable: false),
                     CityId = table.Column<int>(nullable: false),
                     PricelistId = table.Column<int>(nullable: false),
-                    OwnerCompanyId = table.Column<int>(nullable: false)
+                    CompanyId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -452,7 +450,6 @@ namespace TransportSystems.Backend.API.Migrations
                     AddedDate = table.Column<DateTime>(nullable: false),
                     ModifiedDate = table.Column<DateTime>(nullable: false),
                     CompanyId = table.Column<int>(nullable: false),
-                    GarageId = table.Column<int>(nullable: false),
                     RegistrationNumber = table.Column<string>(nullable: true),
                     BrandCatalogItemId = table.Column<int>(nullable: false),
                     CapacityCatalogItemId = table.Column<int>(nullable: false),
