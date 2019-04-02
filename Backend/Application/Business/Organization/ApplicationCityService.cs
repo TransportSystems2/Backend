@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Common.Models.Units;
+﻿using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Core.Services.Interfaces;
@@ -9,6 +7,7 @@ using TransportSystems.Backend.Application.Interfaces.Geo;
 using TransportSystems.Backend.Application.Interfaces.Organization;
 using TransportSystems.Backend.Application.Interfaces.Pricing;
 using TransportSystems.Backend.Application.Models.Geo;
+using Common.Models.Units;
 
 namespace TransportSystems.Backend.Application.Business.Organization
 {

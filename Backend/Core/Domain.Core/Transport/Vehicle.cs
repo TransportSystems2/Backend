@@ -4,8 +4,6 @@
     {
         public int CompanyId { get; set; }
 
-        public int GarageId { get; set; }
-
         public string RegistrationNumber { get; set; }
 
         public int BrandCatalogItemId { get; set; }
