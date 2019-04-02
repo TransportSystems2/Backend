@@ -25,7 +25,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
         {
             if (string.IsNullOrEmpty(name))
             {
-                throw new ArgumentNullException("Name");
+                throw new ArgumentException("Name of company is null or empty", "Name");
             }
 
             if (await Repository.GetByName(name) != null)

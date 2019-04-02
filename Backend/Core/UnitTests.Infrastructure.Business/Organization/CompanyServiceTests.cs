@@ -75,7 +75,7 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
         {
             var isPrivate = false;
 
-            await Assert.ThrowsAsync<ArgumentNullException>("Name", () => Suite.Service.Create(name, isPrivate));
+            await Assert.ThrowsAsync<ArgumentException>("Name", () => Suite.Service.Create(name, isPrivate));
         }
 
         [Fact]
