@@ -68,10 +68,11 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
             await Assert.ThrowsAsync<EntityAlreadyExistsException>("Name", () => Suite.Service.Create(existingCompany.Name, isPrivate));
         }
 
-        [Fact]
-        public async Task CreatCompanyWhenNameIsEmptyOrNull()
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public async Task CreatCompanyWhenNameIsEmptyOrNull(string name)
         {
-            var name = "";
             var isPrivate = false;
 
             await Assert.ThrowsAsync<ArgumentNullException>("Name", () => Suite.Service.Create(name, isPrivate));

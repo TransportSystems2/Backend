@@ -178,7 +178,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
         }
 
         [Fact]
-        public async Task SignUpDispatcherDriver()
+        public async Task SignUpDispatcherCompany()
         {
             var commonId = 1;
             var dispatcher = new DispatcherAM
