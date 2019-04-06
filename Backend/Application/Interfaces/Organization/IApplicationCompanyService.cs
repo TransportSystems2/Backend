@@ -5,7 +5,7 @@ namespace TransportSystems.Backend.Application.Interfaces.Organization
 {
     public interface IApplicationCompanyService : IApplicationTransactionService
     {
-        Task<Company> CreateDomainCompany(string name, bool isPrivate = true);
+        Task<Company> CreateDomainCompany(string name);
 
         Task<Company> GetDomainCompany(string name);
     }

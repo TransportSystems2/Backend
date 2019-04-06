@@ -143,7 +143,7 @@ namespace TransportSystems.Backend.API.Database
 
                 foreach (var garageAddress in garagesAddresses)
                 {
-                    await GarageService.CreateDomainGarage(companyId, domainCity.Id, garageAddress);
+                    await GarageService.CreateDomainGarage(true, companyId, domainCity.Id, garageAddress);
                 }
             }
         }

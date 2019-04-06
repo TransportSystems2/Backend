@@ -37,10 +37,16 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
 
         protected IPricelistService PricelistService { get; }
 
-        public async Task<Garage> Create(int companyId, int cityId, int addressId, int pricelistId)
+        public async Task<Garage> Create(
+            bool isPublic,
+            int companyId,
+            int cityId,
+            int addressId,
+            int pricelistId)
         {
             var garage = new Garage
             {
+                IsPublic = isPublic,
                 CompanyId = companyId,
                 CityId = cityId,
                 AddressId = addressId,
