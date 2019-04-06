@@ -20,9 +20,9 @@ namespace TransportSystems.Backend.Application.Business.Organization
 
         protected ICompanyService DomainCompanyService { get; }
 
-        public Task<Company> CreateDomainCompany(string name, bool isPrivate = true)
+        public Task<Company> CreateDomainCompany(string name)
         {
-            return DomainCompanyService.Create(name, isPrivate);
+            return DomainCompanyService.Create(name);
         }
 
         public Task<Company> GetDomainCompany(string name)

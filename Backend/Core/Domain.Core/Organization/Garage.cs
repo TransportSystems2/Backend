@@ -9,5 +9,7 @@
         public int PricelistId { get; set; }
 
         public int CompanyId { get; set; }
+
+        public bool IsPublic { get; set; }
     }
 }

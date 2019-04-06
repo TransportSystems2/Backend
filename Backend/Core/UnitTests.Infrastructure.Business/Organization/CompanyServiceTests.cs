@@ -37,17 +37,15 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
         public async Task CreateCompany()
         {
             var companyName = "Транспортные Системы";
-            var isPrivate = false;
 
             Suite.RepositoryMock
                 .Setup(m => m.GetByName(companyName))
                 .Returns(Task.FromResult<Company>(null));
 
-            var resultCompany = await Suite.Service.Create(companyName, isPrivate);
+            var resultCompany = await Suite.Service.Create(companyName);
 
             Assert.NotNull(resultCompany);
             Assert.Equal(companyName, resultCompany.Name);
-            Assert.Equal(isPrivate, resultCompany.IsPrivate);
         }
 
         [Fact]
@@ -59,13 +57,11 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
                 Name = "Транспортные Системы"
             };
 
-            var isPrivate = false;
-
             Suite.RepositoryMock
                 .Setup(m => m.GetByName(existingCompany.Name))
                 .ReturnsAsync(existingCompany);
 
-            await Assert.ThrowsAsync<EntityAlreadyExistsException>("Name", () => Suite.Service.Create(existingCompany.Name, isPrivate));
+            await Assert.ThrowsAsync<EntityAlreadyExistsException>("Name", () => Suite.Service.Create(existingCompany.Name));
         }
 
         [Theory]
@@ -73,9 +69,7 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
         [InlineData(null)]
         public async Task CreatCompanyWhenNameIsEmptyOrNull(string name)
         {
-            var isPrivate = false;
-
-            await Assert.ThrowsAsync<ArgumentException>("Name", () => Suite.Service.Create(name, isPrivate));
+            await Assert.ThrowsAsync<ArgumentException>("Name", () => Suite.Service.Create(name));
         }
 
         [Fact]

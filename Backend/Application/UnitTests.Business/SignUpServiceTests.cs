@@ -98,7 +98,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             var domainGarage = new Garage { Id = commonId++ };
 
             Suite.DomainCompanyServiceMock
-                 .Setup(m => m.Create(driverCompanyModel.CompanyName, true))
+                 .Setup(m => m.Create(driverCompanyModel.CompanyName))
                  .ReturnsAsync(domainCompany);
 
             Suite.DomainGarageServiceMock
@@ -137,7 +137,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                      garageAddress.District));
 
             Suite.DomainCompanyServiceMock
-                 .Verify(m => m.Create(driverCompanyModel.CompanyName, true));
+                 .Verify(m => m.Create(driverCompanyModel.CompanyName));
 
             Suite.VehicleServiceMock
                  .Verify(m => m.CreateDomainVehicle(
@@ -209,7 +209,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             var domainDispatcher = new Dispatcher { Id = commonId++ };
 
             Suite.DomainCompanyServiceMock
-                 .Setup(m => m.Create(dispatcherCompanyModel.CompanyName, true))
+                 .Setup(m => m.Create(dispatcherCompanyModel.CompanyName))
                  .ReturnsAsync(domainCompany);
             
             Suite.DomainDispatcherServiceMock
@@ -234,7 +234,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
                      garageAddress.District));
 
             Suite.DomainCompanyServiceMock
-                 .Verify(m => m.Create(dispatcherCompanyModel.CompanyName, true));
+                 .Verify(m => m.Create(dispatcherCompanyModel.CompanyName));
 
             Suite.DomainModeratorServiceMock
                  .Verify(m => m.Create(

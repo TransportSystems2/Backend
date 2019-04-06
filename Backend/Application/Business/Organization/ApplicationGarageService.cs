@@ -31,7 +31,11 @@ namespace TransportSystems.Backend.Application.Business.Organization
 
         protected IApplicationAddressService AddressService { get; }
 
-        public async Task<Garage> CreateDomainGarage(int companyId, int cityId, AddressAM address)
+        public async Task<Garage> CreateDomainGarage(
+            bool isPublic,
+            int companyId,
+            int cityId,
+            AddressAM address)
         {
             using (var transaction = await TransactionService.BeginTransaction())
             {
@@ -44,7 +48,12 @@ namespace TransportSystems.Backend.Application.Business.Organization
                     }
 
                     var domainAddress = await AddressService.CreateDomainAddress(AddressKind.Garage, address);
-                    var result = await DomainGarageService.Create(companyId, cityId, domainAddress.Id, domainCity.PricelistId);
+                    var result = await DomainGarageService.Create(
+                        isPublic,
+                        companyId,
+                        cityId,
+                        domainAddress.Id,
+                        domainCity.PricelistId);
 
                     transaction.Commit();
                     return result;

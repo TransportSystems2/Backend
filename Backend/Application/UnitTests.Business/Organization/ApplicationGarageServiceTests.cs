@@ -43,6 +43,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
         {
             var commonId = 1;
             var pricelistId = commonId++;
+            var isPublic = true;
 
             var address = new AddressAM
             {
@@ -86,10 +87,14 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
                 .Setup(m => m.CreateDomainAddress(AddressKind.Garage, address))
                 .ReturnsAsync(domainAddress);
 
-            await Suite.GarageService.CreateDomainGarage(domainCompany.Id, domainCity.Id, address);
+            await Suite.GarageService.CreateDomainGarage(isPublic, domainCompany.Id, domainCity.Id, address);
 
             Suite.DomainGarageServiceMock
-                .Verify(m => m.Create(domainCompany.Id, domainCity.Id, domainAddress.Id, domainCity.PricelistId));
+                .Verify(m => m.Create(isPublic,
+                    domainCompany.Id,
+                    domainCity.Id,
+                    domainAddress.Id,
+                    domainCity.PricelistId));
         }
 
         [Fact]

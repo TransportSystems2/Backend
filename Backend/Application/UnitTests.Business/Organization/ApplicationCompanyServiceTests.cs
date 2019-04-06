@@ -32,18 +32,16 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
         {
             var domainCompany = new Company
             {
-                Name = "ГосЭвакуатор",
-                IsPrivate = false
+                Name = "ГосЭвакуатор"
             };
 
             Suite.DomainCompanyServiceMock
-                .Setup(m => m.Create(domainCompany.Name, domainCompany.IsPrivate))
+                .Setup(m => m.Create(domainCompany.Name))
                 .ReturnsAsync(domainCompany);
 
-            var result = await Suite.Service.CreateDomainCompany(domainCompany.Name, domainCompany.IsPrivate);
+            var result = await Suite.Service.CreateDomainCompany(domainCompany.Name);
 
             Assert.Equal(domainCompany.Name, result.Name);
-            Assert.Equal(domainCompany.IsPrivate, result.IsPrivate);
         }
 
         [Fact]
@@ -51,8 +49,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
         {
             var domainCompany = new Company
             {
-                Name = "ГосЭвакуатор",
-                IsPrivate = false
+                Name = "ГосЭвакуатор"
             };
 
             Suite.DomainCompanyServiceMock

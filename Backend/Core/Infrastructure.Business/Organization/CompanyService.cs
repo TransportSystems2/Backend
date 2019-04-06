@@ -21,7 +21,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
             throw new System.NotImplementedException();
         }
 
-        public async Task<Company> Create(string name, bool isPrivate = true)
+        public async Task<Company> Create(string name)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -33,7 +33,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
                 throw new EntityAlreadyExistsException($"Company this same name: {name}, alredy exists.", "Name");
             }
 
-            var companyModel = new Company { Name = name, IsPrivate = isPrivate };
+            var companyModel = new Company { Name = name };
             await AddCompany(companyModel);
 
             return companyModel;
@@ -57,9 +57,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
             await Repository.Save();
         }
 
-        protected override async Task<bool> DoVerifyEntity(Company entity)
+        protected override Task<bool> DoVerifyEntity(Company entity)
         {
-            return true;
+            return Task.FromResult(true);
         }
     }
 }

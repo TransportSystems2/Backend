@@ -6,7 +6,7 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Organization
 {
     public interface IGarageService : IDomainService<Garage>
     {
-        Task<Garage> Create(int companyId, int cityId, int addressId, int pricelistId);
+        Task<Garage> Create(bool isPublic, int companyId, int cityId, int addressId, int pricelistId);
 
         Task AssignPricelist(int garageId, int pricelistId);
 
