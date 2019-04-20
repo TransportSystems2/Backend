@@ -46,7 +46,7 @@ services:
     restart: always
     environment:
       ConnectionStrings:db: Host=db.postgres.core;Port=5432;Database=ts_data;Username=apiservice
-      ConnectionStrings:identity: http://transportsystems.backend.identity.signin
+      ConnectionStrings:identity: "${IDENTITY}"
       ConnectionStrings:identity_manage: http://transportsystems.backend.identity.manage
     depends_on:
       - db.postgres.core
@@ -74,7 +74,7 @@ services:
     restart: always
     environment:
       ConnectionStrings:db: Host=db.postgres.identity;Port=5432;Database=ts_identity;Username=identityservice
-      ConnectionStrings:identity: http://transportsystems.backend.identity.signin
+      ConnectionStrings:identity: "${IDENTITY}"
     depends_on:
       - db.postgres.identity
       - transportsystems.backend.identity.signin
