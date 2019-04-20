@@ -14,6 +14,7 @@ namespace TransportSystems.Backend.Application.Business
         public SignUpService(
             ITransactionService transactionService,
             IDriverService domainDriverService,
+            IModeratorService domainModeratorService,
             IDispatcherService domainDispatcherService,
             ICompanyService domainCompanyService,
             IGarageService domainGarageService,
@@ -21,6 +22,7 @@ namespace TransportSystems.Backend.Application.Business
             : base(transactionService)
         {
             DomainDriverService = domainDriverService;
+            DomainModeratorService = domainModeratorService;
             DomainDispatcherService = domainDispatcherService;
             DomainCompanyService = domainCompanyService;
             DomainGarageService = domainGarageService;
@@ -28,6 +30,8 @@ namespace TransportSystems.Backend.Application.Business
         }
 
         protected IDriverService DomainDriverService { get; }
+
+        protected IModeratorService DomainModeratorService { get; }
 
         protected IDispatcherService DomainDispatcherService { get; }
 
@@ -51,8 +55,14 @@ namespace TransportSystems.Backend.Application.Business
                     );
 
                     var domainCompany = await DomainCompanyService.Create(
-                        domainGarage.Id,
                         dispatcherCompanyModel.CompanyName);
+
+                    var domainModerator = await DomainModeratorService.Create(
+                        dispatcherCompanyModel.Dispatcher.FirstName,
+                        dispatcherCompanyModel.Dispatcher.LastName,
+                        dispatcherCompanyModel.Dispatcher.PhoneNumber,
+                        domainCompany.Id
+                    );
 
                     var domainDispatcher = await DomainDispatcherService.Create(
                         dispatcherCompanyModel.Dispatcher.FirstName,
@@ -85,12 +95,17 @@ namespace TransportSystems.Backend.Application.Business
                     );
 
                     var domainCompany = await DomainCompanyService.Create(
-                        domainGarage.Id,
                         driverCompanyModel.CompanyName);
 
                     var domainVehicle = await VehicleService.CreateDomainVehicle(
                         domainCompany.Id,
                         driverCompanyModel.Vehicle);
+
+                    var domainModerator = await DomainModeratorService.Create(
+                        driverCompanyModel.Driver.FirstName,
+                        driverCompanyModel.Driver.LastName,
+                        driverCompanyModel.Driver.PhoneNumber,
+                        domainCompany.Id);
 
                     var domainDispatcher = await DomainDispatcherService.Create(
                         driverCompanyModel.Driver.FirstName,

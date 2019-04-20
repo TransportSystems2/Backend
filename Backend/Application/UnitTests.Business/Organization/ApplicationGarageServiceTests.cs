@@ -42,8 +42,8 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
         public async Task CreateDomainGarage()
         {
             var commonId = 1;
-            var cityId = commonId++;
             var pricelistId = commonId++;
+            var isPublic = true;
 
             var address = new AddressAM
             {
@@ -70,21 +70,31 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
 
             var domainCity = new City
             {
-                Id = cityId,
+                Id = commonId,
                 PricelistId = pricelistId
             };
 
+            var domainCompany = new Company
+            {
+                Id = commonId++,
+                Name = "Транспортные системы"
+            };
+
             Suite.CityServiceMock
-                .Setup(m => m.GetDomainCity(cityId))
+                .Setup(m => m.GetDomainCity(domainCity.Id))
                 .ReturnsAsync(domainCity);
             Suite.AddressServiceMock
                 .Setup(m => m.CreateDomainAddress(AddressKind.Garage, address))
                 .ReturnsAsync(domainAddress);
 
-            await Suite.GarageService.CreateDomainGarage(cityId, address);
+            await Suite.GarageService.CreateDomainGarage(isPublic, domainCompany.Id, domainCity.Id, address);
 
             Suite.DomainGarageServiceMock
-                .Verify(m => m.Create(cityId, domainAddress.Id, domainCity.PricelistId));
+                .Verify(m => m.Create(isPublic,
+                    domainCompany.Id,
+                    domainCity.Id,
+                    domainAddress.Id,
+                    domainCity.PricelistId));
         }
 
         [Fact]

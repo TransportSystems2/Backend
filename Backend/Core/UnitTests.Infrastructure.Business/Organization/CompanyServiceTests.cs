@@ -1,10 +1,11 @@
 ﻿using Moq;
+using System;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Core.Domain.Interfaces.Organization;
 using TransportSystems.Backend.Core.Infrastructure.Business.Organization;
+using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Organization;
-
 using Xunit;
 
 namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
@@ -13,40 +14,84 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
     {
         public CompanyServiceTestSuite()
         {
-            CompanyRepositoryMock = new Mock<ICompanyRepository>();
-            GarageServiceMock = new Mock<IGarageService>();
+            RepositoryMock = new Mock<ICompanyRepository>();
 
-            CompanyService = new CompanyService(CompanyRepositoryMock.Object, GarageServiceMock.Object);
+            Service = new CompanyService(RepositoryMock.Object);
         }
 
-        public Mock<ICompanyRepository> CompanyRepositoryMock { get; }
+        public Mock<ICompanyRepository> RepositoryMock { get; }
 
-        public Mock<IGarageService> GarageServiceMock { get; }
-
-        public ICompanyService CompanyService { get; }
+        public ICompanyService Service { get; }
     }
 
     public class CompanyServiceTest
     {
-        [Fact]
-        public async void CreateCompanyResultCreatedCompany()
+        public CompanyServiceTest()
         {
-            var suite = new CompanyServiceTestSuite();
-            var garage = new Garage { Id = 1 };
+            Suite = new CompanyServiceTestSuite();
+        }
+
+        public CompanyServiceTestSuite Suite { get; }
+
+        [Fact]
+        public async Task CreateCompany()
+        {
             var companyName = "Транспортные Системы";
 
-            suite.GarageServiceMock
-                .Setup(m => m.IsExist(garage.Id))
-                .ReturnsAsync(true);
-            suite.CompanyRepositoryMock
+            Suite.RepositoryMock
                 .Setup(m => m.GetByName(companyName))
-                .Returns<Company>(null);
+                .Returns(Task.FromResult<Company>(null));
 
-            var resultCompany = await suite.CompanyService.Create(garage.Id, companyName);
+            var resultCompany = await Suite.Service.Create(companyName);
 
             Assert.NotNull(resultCompany);
-            Assert.Equal(garage.Id, resultCompany.GarageId);
             Assert.Equal(companyName, resultCompany.Name);
+        }
+
+        [Fact]
+        public async Task CreateCompanyWhenCompanyWithSameNameAlreadyExists()
+        {
+            var existingCompany = new Company
+            {
+                Id = 1,
+                Name = "Транспортные Системы"
+            };
+
+            Suite.RepositoryMock
+                .Setup(m => m.GetByName(existingCompany.Name))
+                .ReturnsAsync(existingCompany);
+
+            await Assert.ThrowsAsync<EntityAlreadyExistsException>("Name", () => Suite.Service.Create(existingCompany.Name));
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public async Task CreatCompanyWhenNameIsEmptyOrNull(string name)
+        {
+            await Assert.ThrowsAsync<ArgumentException>("Name", () => Suite.Service.Create(name));
+        }
+
+        [Fact]
+        public async Task GetCompanyByName()
+        {
+            var company = new Company { Name = "Sample" };
+
+            Suite.RepositoryMock
+                .Setup(m => m.GetByName(company.Name))
+                .ReturnsAsync(company);
+
+            var result = await Suite.Service.GetByName(company.Name);
+
+            Assert.Equal(company, result);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public async Task GetCompanyByNameWhereNameIsEmptyOrNull(string name)
+        {
+            await Assert.ThrowsAsync<ArgumentException>("Name", () => Suite.Service.GetByName(name));
         }
     }
 }

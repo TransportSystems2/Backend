@@ -298,6 +298,7 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IApplicationOrderValidatorService, ApplicationOrderValidatorService>();
             services.AddScoped<IApplicationCustomerService, ApplicationCustomerService>();
             services.AddScoped<IApplicationPrognosisService, ApplicationPrognosisService>();
+            services.AddScoped<IApplicationCompanyService, ApplicationCompanyService>();
         }
 
         protected virtual void ConfigureExternalServices(IServiceCollection services)

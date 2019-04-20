@@ -20,9 +20,10 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
             CityServiceMock = new Mock<ICityService>();
             AddressServiceMock = new Mock<IAddressService>();
             PricelistServiceMock = new Mock<IPricelistService>();
+            CompanyServiceMock = new Mock<ICompanyService>();
 
-            GarageService = new GarageService(
-                GarageRepositoryMock.Object,
+            GarageService = new GarageService(GarageRepositoryMock.Object,
+                CompanyServiceMock.Object,
                 CityServiceMock.Object,
                 AddressServiceMock.Object,
                 PricelistServiceMock.Object);
@@ -30,6 +31,8 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
         public IGarageService GarageService { get; }
 
         public Mock<IGarageRepository> GarageRepositoryMock { get; }
+
+        public Mock<ICompanyService> CompanyServiceMock { get; }
 
         public Mock<ICityService> CityServiceMock { get; }
         
@@ -46,9 +49,15 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
             var commonId = 1;
             var suite = new GarageServiceTestSuite();
 
+            var isPublic = true;
+            var companyId = commonId++;
             var cityId = commonId++;
             var addressId = commonId++;
             var pricelistId = commonId++;
+
+            suite.CompanyServiceMock
+                .Setup(m => m.IsExist(companyId))
+                .ReturnsAsync(true);
 
             suite.CityServiceMock
                 .Setup(m => m.IsExist(cityId))
@@ -62,16 +71,20 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
                 .Setup(m => m.IsExist(pricelistId))
                 .ReturnsAsync(true);
         
-            var result = await suite.GarageService.Create(cityId, addressId, pricelistId);
+            var result = await suite.GarageService.Create(isPublic, companyId, cityId, addressId, pricelistId);
 
             suite.GarageRepositoryMock
                 .Verify(m => m.Add(It.Is<Garage>(
-                    g => g.CityId.Equals(cityId)
+                    g => g.IsPublic.Equals(isPublic)
+                    && g.CityId.Equals(cityId)
+                    && g.CompanyId.Equals(companyId)
                     && g.AddressId.Equals(addressId)
                     && g.PricelistId.Equals(pricelistId))));
             suite.GarageRepositoryMock
                 .Verify(m => m.Save());
 
+            Assert.Equal(isPublic, result.IsPublic);
+            Assert.Equal(companyId, result.CompanyId);
             Assert.Equal(cityId, result.CityId);
             Assert.Equal(addressId, result.AddressId);
             Assert.Equal(pricelistId, result.PricelistId);

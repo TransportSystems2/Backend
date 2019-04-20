@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TransportSystems.Backend.Core.Infrastructure.Database;
@@ -9,9 +10,10 @@ using TransportSystems.Backend.Core.Infrastructure.Database;
 namespace TransportSystems.Backend.API.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20190330064950_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -250,6 +252,8 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<DateTime>("AddedDate");
 
+                    b.Property<bool>("IsPrivate");
+
                     b.Property<DateTime>("ModifiedDate");
 
                     b.Property<string>("Name");
@@ -271,8 +275,6 @@ namespace TransportSystems.Backend.API.Migrations
                     b.Property<int>("CityId");
 
                     b.Property<int>("CompanyId");
-
-                    b.Property<bool>("IsPublic");
 
                     b.Property<DateTime>("ModifiedDate");
 

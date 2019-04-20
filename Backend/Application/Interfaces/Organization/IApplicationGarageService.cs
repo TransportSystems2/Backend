@@ -7,7 +7,7 @@ namespace TransportSystems.Backend.Application.Interfaces.Organization
 {
     public interface IApplicationGarageService : IApplicationTransactionService
     {
-        Task<Garage> CreateDomainGarage(int cityId, AddressAM address);
+        Task<Garage> CreateDomainGarage(bool isPublic, int companyId, int cityId, AddressAM address);
 
         Task<Garage> GetDomainGarage(int garageId);
 
