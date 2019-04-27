@@ -154,7 +154,6 @@ namespace TransportSystems.Backend.API
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "TrasnportSystems API V1");
-                c.RoutePrefix = string.Empty;
             });
 
             app.UseHttpsRedirection();
