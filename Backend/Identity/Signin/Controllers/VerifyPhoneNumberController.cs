@@ -14,7 +14,7 @@ using TransportSystems.Backend.Identity.Signin.Services;
 
 namespace TransportSystems.Backend.Identity.Signin.Controllers
 {
-    [Route("identity/getcode")]
+    [Route("identity/code")]
     public class VerifyPhoneNumberController : ControllerBase
     {
         private readonly ISmsService _smsService;
@@ -37,16 +37,76 @@ namespace TransportSystems.Backend.Identity.Signin.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody]PhoneLoginViewModel model)
+        /// <summary>
+        /// Повторная отправка кода по sms.
+        /// </summary>
+        /// <param name="resendToken">
+        /// Токен переотправки, если токен не совпадает с ранее выданным,
+        /// sms не будет отправлено.
+        /// </param>
+        /// <example>
+        /// CfDJ8BNpUHesMKFIvvs7...
+        /// </example>
+        /// <param name="phoneModel">Модель телефона пользователя.</param>
+        /// <response code="202">Отправлено.</response>
+        /// <response code="400">Проверьте заполненую форму.</response>
+        /// <response code="500">Ошибка отправки.</response>
+        [Produces("application/json")]
+        [ProducesResponseType(202)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [HttpPut("resend")]
+        public async Task<IActionResult> ResendCode(string resendToken, [FromBody]PhoneLoginViewModel phoneModel)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var user = await GetUser(model);
-            var (verifyToken, result) = await SendSmsRequet(model, user);
+            var user = await GetUser(phoneModel);
+            if (!await _dataProtectorTokenProvider.ValidateAsync("resend_token", resendToken, _userManager, user))
+            {
+                return BadRequest("Invalid resend token");
+            }
+
+            var (verifyToken, result) = await SendSmsRequet(phoneModel, user);
+
+            if (!result)
+            {
+                return BadRequest("Sending sms failed");
+            }
+
+            var newResendToken = await _dataProtectorTokenProvider.GenerateAsync("resend_token", _userManager, user);
+            var body = new Dictionary<string, string> { { "resend_token", newResendToken } };
+
+            return Accepted(body);
+        }
+
+        /// <summary>
+        /// Генерация и отправка кода по sms.
+        /// </summary>
+        /// <remarks>
+        /// В случае, если номер телефона используется впервые, создается новый пользователь.
+        /// </remarks>
+        /// <returns>Результат отправки sms.</returns>
+        /// <response code="202">Отправлено.</response>
+        /// <response code="400">Проверьте заполненую форму.</response>
+        /// <response code="500">Ошибка отправки.</response>
+        /// <param name="phoneModel">Модель телефона пользователя.</param>
+        [Produces("application/json")]
+        [ProducesResponseType(202)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [HttpPost("send")]
+        public async Task<IActionResult> SendCode([FromBody]PhoneLoginViewModel phoneModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var user = await GetUser(phoneModel);
+            var (verifyToken, result) = await SendSmsRequet(phoneModel, user);
 
             if (!result)
             {
@@ -58,33 +118,6 @@ namespace TransportSystems.Backend.Identity.Signin.Controllers
             {
                 { "resend_token", resendToken }
             };
-
-            return Accepted(body);
-        }
-
-        [HttpPut]
-        public async Task<IActionResult> Put(string resendToken, [FromBody]PhoneLoginViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var user = await GetUser(model);
-            if (!await _dataProtectorTokenProvider.ValidateAsync("resend_token", resendToken, _userManager, user))
-            {
-                return BadRequest("Invalid resend token");
-            }
-
-            var (verifyToken, result) = await SendSmsRequet(model, user);
-
-            if (!result)
-            {
-                return BadRequest("Sending sms failed");
-            }
-
-            var newResendToken = await _dataProtectorTokenProvider.GenerateAsync("resend_token", _userManager, user);
-            var body = new Dictionary<string, string> { { "resend_token", newResendToken } };
 
             return Accepted(body);
         }
