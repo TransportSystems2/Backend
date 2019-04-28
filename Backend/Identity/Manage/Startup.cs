@@ -89,7 +89,7 @@ namespace TransportSystems.Backend.Identity.Manage
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/identity/manage/docs/v1/swagger.json", "Signin api V1");
+                c.SwaggerEndpoint("/identity/manage/docs/v1/swagger.json", "Manage api V1");
                 c.RoutePrefix = "identity/manage/docs";
             });
         }
