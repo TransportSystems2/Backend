@@ -1,5 +1,9 @@
+[![Documentation Status](https://readthedocs.org/projects/gosevakuator/badge/?version=latest)](https://gosevakuator.readthedocs.io/en/latest/?badge=latest)
+
 master [![Build Status](https://travis-ci.com/TransportSystems2/Backend.svg?branch=master)](https://travis-ci.com/TransportSystems2/Backend)
+
 develop [![Build Status](https://travis-ci.com/TransportSystems2/Backend.svg?branch=develop)](https://travis-ci.com/TransportSystems2/Backend)
+
 
 чтобы докер правильно работал на винде, надо создать локальные тома.
 Эти тома будут использоваться для того, чтобы хранить данные баз данных локально на компьютере, а не в образе.
