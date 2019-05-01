@@ -16,13 +16,11 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
     {
         public GarageService(IGarageRepository repository,
             ICompanyService companyService,
-            ICityService cityService,
             IAddressService addressService,
             IPricelistService pricelistService)
             : base(repository)
         {
             CompanyService = companyService;
-            CityService = cityService;
             AddressService = addressService;
             PricelistService = pricelistService;
         }
@@ -31,8 +29,6 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
 
         protected ICompanyService CompanyService { get; }
 
-        protected ICityService CityService { get; }
-
         protected IAddressService AddressService { get; }
 
         protected IPricelistService PricelistService { get; }
@@ -40,7 +36,6 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
         public async Task<Garage> Create(
             bool isPublic,
             int companyId,
-            int cityId,
             int addressId,
             int pricelistId)
         {
@@ -48,7 +43,6 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
             {
                 IsPublic = isPublic,
                 CompanyId = companyId,
-                CityId = cityId,
                 AddressId = addressId,
                 PricelistId = pricelistId
             };
@@ -114,16 +108,24 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
             return result;
         }
 
+        public async Task<Garage> GetByCoordinate(double latitude, double longitude)
+        {
+            var garageAddress = await AddressService.GetByCoordinate(latitude, longitude);
+
+            Garage result = null;
+            if (garageAddress != null)
+            {
+                result = await Repository.GetByAddress(garageAddress.Id);
+            }
+
+            return result;
+        }
+
         protected override async Task<bool> DoVerifyEntity(Garage entity)
         {
             if (!await CompanyService.IsExist(entity.CompanyId))
             {
                 throw new EntityNotFoundException($"CompanyId:{entity.CompanyId} not found", "Company");
-            }
-
-            if (!await CityService.IsExist(entity.CityId))
-            {
-                throw new EntityNotFoundException($"CityId:{entity.CityId} not found", "City");
             }
 
             if (!await AddressService.IsExist(entity.AddressId))

@@ -191,18 +191,18 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Data.GeoObject
         {
             var entities = new[]
             {
-                new Address { Id = 1, Kind = AddressKind.City, Latitude = 1, Longitude = 3 },
-                new Address { Id = 2, Kind = AddressKind.City, Latitude = -3, Longitude = -4 },
-                new Address { Id = 3, Kind = AddressKind.Garage, Latitude = 1, Longitude = 2 },
+                new Address { Id = 1, Kind = AddressKind.Garage, Latitude = 1, Longitude = 3 },
+                new Address { Id = 2, Kind = AddressKind.Garage, Latitude = -3, Longitude = -4 },
+                new Address { Id = 3, Kind = AddressKind.Vehicle, Latitude = 1, Longitude = 2 },
                 new Address { Id = 4, Kind = AddressKind.Vehicle, Latitude = 1, Longitude = 2 },
-                new Address { Id = 5, Kind = AddressKind.City, Latitude = 1.6, Longitude = 2 },
-                new Address { Id = 6, Kind = AddressKind.City, Latitude = 1.01, Longitude = 2.1 },
+                new Address { Id = 5, Kind = AddressKind.Garage, Latitude = 1.6, Longitude = 2 },
+                new Address { Id = 6, Kind = AddressKind.Garage, Latitude = 1.01, Longitude = 2.1 },
             };
 
             await Repository.AddRange(entities);
             await Repository.Save();
 
-            var result = await Repository.GetInCoordinateBounds(AddressKind.City, 1d, 2d, 1.5d, 3.5d);
+            var result = await Repository.GetInCoordinateBounds(AddressKind.Garage, 1d, 2d, 1.5d, 3.5d);
 
             Assert.Equal(2, result.Count);
             Assert.Equal(1, result.ElementAt(0).Id);
@@ -214,12 +214,12 @@ namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Data.GeoObject
         {
             var entities = new[]
             {
-                new Address { Id = 1, Kind = AddressKind.City, Latitude = 1, Longitude = 3 },
-                new Address { Id = 2, Kind = AddressKind.City, Latitude = -3, Longitude = -4 },
-                new Address { Id = 3, Kind = AddressKind.Garage, Latitude = 1, Longitude = 2 },
+                new Address { Id = 1, Kind = AddressKind.Garage, Latitude = 1, Longitude = 3 },
+                new Address { Id = 2, Kind = AddressKind.Garage, Latitude = -3, Longitude = -4 },
+                new Address { Id = 3, Kind = AddressKind.Vehicle, Latitude = 1, Longitude = 2 },
                 new Address { Id = 4, Kind = AddressKind.Vehicle, Latitude = 1, Longitude = 2 },
-                new Address { Id = 5, Kind = AddressKind.City, Latitude = 1.6, Longitude = 2 },
-                new Address { Id = 6, Kind = AddressKind.City, Latitude = 1.01, Longitude = 2.1 },
+                new Address { Id = 5, Kind = AddressKind.Garage, Latitude = 1.6, Longitude = 2 },
+                new Address { Id = 6, Kind = AddressKind.Garage, Latitude = 1.01, Longitude = 2.1 },
             };
 
             await Repository.AddRange(entities);

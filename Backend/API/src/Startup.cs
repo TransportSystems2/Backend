@@ -221,7 +221,6 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IVehicleRepository, VehicleRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<ICompanyRepository, CompanyRepository>();
-            services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IOrderStateRepository, OrderStateRepository>();
             services.AddScoped<ILotRepository, LotRepository>();
@@ -253,7 +252,6 @@ namespace TransportSystems.Backend.API
 
             services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<ICompanyService, CompanyService>();
-            services.AddScoped<ICityService, CityService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IOrderStateService, OrderStateService>();
             services.AddScoped<ILotService, LotService>();
@@ -291,7 +289,6 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IApplicationBillService, ApplicationBillService>();
             services.AddScoped<IApplicationBookingService, ApplicationBookingService>();
             services.AddScoped<IApplicationPricelistService, ApplicationPricelistService>();
-            services.AddScoped<IApplicationCityService, ApplicationCityService>();
             services.AddScoped<IApplicationRouteService, ApplicationRouteService>();
             services.AddScoped<IApplicationOrderService, ApplicationOrderService>();
             services.AddScoped<IApplicationOrderValidatorService, ApplicationOrderValidatorService>();

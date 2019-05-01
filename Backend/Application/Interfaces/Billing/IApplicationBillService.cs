@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
 using TransportSystems.Backend.Application.Models.Billing;
+using TransportSystems.Backend.Application.Models.Geo;
 
 namespace TransportSystems.Backend.Application.Interfaces.Billing
 {

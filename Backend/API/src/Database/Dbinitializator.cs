@@ -32,7 +32,6 @@ namespace TransportSystems.Backend.API.Database
                 DomainCatalogService = services.GetRequiredService<ICatalogService>();
 
                 CatalogService = services.GetRequiredService<IApplicationCatalogService>(); 
-                CityService = services.GetRequiredService<IApplicationCityService>();
                 GarageService = services.GetRequiredService<IApplicationGarageService>();
                 CompanyService = services.GetRequiredService<IApplicationCompanyService>();
                 SignUpService = services.GetRequiredService<ISignUpService>();
@@ -45,8 +44,6 @@ namespace TransportSystems.Backend.API.Database
         public static ICatalogService DomainCatalogService { get; private set; }
 
         public static IApplicationCatalogService CatalogService { get; private set; }
-
-        public static IApplicationCityService CityService { get; private set; }
 
         public static IApplicationGarageService GarageService { get; private set; }
 
@@ -97,53 +94,27 @@ namespace TransportSystems.Backend.API.Database
         {
             var domainCompany = await InitCompany("ГосЭвакуатор");
 
-            var rybinskDomain = "rybinsk";
-            var rybinskAddress = new AddressAM { Country = "Россия", Province = "Ярославская", Area = "Рыбинский район", Locality = "Рыбинск", Latitude = 58.0610321, Longitude = 38.7416854 };
-            var rybinskGaragesAddresses = new List<AddressAM>
+            var garagesAddresses = new List<AddressAM>
             {
                 new AddressAM { Country = "Россия", Province = "Ярославская", Area = "Рыбинский район", Locality = "Рыбинск", District = "Центральный", Street = "Пр. Серова", House = "1", Latitude = 58.0569028, Longitude = 38.780219 },
-                new AddressAM { Country = "Россия", Province = "Ярославская", Area = "Рыбинский район", Locality = "Рыбинск", District = "Заволжский", Street = "Большая Вольская", House = "55", Latitude = 58.0681517, Longitude = 38.8615214 }
+                new AddressAM { Country = "Россия", Province = "Вологодская", Locality = "Вологда", District = "Центральный", Street = "Благовещенская", House = "20", Latitude = 59.2224107, Longitude = 39.8715978 },
+                new AddressAM { Country = "Россия", Province = "Вологодская", Locality = "Череповец", District = "Центральный", Street = "Сталеваров", House = "78", Latitude = 59.1367202, Longitude = 37.9103716 },
+                new AddressAM { Country = "Россия", Province = "Ярославская", Locality = "Ярославль", District = "Ленинский", Street = "Радищева", House = "24", Latitude = 57.6379029, Longitude = 39.840627 }
             };
-            await CreateCityInfrastructure(domainCompany.Id, rybinskDomain, rybinskAddress, rybinskGaragesAddresses);
 
-            var vologdaDomain = "vologda";
-            var vologdaAddress = new AddressAM { Country = "Россия", Province = "Вологодская", Locality = "Вологда", Latitude = 59.2221979, Longitude = 39.8057537 };
-            var vologdaGaragesAddresses = new List<AddressAM>
-            {
-                new AddressAM { Country = "Россия", Province = "Вологодская", Locality = "Вологда", District = "Центральный", Street = "Благовещенская", House = "20", Latitude = 59.2224107, Longitude = 39.8715978 }
-            };
-            await CreateCityInfrastructure(domainCompany.Id, vologdaDomain, vologdaAddress, vologdaGaragesAddresses);
-
-            var cherepovecDomain = "cherepovec";
-            var cherepovecAddress = new AddressAM { Country = "Россия", Province = "Вологодская", Locality = "Череповец", Latitude = 59.1291174, Longitude = 37.7098701 };
-            var cherepovecGaragesAddresses = new List<AddressAM>
-            {
-                new AddressAM { Country = "Россия", Province = "Вологодская", Locality = "Череповец", District = "Центральный", Street = "Сталеваров", House = "78", Latitude = 59.1367202, Longitude = 37.9103716 }
-            };
-            await CreateCityInfrastructure(domainCompany.Id, cherepovecDomain, cherepovecAddress, cherepovecGaragesAddresses);
-
-            var yaroslavlDomain = "yaroslavl";
-            var yaroslavlAddress = new AddressAM { Country = "Россия", Province = "Ярославская", Locality = "Ярославль", Latitude = 57.6525644, Longitude = 39.724092 };
-            var yaroslavlGaragesAddresses = new List<AddressAM>
-            {
-                new AddressAM { Country = "Россия", Province = "Ярославская", Locality = "Ярославль", District = "Ленинский", Street = "Радищева", House = "24", Latitude = 57.6379029, Longitude = 39.840627 },
-            };
-            await CreateCityInfrastructure(domainCompany.Id, yaroslavlDomain, yaroslavlAddress, yaroslavlGaragesAddresses);
+            await InitGarages(domainCompany.Id, garagesAddresses, true);
         }
 
-        private static async Task CreateCityInfrastructure(
+        private static async Task InitGarages(
             int companyId,
-            string cityDomain,
-            AddressAM cityAddress,
-            List<AddressAM> garagesAddresses)
+            List<AddressAM> garagesAddresses,
+            bool isPublic)
         {
-            if (!await CityService.IsExistByDomain(cityDomain))
+            foreach (var garageAddress in garagesAddresses)
             {
-                var domainCity = await CityService.CreateDomainCity(cityDomain, cityAddress);
-
-                foreach (var garageAddress in garagesAddresses)
+                if (await GarageService.GetDomainGarageByAddress(garageAddress) == null)
                 {
-                    await GarageService.CreateDomainGarage(true, companyId, domainCity.Id, garageAddress);
+                    await GarageService.CreateDomainGarage(isPublic, companyId, garageAddress);
                 }
             }
         }

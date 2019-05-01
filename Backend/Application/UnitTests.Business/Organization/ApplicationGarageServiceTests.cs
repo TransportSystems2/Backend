@@ -9,6 +9,10 @@ using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Application.UnitTests.Business.Suite;
 using Xunit;
 using TransportSystems.Backend.Core.Domain.Core.Organization;
+using TransportSystems.Backend.Application.Interfaces.Pricing;
+using TransportSystems.Backend.Application.Models.Pricing;
+using TransportSystems.Backend.Core.Domain.Core.Pricing;
+using Common.Models.Units;
 
 namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
 {
@@ -17,23 +21,23 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
         public ApplicationGarageServiceTestSuite()
         {
             DomainGarageServiceMock = new Mock<IGarageService>();
-            CityServiceMock = new Mock<IApplicationCityService>();
             AddressServiceMock = new Mock<IApplicationAddressService>();
+            PricelistServiceMock = new Mock<IApplicationPricelistService>();
 
             GarageService = new ApplicationGarageService(
                 TransactionServiceMock.Object,
                 DomainGarageServiceMock.Object,
-                CityServiceMock.Object,
-                AddressServiceMock.Object);
+                AddressServiceMock.Object,
+                PricelistServiceMock.Object);
         }
 
         public IApplicationGarageService GarageService { get; }
 
         public Mock<IGarageService> DomainGarageServiceMock { get; }
 
-        public Mock<IApplicationCityService> CityServiceMock { get; }
-
         public Mock<IApplicationAddressService> AddressServiceMock { get; }
+
+        public Mock<IApplicationPricelistService> PricelistServiceMock { get; }
     }
 
     public class ApplicationGarageServiceTests : BaseServiceTests<ApplicationGarageServiceTestSuite>
@@ -68,33 +72,28 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
                 Longitude = 37.597576,
             };
 
-            var domainCity = new City
-            {
-                Id = commonId,
-                PricelistId = pricelistId
-            };
-
             var domainCompany = new Company
             {
                 Id = commonId++,
                 Name = "Транспортные системы"
             };
 
-            Suite.CityServiceMock
-                .Setup(m => m.GetDomainCity(domainCity.Id))
-                .ReturnsAsync(domainCity);
+            var domainPricelist = new Pricelist { Id = commonId++ };
+
             Suite.AddressServiceMock
                 .Setup(m => m.CreateDomainAddress(AddressKind.Garage, address))
                 .ReturnsAsync(domainAddress);
+            Suite.PricelistServiceMock
+                .Setup(m => m.CreateDomainPricelist(It.IsAny<PricelistAM>()))
+                .ReturnsAsync(domainPricelist);
 
-            await Suite.GarageService.CreateDomainGarage(isPublic, domainCompany.Id, domainCity.Id, address);
+            await Suite.GarageService.CreateDomainGarage(isPublic, domainCompany.Id, address);
 
             Suite.DomainGarageServiceMock
                 .Verify(m => m.Create(isPublic,
                     domainCompany.Id,
-                    domainCity.Id,
                     domainAddress.Id,
-                    domainCity.PricelistId));
+                    domainPricelist.Id));
         }
 
         [Fact]
@@ -106,6 +105,44 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
 
             Suite.DomainGarageServiceMock
                 .Verify(m => m.Get(garageId));
+        }
+
+        [Fact]
+        public async Task GetDomainGarageByAddress()
+        {
+            var address = new AddressAM
+            {
+                Country = "Россия",
+                Province = "Ярославская",
+                Locality = "Рыбинск",
+                District = "Центральный"
+            };
+
+            await Suite.GarageService.GetDomainGarageByAddress(address);
+
+            Suite.DomainGarageServiceMock
+                .Verify(m => m.GetByAddress(
+                    address.Country,
+                    address.Province,
+                    address.Locality,
+                    address.District));
+        }
+
+        [Fact]
+        public async Task GetDomainGarageByCoordinate()
+        {
+            var coordinate = new Coordinate
+            {
+                Latitude = 11.000,
+                Longitude = 22.000
+            };
+
+            await Suite.GarageService.GetDomainGarageByCoordinate(coordinate);
+
+            Suite.DomainGarageServiceMock
+                .Verify(m => m.GetByCoordinate(
+                    coordinate.Latitude,
+                    coordinate.Longitude));
         }
 
         [Fact]

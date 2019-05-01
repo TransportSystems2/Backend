@@ -16,26 +16,22 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
     {
         public GarageServiceTestSuite()
         {
-            GarageRepositoryMock = new Mock<IGarageRepository>();
-            CityServiceMock = new Mock<ICityService>();
+            RepositoryMock = new Mock<IGarageRepository>();
             AddressServiceMock = new Mock<IAddressService>();
             PricelistServiceMock = new Mock<IPricelistService>();
             CompanyServiceMock = new Mock<ICompanyService>();
 
-            GarageService = new GarageService(GarageRepositoryMock.Object,
+            Service = new GarageService(RepositoryMock.Object,
                 CompanyServiceMock.Object,
-                CityServiceMock.Object,
                 AddressServiceMock.Object,
                 PricelistServiceMock.Object);
         }
-        public IGarageService GarageService { get; }
+        public IGarageService Service { get; }
 
-        public Mock<IGarageRepository> GarageRepositoryMock { get; }
+        public Mock<IGarageRepository> RepositoryMock { get; }
 
         public Mock<ICompanyService> CompanyServiceMock { get; }
 
-        public Mock<ICityService> CityServiceMock { get; }
-        
         public Mock<IAddressService> AddressServiceMock { get; }
 
         public Mock<IPricelistService> PricelistServiceMock { get; }
@@ -43,11 +39,17 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
 
     public class GarageServiceTests
     {
+        public GarageServiceTests()
+        {
+            Suite = new GarageServiceTestSuite();
+        }
+
+        public GarageServiceTestSuite Suite { get; }
+
         [Fact]
         public async void CreateGarage()
         {
             var commonId = 1;
-            var suite = new GarageServiceTestSuite();
 
             var isPublic = true;
             var companyId = commonId++;
@@ -55,37 +57,31 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
             var addressId = commonId++;
             var pricelistId = commonId++;
 
-            suite.CompanyServiceMock
+            Suite.CompanyServiceMock
                 .Setup(m => m.IsExist(companyId))
                 .ReturnsAsync(true);
 
-            suite.CityServiceMock
-                .Setup(m => m.IsExist(cityId))
-                .ReturnsAsync(true);
-
-            suite.AddressServiceMock
+            Suite.AddressServiceMock
                 .Setup(m => m.IsExist(addressId))
                 .ReturnsAsync(true);
 
-            suite.PricelistServiceMock
+            Suite.PricelistServiceMock
                 .Setup(m => m.IsExist(pricelistId))
                 .ReturnsAsync(true);
         
-            var result = await suite.GarageService.Create(isPublic, companyId, cityId, addressId, pricelistId);
+            var result = await Suite.Service.Create(isPublic, companyId, addressId, pricelistId);
 
-            suite.GarageRepositoryMock
+            Suite.RepositoryMock
                 .Verify(m => m.Add(It.Is<Garage>(
                     g => g.IsPublic.Equals(isPublic)
-                    && g.CityId.Equals(cityId)
                     && g.CompanyId.Equals(companyId)
                     && g.AddressId.Equals(addressId)
                     && g.PricelistId.Equals(pricelistId))));
-            suite.GarageRepositoryMock
+            Suite.RepositoryMock
                 .Verify(m => m.Save());
 
             Assert.Equal(isPublic, result.IsPublic);
             Assert.Equal(companyId, result.CompanyId);
-            Assert.Equal(cityId, result.CityId);
             Assert.Equal(addressId, result.AddressId);
             Assert.Equal(pricelistId, result.PricelistId);
         }
@@ -93,46 +89,75 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
         [Fact]
         public async Task GetAvailableProvince()
         {
-            var suite = new GarageServiceTestSuite();
             var country = "Россия";
             var addressKind = AddressKind.Garage;
             var orderingKind = OrderingKind.Asc;
 
-            var result = await suite.GarageService.GetAvailableProvinces(country);
+            var result = await Suite.Service.GetAvailableProvinces(country);
 
-            suite.AddressServiceMock
+            Suite.AddressServiceMock
                  .Verify(m => m.GetProvinces(addressKind, country, orderingKind), Times.Once);
         }
 
         [Fact]
         public async Task GetAvailableLocalities()
         {
-            var suite = new GarageServiceTestSuite();
             var country = "Россия";
             var province = "Ярославская область";
             var addressKind = AddressKind.Garage;
             var orderingKind = OrderingKind.Asc;
 
-            var result = await suite.GarageService.GetAvailableLocalities(country, province);
+            var result = await Suite.Service.GetAvailableLocalities(country, province);
 
-            suite.AddressServiceMock
+            Suite.AddressServiceMock
                  .Verify(m => m.GetLocalities(addressKind, country, province, orderingKind), Times.Once);
         }
 
         [Fact]
         public async Task GetAvailableDistricts()
         {
-            var suite = new GarageServiceTestSuite();
             var country = "Россия";
             var province = "Ярославская";
             var locality = "Ярославль";
             var addressKind = AddressKind.Garage;
             var orderingKind = OrderingKind.Asc;
 
-            var result = await suite.GarageService.GetAvailableDistricts(country, province, locality);
+            var result = await Suite.Service.GetAvailableDistricts(country, province, locality);
 
-            suite.AddressServiceMock
+            Suite.AddressServiceMock
                  .Verify(m => m.GetDistricts(addressKind, country, province, locality, orderingKind), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetByCoordinate()
+        {
+            var commonId = 1;
+
+            var address = new Address
+            {
+                Id = commonId++,
+                Latitude = 11.0000,
+                Longitude = 22.0000
+            };
+
+            var garage = new Garage
+            {
+                Id = commonId,
+                AddressId = address.Id
+            };
+
+            Suite.AddressServiceMock
+                .Setup(m => m.GetByCoordinate(address.Latitude, address.Longitude))
+                .ReturnsAsync(address);
+            Suite.RepositoryMock
+                .Setup(m => m.GetByAddress(address.Id))
+                .ReturnsAsync(garage);
+
+            var result = await Suite.Service.GetByCoordinate(address.Latitude, address.Longitude);
+
+            Assert.Equal(garage, result);
+            Assert.Equal(garage.Id, result.Id);
+            Assert.Equal(garage.AddressId, result.AddressId);
         }
     }
 }

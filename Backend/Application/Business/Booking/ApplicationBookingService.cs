@@ -45,7 +45,7 @@ namespace TransportSystems.Backend.Application.Business.Booking
             var result = new BookingResponseAM();
 
             var firstWaypointCoordinate = request.Waypoints.Points.First().ToCoordinate();
-            var rootAddresses = await AddressService.GetNearestAddresses(AddressKind.City, firstWaypointCoordinate);
+            var rootAddresses = await AddressService.GetNearestAddresses(AddressKind.Garage, firstWaypointCoordinate);
 
             var possibleRoutes = await RouteService.GetPossibleRoutes(rootAddresses, request.Waypoints);
             var bookingRoutes = await GetBookingRoutes(possibleRoutes, request.Cargo, request.Basket);
