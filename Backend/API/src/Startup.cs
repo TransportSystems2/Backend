@@ -149,11 +149,15 @@ namespace TransportSystems.Backend.API
                 app.UseHsts();
             }
 
-            app.UseSwagger();
+            app.UseSwagger(c =>
+            {
+                c.RouteTemplate = "api/docs/{documentName}/swagger.json";
+            });
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "TrasnportSystems API V1");
+                c.SwaggerEndpoint("/api/docs/v1/swagger.json", "TrasnportSystems API V1");
+                c.RoutePrefix = "api/docs";
             });
 
             app.UseHttpsRedirection();
