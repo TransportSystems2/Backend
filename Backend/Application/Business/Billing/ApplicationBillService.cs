@@ -9,6 +9,7 @@ using TransportSystems.Backend.Application.Interfaces.Billing;
 using TransportSystems.Backend.Application.Interfaces.Organization;
 using TransportSystems.Backend.Application.Interfaces.Pricing;
 using TransportSystems.Backend.Application.Models.Billing;
+using TransportSystems.Backend.Application.Models.Geo;
 
 namespace TransportSystems.Backend.Application.Business.Billing
 {
@@ -22,14 +23,14 @@ namespace TransportSystems.Backend.Application.Business.Billing
             IBillItemService domainBillItemService,
             IBasketService domainBasketService,
             IApplicationPricelistService pricelistService,
-            IApplicationCityService cityService)
+            IApplicationGarageService garageService)
             : base(transactionService)
         {
             DomainBillService = domainBillService;
             DomainBillItemService = domainBillItemService;
             DomainBasketService = domainBasketService;
             PricelistService = pricelistService;
-            CityService = cityService; 
+            GarageService = garageService; 
         }
 
         protected IBillService DomainBillService { get; }
@@ -40,7 +41,7 @@ namespace TransportSystems.Backend.Application.Business.Billing
 
         protected IApplicationPricelistService PricelistService { get; }
 
-        protected IApplicationCityService CityService { get; }
+        protected IApplicationGarageService GarageService { get; }
 
         public async Task<BillAM> CalculateBill(BillInfoAM billInfo, BasketAM basket)
         {
@@ -157,7 +158,7 @@ namespace TransportSystems.Backend.Application.Business.Billing
 
         public async Task<BillInfoAM> GetBillInfo(Coordinate coordinate, int catalogItemId)
         {
-            var domainCity = await CityService.GetDomainCityByCoordinate(coordinate);
+            var domainCity = await GarageService.GetDomainGarageByCoordinate(coordinate);
             var domainPrice = await PricelistService.GetDomainPrice(domainCity.PricelistId, catalogItemId);
 
             return new BillInfoAM

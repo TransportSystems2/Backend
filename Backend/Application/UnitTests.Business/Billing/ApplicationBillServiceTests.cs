@@ -14,6 +14,7 @@ using TransportSystems.Backend.Application.Models.Billing;
 using TransportSystems.Backend.Application.UnitTests.Business.Suite;
 using Xunit;
 using DotNetDistance;
+using TransportSystems.Backend.Application.Models.Geo;
 
 namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
 {
@@ -25,7 +26,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
             DomainBillItemServiceMock = new Mock<IBillItemService>();
             DomainBasketServiceMock = new Mock<IBasketService>();
             PricelistServiceMock = new Mock<IApplicationPricelistService>();
-            CityServiceMock = new Mock<IApplicationCityService>();
+            GarageServiceMock = new Mock<IApplicationGarageService>();
 
             Service = new ApplicationBillService(
                 TransactionServiceMock.Object,
@@ -33,7 +34,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
                 DomainBillItemServiceMock.Object,
                 DomainBasketServiceMock.Object,
                 PricelistServiceMock.Object,
-                CityServiceMock.Object);
+                GarageServiceMock.Object);
         }
 
         public IApplicationBillService Service { get; }
@@ -46,7 +47,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
 
         public Mock<IApplicationPricelistService> PricelistServiceMock { get; }
 
-        public Mock<IApplicationCityService> CityServiceMock { get; }
+        public Mock<IApplicationGarageService> GarageServiceMock { get; }
     }
 
     public class ApplicationBillServiceTests : BaseServiceTests<ApplicationBillServiceTestSuite>
@@ -410,17 +411,17 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
                 CommissionPercentage = 10
             };
 
-            var domainCity = new City
+            var domainGarage = new Garage
             {
                 Id = commonId++,
                 PricelistId = commonId++
             };
 
-            Suite.CityServiceMock
-                .Setup(m => m.GetDomainCityByCoordinate(coordinate))
-                .ReturnsAsync(domainCity);
+            Suite.GarageServiceMock
+                .Setup(m => m.GetDomainGarageByCoordinate(coordinate))
+                .ReturnsAsync(domainGarage);
             Suite.PricelistServiceMock
-                .Setup(m => m.GetDomainPrice(domainCity.PricelistId, catalogItemId))
+                .Setup(m => m.GetDomainPrice(domainGarage.PricelistId, catalogItemId))
                 .ReturnsAsync(domainPrice);
 
             var result = await Suite.Service.GetBillInfo(coordinate, catalogItemId);

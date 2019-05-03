@@ -193,7 +193,7 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Geo
         {
             var suite = new AddressServiceTestSuite();
 
-            var kind = AddressKind.City;
+            var kind = AddressKind.Garage;
             var minLatitude = 1;
             var minLongitude = 2;
             var maxLatitude = 3;

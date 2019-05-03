@@ -17,8 +17,6 @@ namespace TransportSystems.Backend.Core.Infrastructure.Database
 {
     public class ApplicationContext : DbContext, IContext
     {
-        public DbSet<City> Cities { get; set; }
-
         public DbSet<Company> Companies { get; set; }
 
         public DbSet<Garage> Garages { get; set; }

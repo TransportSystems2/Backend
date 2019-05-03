@@ -6,7 +6,7 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Organization
 {
     public interface IGarageService : IDomainService<Garage>
     {
-        Task<Garage> Create(bool isPublic, int companyId, int cityId, int addressId, int pricelistId);
+        Task<Garage> Create(bool isPublic, int companyId, int addressId, int pricelistId);
 
         Task AssignPricelist(int garageId, int pricelistId);
 
@@ -17,5 +17,7 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Organization
         Task<ICollection<string>> GetAvailableDistricts(string country, string province, string locality);
 
         Task<Garage> GetByAddress(string country, string province, string locality, string district);
+
+        Task<Garage> GetByCoordinate(double latitude, double longitude);
     }
 }

@@ -224,7 +224,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Geo
         [Fact]
         public async Task GetNearestDomainAddresses()
         {
-            var addressKind = AddressKind.City;
+            var addressKind = AddressKind.Garage;
             var coordinate = new Coordinate { Latitude = 1.3, Longitude = 2.3 };
             var maxResultCount = 3;
             var distance = 500;
