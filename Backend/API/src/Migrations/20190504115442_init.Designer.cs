@@ -10,8 +10,8 @@ using TransportSystems.Backend.Core.Infrastructure.Database;
 namespace TransportSystems.Backend.API.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20190406075658_PropertyOfPublicityInTheGarage")]
-    partial class PropertyOfPublicityInTheGarage
+    [Migration("20190504115442_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -225,26 +225,6 @@ namespace TransportSystems.Backend.API.Migrations
                     b.ToTable("OrderStates");
                 });
 
-            modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Organization.City", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("AddedDate");
-
-                    b.Property<int>("AddressId");
-
-                    b.Property<string>("Domain");
-
-                    b.Property<DateTime>("ModifiedDate");
-
-                    b.Property<int>("PricelistId");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Cities");
-                });
-
             modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Organization.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -269,8 +249,6 @@ namespace TransportSystems.Backend.API.Migrations
                     b.Property<DateTime>("AddedDate");
 
                     b.Property<int>("AddressId");
-
-                    b.Property<int>("CityId");
 
                     b.Property<int>("CompanyId");
 
