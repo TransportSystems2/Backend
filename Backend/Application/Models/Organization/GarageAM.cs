@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TransportSystems.Backend.Application.Models.Geo;
+﻿using TransportSystems.Backend.Application.Models.Geo;
 
 namespace TransportSystems.Backend.Application.Models.Organization
 {

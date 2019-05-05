@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using Common.Models.Units;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Core.Domain.Interfaces.Organization;
 using TransportSystems.Backend.Core.Services.Interfaces;
@@ -10,9 +10,10 @@ using TransportSystems.Backend.Core.Services.Interfaces.Pricing;
 
 namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
 {
-    public class GarageService : DomainService<Garage>, IGarageService
+    public class MarketService : DomainService<Market>, IMarketService
     {
-        public GarageService(IGarageRepository repository,
+        public MarketService(
+            IMarketRepository repository,
             ICompanyService companyService,
             IAddressService addressService,
             IPricelistService pricelistService)
@@ -23,7 +24,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
             PricelistService = pricelistService;
         }
 
-        protected new IGarageRepository Repository => (IGarageRepository)base.Repository;
+        protected new IMarketRepository Repository { get => (IMarketRepository)base.Repository; }
 
         protected ICompanyService CompanyService { get; }
 
@@ -31,48 +32,28 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
 
         protected IPricelistService PricelistService { get; }
 
-        public async Task<Garage> Create(
+        public async Task<Market> Create(
             int companyId,
-            int addressId)
+            int addressId,
+            int pricelistId)
         {
-            var garage = new Garage
+            var market = new Market
             {
                 CompanyId = companyId,
                 AddressId = addressId,
+                PricelistId = pricelistId
             };
 
-            await AddGarage(garage);
+            await AddMarket(market);
 
-            return garage;
+            return market;
         }
 
-        protected async Task AddGarage(Garage garage)
-        {
-            await Verify(garage);
-
-            await Repository.Add(garage);
-            await Repository.Save();
-        }
-
-        public async Task<Garage> GetByAddress(string country, string province, string locality, string district)
-        {
-            var garagesAddresses = await AddressService.GetByGeocoding(AddressKind.Garage, country, province, locality, district);
-            var firstGarageAddress = garagesAddresses.FirstOrDefault();
-
-            Garage result = null;
-            if (firstGarageAddress != null)
-            {
-                result = await Repository.GetByAddress(firstGarageAddress.Id);
-            }
-
-            return result;
-        }
-
-        public async Task<Garage> GetByCoordinate(double latitude, double longitude)
+        public async Task<Market> GetByCoordinate(double latitude, double longitude)
         {
             var garageAddress = await AddressService.GetByCoordinate(latitude, longitude);
 
-            Garage result = null;
+            Market result = null;
             if (garageAddress != null)
             {
                 result = await Repository.GetByAddress(garageAddress.Id);
@@ -81,7 +62,19 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
             return result;
         }
 
-        protected override async Task<bool> DoVerifyEntity(Garage entity)
+        public Task<ICollection<Market>> GetByAddressIds(ICollection<int> addressIds)
+        {
+            return Repository.GetByAddressIds(addressIds);
+        }
+
+        protected async Task AddMarket(Market market)
+        {
+            await Verify(market);
+
+            await Repository.Add(market);
+            await Repository.Save();
+        }
+        protected override async Task<bool> DoVerifyEntity(Market entity)
         {
             if (!await CompanyService.IsExist(entity.CompanyId))
             {
@@ -91,6 +84,11 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
             if (!await AddressService.IsExist(entity.AddressId))
             {
                 throw new EntityNotFoundException($"AddressId:{entity.AddressId} not found", "Address");
+            }
+
+            if (!await PricelistService.IsExist(entity.PricelistId))
+            {
+                throw new EntityNotFoundException($"PricelistId:{entity.PricelistId} not found", "Pricelist");
             }
 
             return true;

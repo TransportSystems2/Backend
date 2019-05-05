@@ -10,23 +10,27 @@ using Xunit;
 
 namespace TransportSystems.Backend.Application.UnitTests.Business.Users
 {
-    public class ApplicationCustomerServiceTestSuite : TransactionTestsSuite
+    public class ApplicationUserServiceTestSuite : TransactionTestsSuite
     {
-        public ApplicationCustomerServiceTestSuite()
+        public ApplicationUserServiceTestSuite()
         {
             DomainCustomerServiceMock = new Mock<ICustomerService>();
+            DomainModeratorServiceMock = new Mock<IModeratorService>();
 
-            CustomerService = new ApplicationCustomerService(
+            Service = new ApplicationUserService(
                 TransactionServiceMock.Object,
-                DomainCustomerServiceMock.Object);
+                DomainCustomerServiceMock.Object,
+                DomainModeratorServiceMock.Object);
         }
 
-        public IApplicationCustomerService CustomerService { get; }
+        public IApplicationUserService Service { get; }
 
         public Mock<ICustomerService> DomainCustomerServiceMock { get; }
+
+        public Mock<IModeratorService> DomainModeratorServiceMock { get; }
     }
 
-    public class ApplicationCustomerServiceTests : BaseServiceTests<ApplicationCustomerServiceTestSuite>
+    public class ApplicationUserServiceTests : BaseServiceTests<ApplicationUserServiceTestSuite>
     {
         [Fact]
         public async Task GetDomainCustomerlWhenCustomerDontExist()
@@ -42,7 +46,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Users
                 .Setup(m => m.GetByPhoneNumber(customer.PhoneNumber))
                 .Returns(Task.FromResult<Customer>(null));
             
-            await Suite.CustomerService.GetDomainCustomer(customer);
+            await Suite.Service.GetOrCreateDomainCustomer(customer);
 
             Suite.DomainCustomerServiceMock
                 .Verify(m => m.Create(customer.FirstName, customer.LastName, customer.PhoneNumber));
@@ -67,9 +71,29 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Users
                 .Setup(m => m.GetByPhoneNumber(customer.PhoneNumber))
                 .ReturnsAsync(domainCustomer);
 
-            var result = await Suite.CustomerService.GetDomainCustomer(customer);
+            var result = await Suite.Service.GetOrCreateDomainCustomer(customer);
 
             Assert.Equal(domainCustomer.Id, result.Id);
+        }
+
+        [Fact]
+        public async Task GetDomainModeratorByIndetityUser()
+        {
+            var commonId = 1;
+            var identityUserId = commonId++;
+            var moderator = new Moderator
+            {
+                Id = commonId++,
+                IdentityUserId = identityUserId
+            };
+
+            Suite.DomainModeratorServiceMock
+                .Setup(m => m.GetByIndentityUser(identityUserId))
+                .ReturnsAsync(moderator);
+
+            var result = await Suite.Service.GetDomainModeratorByIdentityUser(identityUserId);
+
+            Assert.Equal(moderator, result);
         }
     }
 }

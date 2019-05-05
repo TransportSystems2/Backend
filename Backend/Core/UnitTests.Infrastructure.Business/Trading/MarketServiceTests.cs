@@ -16,6 +16,7 @@ using Xunit;
 
 namespace TransportSystems.UnitTests.Infrastructure.Business.Trading
 {
+    /*
     public class MarketServiceSuite
     {
         public MarketServiceSuite()
@@ -81,4 +82,5 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Trading
                 .Verify(m => m.Notice(It.IsAny<Notify>()), Times.Once);
         }
     }
+    */
 }

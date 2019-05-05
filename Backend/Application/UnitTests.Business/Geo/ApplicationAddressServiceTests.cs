@@ -265,7 +265,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Geo
                 .Setup(m => m.GetNearestCoordinates(coordinate, It.IsAny<IEnumerable<Coordinate>>(), maxResultCount))
                 .ReturnsAsync(orderedCoordinates);
 
-            var result = await Suite.AddressService.GetNearestAddresses(addressKind, coordinate, distance, maxResultCount);
+            var result = await Suite.AddressService.GetNearestDomainAddresses(addressKind, coordinate, distance, maxResultCount);
 
             Assert.Equal(maxResultCount, result.Count);
 

@@ -16,23 +16,5 @@ namespace TransportSystems.Backend.API.Controllers.Organization
         }
 
         protected IApplicationGarageService GarageService { get; }
-
-        [HttpGet("available_provinces")]
-        public Task<ICollection<string>> GetAvailableProvinces(string country)
-        {
-            return GarageService.GetAvailableProvinces(country);
-        }
-
-        [HttpGet("available_localities")]
-        public Task<ICollection<string>> GetAvailableLocalities(string country, string province)
-        {
-            return GarageService.GetAvailableLocalities(country, province);
-        }
-
-        [HttpGet("available_districts")]
-        public Task<ICollection<string>> GetAvailableDistricts(string country, string province, string locality)
-        {
-            return GarageService.GetAvailableDistricts(country, province, locality);
-        }
     }
 }

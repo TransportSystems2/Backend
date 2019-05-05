@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Core.Services.Interfaces;
@@ -33,7 +32,6 @@ namespace TransportSystems.Backend.Application.Business.Organization
         protected IApplicationPricelistService PricelistService { get; }
 
         public async Task<Garage> CreateDomainGarage(
-            bool isPublic,
             int companyId,
             AddressAM address)
         {
@@ -46,10 +44,8 @@ namespace TransportSystems.Backend.Application.Business.Organization
 
                     var domainAddress = await AddressService.CreateDomainAddress(AddressKind.Garage, address);
                     var result = await DomainGarageService.Create(
-                        isPublic,
                         companyId,
-                        domainAddress.Id,
-                        domainPricelist.Id);
+                        domainAddress.Id);
 
                     transaction.Commit();
                     return result;
@@ -75,21 +71,6 @@ namespace TransportSystems.Backend.Application.Business.Organization
         public Task<Garage> GetDomainGarageByCoordinate(Coordinate coordinate)
         {
             return DomainGarageService.GetByCoordinate(coordinate.Latitude, coordinate.Longitude);
-        }
-
-        public Task<ICollection<string>> GetAvailableProvinces(string country)
-        {
-            return DomainGarageService.GetAvailableProvinces(country);
-        }
-
-        public Task<ICollection<string>> GetAvailableLocalities(string country, string province)
-        {
-            return DomainGarageService.GetAvailableLocalities(country, province);
-        }
-
-        public Task<ICollection<string>> GetAvailableDistricts(string country, string province, string locality)
-        {
-            return DomainGarageService.GetAvailableDistricts(country, province, locality);
         }
     }
 }

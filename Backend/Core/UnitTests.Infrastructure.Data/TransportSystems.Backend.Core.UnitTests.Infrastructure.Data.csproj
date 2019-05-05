@@ -20,7 +20,4 @@
         <ProjectReference Include="..\Infrastructure.Database\TransportSystems.Backend.Core.Infrastructure.Database.csproj" />
         <ProjectReference Include="..\Services.Interfaces\TransportSystems.Backend.Core.Services.Interfaces.csproj" />
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Organization\" />
-    </ItemGroup>
 </Project>

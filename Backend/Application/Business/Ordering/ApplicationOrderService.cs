@@ -15,6 +15,8 @@ using TransportSystems.Backend.Application.Models.Booking;
 using TransportSystems.Backend.Application.Models.Ordering;
 using TransportSystems.Backend.Application.Interfaces.Ordering;
 using TransportSystems.Backend.Core.Services.Interfaces.Ordering;
+using TransportSystems.Backend.Core.Services.Interfaces.Organization;
+using TransportSystems.Backend.Application.Interfaces.Geo;
 
 namespace TransportSystems.Backend.Application.Business
 {
@@ -24,36 +26,43 @@ namespace TransportSystems.Backend.Application.Business
             ITransactionService transactionService,
             IOrderService domainOrderService,
             IOrderStateService domainOrderStateService,
+            IMarketService domainMarketService,
             IApplicationCargoService cargoService,
             IApplicationRouteService routeService,
-            IApplicationCustomerService customerService,
+            IApplicationUserService customerService,
             IApplicationBillService billService,
-            IApplicationOrderValidatorService validatorService)
+            IApplicationOrderValidatorService validatorService,
+            IApplicationAddressService addressService)
             : base(transactionService)
         {
             DomainOrderService = domainOrderService;
             DomainOrderStateService = domainOrderStateService;
+            DomainMarketService = domainMarketService;
             CargoService = cargoService;
             RouteService = routeService;
             CustomerService = customerService;
             BillService = billService;
             ValidatorService = validatorService;
+            AddressService = addressService;
         }
 
         protected IOrderService DomainOrderService { get; }
 
         protected IOrderStateService DomainOrderStateService { get; }
 
+        protected IMarketService DomainMarketService { get; }
 
         protected IApplicationCargoService CargoService { get; }
 
         protected IApplicationRouteService RouteService { get; }
 
-        protected IApplicationCustomerService CustomerService { get; }
+        protected IApplicationUserService CustomerService { get; }
 
         protected IApplicationBillService BillService { get; }
 
         protected IApplicationOrderValidatorService ValidatorService { get; }
+
+        protected IApplicationAddressService AddressService { get; }
 
         public async Task<Order> CreateOrder(BookingAM booking)
         {
@@ -61,10 +70,13 @@ namespace TransportSystems.Backend.Application.Business
             {
                 try
                 {
-                    var domainCustomer = await CustomerService.GetDomainCustomer(booking.Customer);
+                    var domainCustomer = await CustomerService.GetOrCreateDomainCustomer(booking.Customer);
                     var domainCargo = await CargoService.CreateDomainCargo(booking.Cargo);
 
-                    var orderRoute = await RouteService.GetRoute(booking.RootAddress, booking.Waypoints);
+                    var domainMarket = await DomainMarketService.Get(booking.MarketId);
+                    var marketAddress = await AddressService.GetAddress(domainMarket.AddressId);
+
+                    var orderRoute = await RouteService.GetRoute(marketAddress, booking.Waypoints);
                     var orderBill = await BillService.CalculateBill(booking.Bill.Info, booking.Bill.Basket);
 
                     await ValidatorService.Validate(booking, orderRoute, orderBill);
@@ -75,6 +87,7 @@ namespace TransportSystems.Backend.Application.Business
                     var result = await DomainOrderService.Create();
                     await DomainOrderStateService.New(
                         result.Id,
+                        domainMarket.Id,
                         booking.TimeOfDelivery,
                         domainCustomer.Id,
                         domainCargo.Id,

@@ -10,8 +10,8 @@ using TransportSystems.Backend.Core.Infrastructure.Database;
 namespace TransportSystems.Backend.API.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20190330064950_Initial")]
-    partial class Initial
+    [Migration("20190503151438_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -198,13 +198,17 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<int>("CargoId");
 
-                    b.Property<int>("CompanyId");
-
                     b.Property<int>("CustomerId");
 
                     b.Property<int>("DispatcherId");
 
                     b.Property<int>("DriverId");
+
+                    b.Property<int>("GarageId");
+
+                    b.Property<int>("GenCompanyId");
+
+                    b.Property<int>("MarketId");
 
                     b.Property<int>("ModeratorId");
 
@@ -218,31 +222,15 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<int>("Status");
 
+                    b.Property<int>("SubCompanyId");
+
                     b.Property<DateTime>("TimeOfDelivery");
+
+                    b.Property<int>("VehicleId");
 
                     b.HasKey("Id");
 
                     b.ToTable("OrderStates");
-                });
-
-            modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Organization.City", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("AddedDate");
-
-                    b.Property<int>("AddressId");
-
-                    b.Property<string>("Domain");
-
-                    b.Property<DateTime>("ModifiedDate");
-
-                    b.Property<int>("PricelistId");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Cities");
                 });
 
             modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Organization.Company", b =>
@@ -251,8 +239,6 @@ namespace TransportSystems.Backend.API.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("AddedDate");
-
-                    b.Property<bool>("IsPrivate");
 
                     b.Property<DateTime>("ModifiedDate");
 
@@ -272,13 +258,9 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<int>("AddressId");
 
-                    b.Property<int>("CityId");
-
                     b.Property<int>("CompanyId");
 
                     b.Property<DateTime>("ModifiedDate");
-
-                    b.Property<int>("PricelistId");
 
                     b.HasKey("Id");
 

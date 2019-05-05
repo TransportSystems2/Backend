@@ -49,6 +49,11 @@ namespace TransportSystems.Backend.External.Business.Direction
 
         public Task<ICollection<Coordinate>> GetNearestCoordinates(Coordinate originCoordinate, IEnumerable<Coordinate> coordinates, int maxResultCount = 5)
         {
+            if (maxResultCount == 0)
+            {
+                maxResultCount = int.MaxValue;
+            }
+
             maxResultCount = Math.Min(maxResultCount, coordinates.Count());
 
             return Task.FromResult((ICollection<Coordinate>)coordinates.OrderBy(

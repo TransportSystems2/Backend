@@ -11,6 +11,7 @@ using TransportSystems.Backend.Core.Services.Interfaces.Users;
 
 namespace TransportSystems.Backend.Core.Infrastructure.Business.Trading
 {
+    /*
     public class MarketService : BaseService, IMarketService
     {
         public MarketService(
@@ -60,4 +61,5 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Trading
             await NotificationService.Notice(notify);
         }
     }
+    */
 }

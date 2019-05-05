@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TransportSystems.Backend.Application.Business;
 using TransportSystems.Backend.Application.Interfaces;
 using TransportSystems.Backend.Application.Interfaces.Billing;
+using TransportSystems.Backend.Application.Interfaces.Geo;
 using TransportSystems.Backend.Application.Interfaces.Ordering;
 using TransportSystems.Backend.Application.Interfaces.Routing;
 using TransportSystems.Backend.Application.Interfaces.Users;
@@ -19,11 +20,13 @@ using TransportSystems.Backend.Application.Models.Users;
 using TransportSystems.Backend.Application.UnitTests.Business.Suite;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
 using TransportSystems.Backend.Core.Domain.Core.Ordering;
+using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Core.Domain.Core.Routing;
 using TransportSystems.Backend.Core.Domain.Core.Transport;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Services.Interfaces.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Ordering;
+using TransportSystems.Backend.Core.Services.Interfaces.Organization;
 using Xunit;
 
 namespace TransportSystems.Backend.Application.UnitTests.Business
@@ -34,21 +37,25 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
         {
             DomainOrderServiceMock = new Mock<IOrderService>();
             DomainOrderStateServiceMock = new Mock<IOrderStateService>();
+            DomainMarketServiceMock = new Mock<IMarketService>();
             CargoServiceMock = new Mock<IApplicationCargoService>();
             RouteServiceMock = new Mock<IApplicationRouteService>();
-            CustomerServiceMock = new Mock<IApplicationCustomerService>();
+            CustomerServiceMock = new Mock<IApplicationUserService>();
             BillServiceMock = new Mock<IApplicationBillService>();
             OrderValidatorServiceMock = new Mock<IApplicationOrderValidatorService>();
+            AddressServiceMock = new Mock<IApplicationAddressService>();
 
             OrderService = new ApplicationOrderService(
                 TransactionServiceMock.Object,
                 DomainOrderServiceMock.Object,
                 DomainOrderStateServiceMock.Object,
+                DomainMarketServiceMock.Object,
                 CargoServiceMock.Object,
                 RouteServiceMock.Object,
                 CustomerServiceMock.Object,
                 BillServiceMock.Object,
-                OrderValidatorServiceMock.Object);
+                OrderValidatorServiceMock.Object,
+                AddressServiceMock.Object);
         }
 
         public IApplicationOrderService OrderService { get; }
@@ -57,15 +64,19 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
 
         public Mock<IOrderStateService> DomainOrderStateServiceMock { get; }
 
+        public Mock<IMarketService> DomainMarketServiceMock { get; }
+
         public Mock<IApplicationCargoService> CargoServiceMock { get; }
 
         public Mock<IApplicationRouteService> RouteServiceMock { get; }
 
-        public Mock<IApplicationCustomerService> CustomerServiceMock { get; }
+        public Mock<IApplicationUserService> CustomerServiceMock { get; }
 
         public Mock<IApplicationBillService> BillServiceMock { get; }
 
         public Mock<IApplicationOrderValidatorService> OrderValidatorServiceMock { get; }
+
+        public Mock<IApplicationAddressService> AddressServiceMock { get; }
     }
 
     public class ApplicationOrderServiceTests : BaseServiceTests<ApplicationOrderServiceTestSuite>
@@ -177,14 +188,12 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
         {
             var commonId = 1;
 
+            var domainMarket = new Market { Id = commonId++, AddressId = commonId++ };
+
             var booking = new BookingAM
             {
                 TimeOfDelivery = DateTime.MinValue,
-                RootAddress = new AddressAM
-                {
-                    Latitude = 11.2222,
-                    Longitude = 22.3333
-                },
+                MarketId = domainMarket.Id,
                 Bill = new BillAM
                 {
                     Info = new BillInfoAM
@@ -229,6 +238,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
 
             var route = new RouteAM();
             var bill = new BillAM();
+            var marketAddress = new AddressAM { Latitude = 11.2222, Longitude = 22.3333 };
             var domainRoute = new Route { Id = commonId++ };
             var domainCustomer = new Customer { Id = commonId++ };
             var domainCargo = new Cargo { Id = commonId++ };
@@ -236,13 +246,13 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             var domainOrder = new Order { Id = commonId++ };
 
             Suite.CustomerServiceMock
-                .Setup(m => m.GetDomainCustomer(booking.Customer))
+                .Setup(m => m.GetOrCreateDomainCustomer(booking.Customer))
                 .ReturnsAsync(domainCustomer);
             Suite.CargoServiceMock
                 .Setup(m => m.CreateDomainCargo(booking.Cargo))
                 .ReturnsAsync(domainCargo);
             Suite.RouteServiceMock
-                .Setup(m => m.GetRoute(booking.RootAddress, booking.Waypoints))
+                .Setup(m => m.GetRoute(marketAddress, booking.Waypoints))
                 .ReturnsAsync(route);
             Suite.RouteServiceMock
                 .Setup(m => m.CreateDomainRoute(route))
@@ -256,12 +266,19 @@ namespace TransportSystems.Backend.Application.UnitTests.Business
             Suite.DomainOrderServiceMock
                 .Setup(m => m.Create())
                 .ReturnsAsync(domainOrder);
+            Suite.DomainMarketServiceMock
+                .Setup(m => m.Get(booking.MarketId))
+                .ReturnsAsync(domainMarket);
+            Suite.AddressServiceMock
+                .Setup(m => m.GetAddress(domainMarket.AddressId))
+                .ReturnsAsync(marketAddress);
 
             var result = await Suite.OrderService.CreateOrder(booking);
 
             Suite.DomainOrderStateServiceMock
                 .Verify(m => m.New(
                     domainOrder.Id,
+                    domainMarket.Id,
                     booking.TimeOfDelivery,
                     domainCustomer.Id,
                     domainCargo.Id,

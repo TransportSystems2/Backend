@@ -65,6 +65,8 @@ namespace TransportSystems.Backend.Core.Infrastructure.Database
 
         public DbSet<CatalogItem> CatalogItems { get; set; }
 
+        public DbSet<Market> Markets { get; set; }
+
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)
         {
