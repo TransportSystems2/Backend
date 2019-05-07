@@ -26,15 +26,13 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
             DomainBillItemServiceMock = new Mock<IBillItemService>();
             DomainBasketServiceMock = new Mock<IBasketService>();
             PricelistServiceMock = new Mock<IApplicationPricelistService>();
-            GarageServiceMock = new Mock<IApplicationGarageService>();
 
             Service = new ApplicationBillService(
                 TransactionServiceMock.Object,
                 DomainBillServiceMock.Object,
                 DomainBillItemServiceMock.Object,
                 DomainBasketServiceMock.Object,
-                PricelistServiceMock.Object,
-                GarageServiceMock.Object);
+                PricelistServiceMock.Object);
         }
 
         public IApplicationBillService Service { get; }
@@ -46,8 +44,6 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
         public Mock<IBasketService> DomainBasketServiceMock { get; }
 
         public Mock<IApplicationPricelistService> PricelistServiceMock { get; }
-
-        public Mock<IApplicationGarageService> GarageServiceMock { get; }
     }
 
     public class ApplicationBillServiceTests : BaseServiceTests<ApplicationBillServiceTestSuite>
@@ -402,8 +398,8 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
         {
             var commonId = 1;
 
-            var coordinate = new Coordinate();
             var catalogItemId = commonId++;
+            var domainPricelistId = commonId++;
 
             var domainPrice = new Price
             {
@@ -411,20 +407,12 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Billing
                 CommissionPercentage = 10
             };
 
-            var domainGarage = new Garage
-            {
-                Id = commonId++,
-                PricelistId = commonId++
-            };
 
-            Suite.GarageServiceMock
-                .Setup(m => m.GetDomainGarageByCoordinate(coordinate))
-                .ReturnsAsync(domainGarage);
             Suite.PricelistServiceMock
-                .Setup(m => m.GetDomainPrice(domainGarage.PricelistId, catalogItemId))
+                .Setup(m => m.GetDomainPrice(domainPricelistId, catalogItemId))
                 .ReturnsAsync(domainPrice);
 
-            var result = await Suite.Service.GetBillInfo(coordinate, catalogItemId);
+            var result = await Suite.Service.GetBillInfo(domainPricelistId, catalogItemId);
 
             Assert.Equal(domainPrice.Id, result.PriceId);
             Assert.Equal(domainPrice.CommissionPercentage, result.CommissionPercentage);

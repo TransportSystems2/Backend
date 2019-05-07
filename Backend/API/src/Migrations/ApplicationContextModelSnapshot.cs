@@ -196,13 +196,17 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<int>("CargoId");
 
-                    b.Property<int>("CompanyId");
-
                     b.Property<int>("CustomerId");
 
                     b.Property<int>("DispatcherId");
 
                     b.Property<int>("DriverId");
+
+                    b.Property<int>("GarageId");
+
+                    b.Property<int>("GenCompanyId");
+
+                    b.Property<int>("MarketId");
 
                     b.Property<int>("ModeratorId");
 
@@ -216,31 +220,15 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<int>("Status");
 
+                    b.Property<int>("SubCompanyId");
+
                     b.Property<DateTime>("TimeOfDelivery");
+
+                    b.Property<int>("VehicleId");
 
                     b.HasKey("Id");
 
                     b.ToTable("OrderStates");
-                });
-
-            modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Organization.City", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("AddedDate");
-
-                    b.Property<int>("AddressId");
-
-                    b.Property<string>("Domain");
-
-                    b.Property<DateTime>("ModifiedDate");
-
-                    b.Property<int>("PricelistId");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Cities");
                 });
 
             modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Organization.Company", b =>
@@ -268,11 +256,25 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<int>("AddressId");
 
-                    b.Property<int>("CityId");
-
                     b.Property<int>("CompanyId");
 
-                    b.Property<bool>("IsPublic");
+                    b.Property<DateTime>("ModifiedDate");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Garages");
+                });
+
+            modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Organization.Market", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("AddedDate");
+
+                    b.Property<int>("AddressId");
+
+                    b.Property<int>("CompanyId");
 
                     b.Property<DateTime>("ModifiedDate");
 
@@ -280,7 +282,7 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Garages");
+                    b.ToTable("Markets");
                 });
 
             modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Pricing.Price", b =>

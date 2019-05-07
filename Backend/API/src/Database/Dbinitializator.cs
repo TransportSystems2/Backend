@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TransportSystems.Backend.Application.Business.Geo;
 using TransportSystems.Backend.Application.Interfaces;
 using TransportSystems.Backend.Application.Interfaces.Catalogs;
 using TransportSystems.Backend.Application.Interfaces.Organization;
@@ -33,6 +34,7 @@ namespace TransportSystems.Backend.API.Database
 
                 CatalogService = services.GetRequiredService<IApplicationCatalogService>(); 
                 GarageService = services.GetRequiredService<IApplicationGarageService>();
+                MarketService = services.GetRequiredService<IApplicationMarketService>();
                 CompanyService = services.GetRequiredService<IApplicationCompanyService>();
                 SignUpService = services.GetRequiredService<ISignUpService>();
 
@@ -46,6 +48,8 @@ namespace TransportSystems.Backend.API.Database
         public static IApplicationCatalogService CatalogService { get; private set; }
 
         public static IApplicationGarageService GarageService { get; private set; }
+
+        public static IApplicationMarketService MarketService { get; private set; }
 
         public static IApplicationCompanyService CompanyService { get; private set; } 
 
@@ -94,7 +98,7 @@ namespace TransportSystems.Backend.API.Database
         {
             var domainCompany = await InitCompany("ГосЭвакуатор");
 
-            var garagesAddresses = new List<AddressAM>
+            var marketAddresses = new List<AddressAM>
             {
                 new AddressAM { Country = "Россия", Province = "Ярославская", Area = "Рыбинский район", Locality = "Рыбинск", District = "Центральный", Street = "Пр. Серова", House = "1", Latitude = 58.0569028, Longitude = 38.780219 },
                 new AddressAM { Country = "Россия", Province = "Вологодская", Locality = "Вологда", District = "Центральный", Street = "Благовещенская", House = "20", Latitude = 59.2224107, Longitude = 39.8715978 },
@@ -102,19 +106,18 @@ namespace TransportSystems.Backend.API.Database
                 new AddressAM { Country = "Россия", Province = "Ярославская", Locality = "Ярославль", District = "Ленинский", Street = "Радищева", House = "24", Latitude = 57.6379029, Longitude = 39.840627 }
             };
 
-            await InitGarages(domainCompany.Id, garagesAddresses, true);
+            await InitMarkets(domainCompany.Id, marketAddresses);
         }
 
-        private static async Task InitGarages(
+        private static async Task InitMarkets(
             int companyId,
-            List<AddressAM> garagesAddresses,
-            bool isPublic)
+            List<AddressAM> marketAddresses)
         {
-            foreach (var garageAddress in garagesAddresses)
+            foreach (var marketAddress in marketAddresses)
             {
-                if (await GarageService.GetDomainGarageByAddress(garageAddress) == null)
+                if (await MarketService.GetDomainMarketByCoordinate(marketAddress.ToCoordinate()) == null)
                 {
-                    await GarageService.CreateDomainGarage(isPublic, companyId, garageAddress);
+                    await MarketService.CreateDomainMarket(companyId, marketAddress);
                 }
             }
         }

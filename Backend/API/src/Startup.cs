@@ -241,6 +241,7 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IBillItemRepository, BillItemRepository>();
             services.AddScoped<IBasketRepository, BasketRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IMarketRepository, MarketRepository>();
         }
 
         protected virtual void ConfigureCustomServices(IServiceCollection services)
@@ -253,7 +254,6 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IDispatcherService, DispatcherService>();
 
             services.AddScoped<IVehicleService, VehicleService>();
-
             services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<IOrderService, OrderService>();
@@ -273,8 +273,8 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IBillService, BillService>();
             services.AddScoped<IBillItemService, BillItemService>();
             services.AddScoped<IBasketService, BasketService>();
-
             services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<IMarketService, MarketService>();
 
             var identityUri = Configuration.GetConnectionString("identity_manage");
             var identityUsersAPI = IdentityUsersAPIFactory<IIdentityUsersAPI>.Create(identityUri);
@@ -296,9 +296,10 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IApplicationRouteService, ApplicationRouteService>();
             services.AddScoped<IApplicationOrderService, ApplicationOrderService>();
             services.AddScoped<IApplicationOrderValidatorService, ApplicationOrderValidatorService>();
-            services.AddScoped<IApplicationCustomerService, ApplicationCustomerService>();
+            services.AddScoped<IApplicationUserService, ApplicationUserService>();
             services.AddScoped<IApplicationPrognosisService, ApplicationPrognosisService>();
             services.AddScoped<IApplicationCompanyService, ApplicationCompanyService>();
+            services.AddScoped<IApplicationMarketService, ApplicationMarketService>();
         }
 
         protected virtual void ConfigureExternalServices(IServiceCollection services)

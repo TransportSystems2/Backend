@@ -1,5 +1,4 @@
-﻿using Common.Models.Units;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
@@ -9,7 +8,6 @@ using TransportSystems.Backend.Application.Interfaces.Billing;
 using TransportSystems.Backend.Application.Interfaces.Organization;
 using TransportSystems.Backend.Application.Interfaces.Pricing;
 using TransportSystems.Backend.Application.Models.Billing;
-using TransportSystems.Backend.Application.Models.Geo;
 
 namespace TransportSystems.Backend.Application.Business.Billing
 {
@@ -22,15 +20,13 @@ namespace TransportSystems.Backend.Application.Business.Billing
             IBillService domainBillService,
             IBillItemService domainBillItemService,
             IBasketService domainBasketService,
-            IApplicationPricelistService pricelistService,
-            IApplicationGarageService garageService)
+            IApplicationPricelistService pricelistService)
             : base(transactionService)
         {
             DomainBillService = domainBillService;
             DomainBillItemService = domainBillItemService;
             DomainBasketService = domainBasketService;
             PricelistService = pricelistService;
-            GarageService = garageService; 
         }
 
         protected IBillService DomainBillService { get; }
@@ -156,10 +152,9 @@ namespace TransportSystems.Backend.Application.Business.Billing
             return DomainBillItemService.Create(billId, billItem.Key, billItem.Value, billItem.Price, billItem.Cost);
         }
 
-        public async Task<BillInfoAM> GetBillInfo(Coordinate coordinate, int catalogItemId)
+        public async Task<BillInfoAM> GetBillInfo(int pricelistId, int catalogItemId)
         {
-            var domainCity = await GarageService.GetDomainGarageByCoordinate(coordinate);
-            var domainPrice = await PricelistService.GetDomainPrice(domainCity.PricelistId, catalogItemId);
+            var domainPrice = await PricelistService.GetDomainPrice(pricelistId, catalogItemId);
 
             return new BillInfoAM
             {

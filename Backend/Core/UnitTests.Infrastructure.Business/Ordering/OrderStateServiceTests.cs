@@ -11,6 +11,7 @@ using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Billing;
 using TransportSystems.Backend.Core.Services.Interfaces.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Ordering;
+using TransportSystems.Backend.Core.Services.Interfaces.Organization;
 using TransportSystems.Backend.Core.Services.Interfaces.Routing;
 using TransportSystems.Backend.Core.Services.Interfaces.Transport;
 using TransportSystems.Backend.Core.Services.Interfaces.Users;
@@ -31,6 +32,7 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Ordering
             CargoServiceMock = new Mock<ICargoService>();
             RouteServiceMock = new Mock<IRouteService>();
             BillServiceMock = new Mock<IBillService>();
+            MarketServiceMock = new Mock<IMarketService>();
 
             Service = new OrderStateService(
                 RepositoryMock.Object,
@@ -41,7 +43,8 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Ordering
                 CustomerServiceMock.Object,
                 CargoServiceMock.Object,
                 RouteServiceMock.Object,
-                BillServiceMock.Object);
+                BillServiceMock.Object,
+                MarketServiceMock.Object);
         }
 
         public IOrderStateService Service { get; }
@@ -63,6 +66,8 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Ordering
         public Mock<IRouteService> RouteServiceMock { get; }
 
         public Mock<IBillService> BillServiceMock { get; }
+
+        public Mock<IMarketService> MarketServiceMock { get; }
     }
 
     public class OrderStateServiceTests
@@ -123,38 +128,43 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Ordering
         {
             var commonId = 1;
             var suite = new OrderStateServiceTestSuite();
-            var order = new Order { Id = commonId++ };
+            var orderId = commonId++;
             var timeOfDelivery = DateTime.Now + TimeSpan.FromMinutes(30);
-            var customer = new Customer { Id = commonId++ };
-            var cargo = new Cargo { Id = commonId++ };
-            var route = new Route { Id = commonId++ };
-            var bill = new Bill { Id = commonId };
+            var customerId = commonId++;
+            var cargoId = commonId++;
+            var routeId = commonId++;
+            var billId = commonId++;
+            var marketId = commonId++;
 
             suite.OrderServiceMock
-                .Setup(m => m.IsExist(order.Id))
+                .Setup(m => m.IsExist(orderId))
                 .ReturnsAsync(true);
             suite.CustomerServiceMock
-                .Setup(m => m.IsExist(customer.Id))
+                .Setup(m => m.IsExist(customerId))
                 .ReturnsAsync(true);
             suite.CargoServiceMock
-                .Setup(m => m.IsExist(cargo.Id))
+                .Setup(m => m.IsExist(cargoId))
                 .ReturnsAsync(true);
             suite.RouteServiceMock
-                .Setup(m => m.IsExist(route.Id))
+                .Setup(m => m.IsExist(routeId))
                 .ReturnsAsync(true);
             suite.BillServiceMock
-                .Setup(m => m.IsExist(bill.Id))
+                .Setup(m => m.IsExist(billId))
+                .ReturnsAsync(true);
+            suite.MarketServiceMock
+                .Setup(m => m.IsExist(marketId))
                 .ReturnsAsync(true);
 
-            await suite.Service.New(order.Id, timeOfDelivery, customer.Id, cargo.Id, route.Id, bill.Id);
+            await suite.Service.New(orderId, marketId, timeOfDelivery, customerId, cargoId, routeId, billId);
             suite.RepositoryMock
                 .Verify(m => m.Add(It.Is<OrderState>(
-                    s => s.OrderId.Equals(order.Id)
+                    s => s.OrderId.Equals(orderId)
+                    && s.MarketId.Equals(marketId)
                     && s.TimeOfDelivery.Equals(timeOfDelivery)
-                    && s.CustomerId.Equals(customer.Id)
-                    && s.CargoId.Equals(cargo.Id)
-                    && s.RouteId.Equals(route.Id)
-                    && s.BillId.Equals(bill.Id))));
+                    && s.CustomerId.Equals(customerId)
+                    && s.CargoId.Equals(cargoId)
+                    && s.RouteId.Equals(routeId)
+                    && s.BillId.Equals(billId))));
         }
 
         [Fact]

@@ -144,9 +144,11 @@ namespace TransportSystems.Backend.Application.Business.Geo
             return MappingService.Map(source, destination);
         }
 
-        public async Task<ICollection<AddressAM>> GetNearestAddresses(AddressKind kind, Coordinate originCoordinate, double distance = 500, int maxResultCount = 5)
+        public async Task<ICollection<Address>> GetNearestDomainAddresses(AddressKind kind,
+            Coordinate originCoordinate,
+            double distance = 500,
+            int maxResultCount = 5)
         {
-
             var coordinateBounds = await DirectionService.GetCoordinateBounds(originCoordinate, distance);
             var domainAddresses = await DomainAddressService.GetByCoordinateBounds(
                 kind,
@@ -155,7 +157,7 @@ namespace TransportSystems.Backend.Application.Business.Geo
                 coordinateBounds.MaxLatitude,
                 coordinateBounds.MaxLongitude);
 
-            var nearestDomainAddresses = new List<Address>();
+            var result = new List<Address>();
 
             if (domainAddresses.Any())
             {
@@ -164,11 +166,11 @@ namespace TransportSystems.Backend.Application.Business.Geo
                 foreach (var coordinate in nearestCoordinates)
                 {
                     var domainAddress = domainAddresses.First(a => a.Latitude.Equals(coordinate.Latitude) && a.Longitude.Equals(coordinate.Longitude));
-                    nearestDomainAddresses.Add(domainAddress);
+                    result.Add(domainAddress);
                 }
             }
 
-            return FromDomainAddresses(nearestDomainAddresses);
+            return result;
         }
 
         public ICollection<AddressAM> FromDomainAddresses(ICollection<Address> source)

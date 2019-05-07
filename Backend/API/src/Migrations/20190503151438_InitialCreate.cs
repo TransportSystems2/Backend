@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace TransportSystems.Backend.API.Migrations
 {
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -147,23 +147,6 @@ namespace TransportSystems.Backend.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Cities",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    AddedDate = table.Column<DateTime>(nullable: false),
-                    ModifiedDate = table.Column<DateTime>(nullable: false),
-                    Domain = table.Column<string>(nullable: true),
-                    AddressId = table.Column<int>(nullable: false),
-                    PricelistId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Cities", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Companies",
                 columns: table => new
                 {
@@ -171,8 +154,7 @@ namespace TransportSystems.Backend.API.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     AddedDate = table.Column<DateTime>(nullable: false),
                     ModifiedDate = table.Column<DateTime>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    IsPrivate = table.Column<bool>(nullable: false)
+                    Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -236,8 +218,6 @@ namespace TransportSystems.Backend.API.Migrations
                     AddedDate = table.Column<DateTime>(nullable: false),
                     ModifiedDate = table.Column<DateTime>(nullable: false),
                     AddressId = table.Column<int>(nullable: false),
-                    CityId = table.Column<int>(nullable: false),
-                    PricelistId = table.Column<int>(nullable: false),
                     CompanyId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -320,14 +300,18 @@ namespace TransportSystems.Backend.API.Migrations
                     OrderId = table.Column<int>(nullable: false),
                     Status = table.Column<int>(nullable: false),
                     TimeOfDelivery = table.Column<DateTime>(nullable: false),
-                    ModeratorId = table.Column<int>(nullable: false),
+                    MarketId = table.Column<int>(nullable: false),
+                    GenCompanyId = table.Column<int>(nullable: false),
+                    SubCompanyId = table.Column<int>(nullable: false),
+                    GarageId = table.Column<int>(nullable: false),
                     CustomerId = table.Column<int>(nullable: false),
+                    ModeratorId = table.Column<int>(nullable: false),
+                    DispatcherId = table.Column<int>(nullable: false),
+                    DriverId = table.Column<int>(nullable: false),
+                    VehicleId = table.Column<int>(nullable: false),
                     PathId = table.Column<int>(nullable: false),
                     RouteId = table.Column<int>(nullable: false),
                     CargoId = table.Column<int>(nullable: false),
-                    CompanyId = table.Column<int>(nullable: false),
-                    DispatcherId = table.Column<int>(nullable: false),
-                    DriverId = table.Column<int>(nullable: false),
                     BillId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -483,9 +467,6 @@ namespace TransportSystems.Backend.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Catalogs");
-
-            migrationBuilder.DropTable(
-                name: "Cities");
 
             migrationBuilder.DropTable(
                 name: "Companies");

@@ -9,25 +9,25 @@ using TransportSystems.Backend.Core.Services.Interfaces.Organization;
 using TransportSystems.Backend.Core.Services.Interfaces.Pricing;
 using Xunit;
 
-namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
+namespace TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.Organization
 {
-    public class GarageServiceTestSuite
+    public class MarketServiceTestSuite
     {
-        public GarageServiceTestSuite()
+        public MarketServiceTestSuite()
         {
-            RepositoryMock = new Mock<IGarageRepository>();
+            RepositoryMock = new Mock<IMarketRepository>();
             AddressServiceMock = new Mock<IAddressService>();
             PricelistServiceMock = new Mock<IPricelistService>();
             CompanyServiceMock = new Mock<ICompanyService>();
 
-            Service = new GarageService(RepositoryMock.Object,
+            Service = new MarketService(RepositoryMock.Object,
                 CompanyServiceMock.Object,
                 AddressServiceMock.Object,
                 PricelistServiceMock.Object);
         }
-        public IGarageService Service { get; }
+        public IMarketService Service { get; }
 
-        public Mock<IGarageRepository> RepositoryMock { get; }
+        public Mock<IMarketRepository> RepositoryMock { get; }
 
         public Mock<ICompanyService> CompanyServiceMock { get; }
 
@@ -36,23 +36,24 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
         public Mock<IPricelistService> PricelistServiceMock { get; }
     }
 
-    public class GarageServiceTests
+    public class MarketServiceTests
     {
-        public GarageServiceTests()
+        public MarketServiceTests()
         {
-            Suite = new GarageServiceTestSuite();
+            Suite = new MarketServiceTestSuite();
         }
 
-        public GarageServiceTestSuite Suite { get; }
+        public MarketServiceTestSuite Suite { get; }
 
         [Fact]
-        public async void CreateGarage()
+        public async void CreateMarket()
         {
             var commonId = 1;
 
             var companyId = commonId++;
             var cityId = commonId++;
             var addressId = commonId++;
+            var pricelistId = commonId++;
 
             Suite.CompanyServiceMock
                 .Setup(m => m.IsExist(companyId))
@@ -61,18 +62,24 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
             Suite.AddressServiceMock
                 .Setup(m => m.IsExist(addressId))
                 .ReturnsAsync(true);
-        
-            var result = await Suite.Service.Create(companyId, addressId);
+
+            Suite.PricelistServiceMock
+                .Setup(m => m.IsExist(pricelistId))
+                .ReturnsAsync(true);
+
+            var result = await Suite.Service.Create(companyId, addressId, pricelistId);
 
             Suite.RepositoryMock
-                .Verify(m => m.Add(It.Is<Garage>(
+                .Verify(m => m.Add(It.Is<Market>(
                     g => g.CompanyId.Equals(companyId)
-                    && g.AddressId.Equals(addressId))));
+                    && g.AddressId.Equals(addressId)
+                    && g.PricelistId.Equals(pricelistId))));
             Suite.RepositoryMock
                 .Verify(m => m.Save());
 
             Assert.Equal(companyId, result.CompanyId);
             Assert.Equal(addressId, result.AddressId);
+            Assert.Equal(pricelistId, result.PricelistId);
         }
 
         [Fact]
@@ -87,7 +94,7 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
                 Longitude = 22.0000
             };
 
-            var garage = new Garage
+            var market = new Market
             {
                 Id = commonId,
                 AddressId = address.Id
@@ -98,13 +105,13 @@ namespace TransportSystems.UnitTests.Infrastructure.Business.Oraganization
                 .ReturnsAsync(address);
             Suite.RepositoryMock
                 .Setup(m => m.GetByAddress(address.Id))
-                .ReturnsAsync(garage);
+                .ReturnsAsync(market);
 
             var result = await Suite.Service.GetByCoordinate(address.Latitude, address.Longitude);
 
-            Assert.Equal(garage, result);
-            Assert.Equal(garage.Id, result.Id);
-            Assert.Equal(garage.AddressId, result.AddressId);
+            Assert.Equal(market, result);
+            Assert.Equal(market.Id, result.Id);
+            Assert.Equal(market.AddressId, result.AddressId);
         }
     }
 }

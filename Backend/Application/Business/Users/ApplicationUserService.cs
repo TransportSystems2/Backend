@@ -8,19 +8,23 @@ using TransportSystems.Backend.Application.Models.Users;
 
 namespace TransportSystems.Backend.Application.Business
 {
-    public class ApplicationCustomerService : ApplicationTransactionService, IApplicationCustomerService
+    public class ApplicationUserService : ApplicationTransactionService, IApplicationUserService
     {
-        public ApplicationCustomerService(
+        public ApplicationUserService(
             ITransactionService transactionService,
-            ICustomerService domainCustomerService)
+            ICustomerService domainCustomerService,
+            IModeratorService domainModeratorService)
             : base(transactionService)
         {
             DomainCustomerService = domainCustomerService;
+            DomainModeratorService = domainModeratorService;
         }
 
         protected ICustomerService DomainCustomerService { get; }
 
-        public async Task<Customer> GetDomainCustomer(CustomerAM customer)
+        protected IModeratorService DomainModeratorService { get; }
+
+        public async Task<Customer> GetOrCreateDomainCustomer(CustomerAM customer)
         {
             var result = await DomainCustomerService.GetByPhoneNumber(customer.PhoneNumber);
             if (result == null)
@@ -32,6 +36,11 @@ namespace TransportSystems.Backend.Application.Business
             }
 
             return result;
+        }
+
+        public Task<Moderator> GetDomainModeratorByIdentityUser(int identityUserId)
+        {
+            return DomainModeratorService.GetByIndentityUser(identityUserId);
         }
     }
 }

@@ -1,18 +1,18 @@
-﻿using Moq;
+﻿using Common.Models.Units;
+using Moq;
 using System.Threading.Tasks;
-using TransportSystems.Backend.Core.Domain.Core.Geo;
-using TransportSystems.Backend.Core.Services.Interfaces.Organization;
 using TransportSystems.Backend.Application.Business.Organization;
 using TransportSystems.Backend.Application.Interfaces.Geo;
 using TransportSystems.Backend.Application.Interfaces.Organization;
-using TransportSystems.Backend.Application.Models.Geo;
-using TransportSystems.Backend.Application.UnitTests.Business.Suite;
-using Xunit;
-using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Application.Interfaces.Pricing;
+using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Application.Models.Pricing;
+using TransportSystems.Backend.Application.UnitTests.Business.Suite;
+using TransportSystems.Backend.Core.Domain.Core.Geo;
+using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Core.Domain.Core.Pricing;
-using Common.Models.Units;
+using TransportSystems.Backend.Core.Services.Interfaces.Organization;
+using Xunit;
 
 namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
 {
@@ -87,13 +87,11 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
                 .Setup(m => m.CreateDomainPricelist(It.IsAny<PricelistAM>()))
                 .ReturnsAsync(domainPricelist);
 
-            await Suite.GarageService.CreateDomainGarage(isPublic, domainCompany.Id, address);
+            await Suite.GarageService.CreateDomainGarage(domainCompany.Id, address);
 
             Suite.DomainGarageServiceMock
-                .Verify(m => m.Create(isPublic,
-                    domainCompany.Id,
-                    domainAddress.Id,
-                    domainPricelist.Id));
+                .Verify(m => m.Create(domainCompany.Id,
+                    domainAddress.Id));
         }
 
         [Fact]
@@ -143,42 +141,6 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Organization
                 .Verify(m => m.GetByCoordinate(
                     coordinate.Latitude,
                     coordinate.Longitude));
-        }
-
-        [Fact]
-        public async Task GetAvailableProvince()
-        {
-            var country = "Россия";
-
-            var result = await Suite.GarageService.GetAvailableProvinces(country);
-
-            Suite.DomainGarageServiceMock
-                .Verify(m => m.GetAvailableProvinces(country), Times.Once);
-        }
-
-        [Fact]
-        public async Task GetAvailableLocalities()
-        {
-            var country = "Россия";
-            var province = "Ярославская область";
-
-            var result = await Suite.GarageService.GetAvailableLocalities(country, province);
-
-            Suite.DomainGarageServiceMock
-                .Verify(m => m.GetAvailableLocalities(country, province), Times.Once);
-        }
-
-        [Fact]
-        public async Task GetAvailableDistricts()
-        {
-            var country = "Россия";
-            var province = "Ярославская";
-            var locality = "Ярославль";
-
-            var result = await Suite.GarageService.GetAvailableDistricts(country, province, locality);
-
-            Suite.DomainGarageServiceMock
-                .Verify(m => m.GetAvailableDistricts(country, province, locality), Times.Once);
         }
     }
 }

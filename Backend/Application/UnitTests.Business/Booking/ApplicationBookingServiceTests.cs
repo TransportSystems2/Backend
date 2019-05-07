@@ -9,13 +9,16 @@ using TransportSystems.Backend.Application.Business.Booking;
 using TransportSystems.Backend.Application.Interfaces.Billing;
 using TransportSystems.Backend.Application.Interfaces.Booking;
 using TransportSystems.Backend.Application.Interfaces.Geo;
+using TransportSystems.Backend.Application.Interfaces.Organization;
 using TransportSystems.Backend.Application.Interfaces.Prognosing;
 using TransportSystems.Backend.Application.Interfaces.Routing;
+using TransportSystems.Backend.Application.Interfaces.Users;
 using TransportSystems.Backend.Application.Models.Billing;
 using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Application.Models.Routing;
 using TransportSystems.Backend.Application.Models.Transport;
 using TransportSystems.Backend.Application.UnitTests.Business.Suite;
+using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Core.Domain.Core.Routing;
 using Xunit;
 
@@ -29,12 +32,16 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
             BillServiceMock = new Mock<IApplicationBillService>();
             RouteServiceMock = new Mock<IApplicationRouteService>();
             PrognosisServiceMock = new Mock<IApplicationPrognosisService>();
+            MarketServiceMock = new Mock<IApplicationMarketService>();
+            UserServiceMock = new Mock<IApplicationUserService>();
 
             BookingService = new ApplicationBookingService(
                 AddressServiceMock.Object,
                 BillServiceMock.Object,
                 RouteServiceMock.Object,
-                PrognosisServiceMock.Object);
+                PrognosisServiceMock.Object,
+                MarketServiceMock.Object,
+                UserServiceMock.Object);
         }
 
         public IApplicationBookingService BookingService { get; }
@@ -46,6 +53,10 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
         public Mock<IApplicationRouteService> RouteServiceMock { get; }
 
         public Mock<IApplicationPrognosisService> PrognosisServiceMock { get; }
+
+        public Mock<IApplicationMarketService> MarketServiceMock { get; }
+
+        public Mock<IApplicationUserService> UserServiceMock { get; }
     }
 
     public class ApplicationBookingServiceTests : BaseServiceTests<ApplicationBookingServiceTestSuite>
@@ -55,7 +66,7 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
         {
             var commonId = 1;
 
-            var rootAddress = new AddressAM
+            var marketAddress = new AddressAM
             {
                 Locality = "Ярославль",
                 Latitude = 11.1111,
@@ -99,19 +110,34 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
                 }
             };
 
+            var waypoints = new WaypointsAM();
+
+            var domainMarket = new Market
+            {
+                Id = commonId++,
+                PricelistId = commonId++,
+                AddressId = commonId++
+            };
+
             var feedDistance = route.Legs[0].Distance;
             var avgDeliveryTime = TimeSpan.FromMinutes(30);
             var totalDistance = route.Legs.Select(l => l.Distance).Sum();
 
-            var bill = new BillAM {  TotalCost = 100 };
-            var title = $"{rootAddress.Locality} - {bill.TotalCost}₽";
+            var bill = new BillAM { TotalCost = 100 };
+            var title = $"{marketAddress.Locality} - {bill.TotalCost}₽";
 
+            Suite.AddressServiceMock
+                .Setup(m => m.GetAddress(domainMarket.AddressId))
+                .ReturnsAsync(marketAddress);
+            Suite.RouteServiceMock
+                .Setup(m => m.GetRoute(marketAddress, waypoints))
+                .ReturnsAsync(route);
             Suite.PrognosisServiceMock
                 .Setup(m => m.GetAvgDeliveryTime(route, cargo, basket))
                 .ReturnsAsync(avgDeliveryTime);
             Suite.RouteServiceMock
                 .Setup(m => m.GetRootAddress(route))
-                .Returns(rootAddress);
+                .Returns(marketAddress);
             Suite.RouteServiceMock
                 .Setup(m => m.GetFeedDistance(route))
                 .Returns(feedDistance);
@@ -119,13 +145,11 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
                 .Setup(m => m.GetTotalDistance(route))
                 .Returns(totalDistance);
             Suite.AddressServiceMock
-                .Setup(m => m.GetTimeBeltByAddress(rootAddress))
+                .Setup(m => m.GetTimeBeltByAddress(marketAddress))
                 .ReturnsAsync(rootAddressTimeBelt);
 
             Suite.BillServiceMock
-                .Setup(m => m.GetBillInfo(
-                    It.Is<Coordinate>(c => c.Latitude.Equals(rootAddress.Latitude) && c.Longitude.Equals(rootAddress.Longitude)),
-                    cargo.WeightCatalogItemId))
+                .Setup(m => m.GetBillInfo(domainMarket.PricelistId, cargo.WeightCatalogItemId))
                 .ReturnsAsync(billInfo);
             Suite.BillServiceMock
                 .Setup(m => m.CalculateBill(
@@ -133,10 +157,10 @@ namespace TransportSystems.Backend.Application.UnitTests.Business.Booking
                     It.Is<BasketAM>(b => (b != basket) && b.Distance.Equals(totalDistance))))
                 .ReturnsAsync(bill);
 
-            var result = await Suite.BookingService.CalculateBookingRoute(route, cargo, basket);
+            var result = await Suite.BookingService.CalculateBookingRoute(domainMarket, waypoints, cargo, basket);
 
-            Assert.Equal(rootAddress, result.RootAddress);
-            Assert.Equal(rootAddressTimeBelt, result.RootAddressTimeBelt);
+            Assert.Equal(domainMarket.Id, result.MarketId);
+            Assert.Equal(rootAddressTimeBelt, result.MarketTimeBelt);
             Assert.Equal(feedDistance, result.FeedDistance);
             Assert.Equal(avgDeliveryTime, result.AvgDeliveryTime);
             Assert.Equal(totalDistance, result.TotalDistance);

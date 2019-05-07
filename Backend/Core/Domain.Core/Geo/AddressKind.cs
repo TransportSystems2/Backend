@@ -3,6 +3,7 @@
     public enum AddressKind
     {
         Other,
+        Market,
         Garage,
         Vehicle
     }

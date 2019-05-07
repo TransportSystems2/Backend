@@ -3,10 +3,8 @@ using TransportSystems.Backend.Application.Models.Pricing;
 
 namespace TransportSystems.Backend.Application.Models.Organization
 {
-    public class CityAM : DomainAM
+    public class MarketAM : BaseAM
     {
-        public string Domain { get; set; }
-
         public AddressAM Address { get; set; }
         
         public PricelistAM Pricelist { get; set; }

@@ -2,7 +2,7 @@
 using DotNetDistance;
 using System;
 using TransportSystems.Backend.Application.Models.Billing;
-using TransportSystems.Backend.Application.Models.Geo;
+using TransportSystems.Backend.Application.Models.Organization;
 
 namespace TransportSystems.Backend.Application.Models.Booking
 {
@@ -10,9 +10,9 @@ namespace TransportSystems.Backend.Application.Models.Booking
     {
         public string Title { get; set; }
 
-        public AddressAM RootAddress { get; set; }
+        public int MarketId { get; set; }
 
-        public TimeBelt RootAddressTimeBelt { get; set; }
+        public TimeBelt MarketTimeBelt { get; set; }
 
         public Distance TotalDistance { get; set; }
 

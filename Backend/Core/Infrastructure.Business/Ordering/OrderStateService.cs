@@ -8,6 +8,7 @@ using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Billing;
 using TransportSystems.Backend.Core.Services.Interfaces.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Ordering;
+using TransportSystems.Backend.Core.Services.Interfaces.Organization;
 using TransportSystems.Backend.Core.Services.Interfaces.Routing;
 using TransportSystems.Backend.Core.Services.Interfaces.Transport;
 using TransportSystems.Backend.Core.Services.Interfaces.Users;
@@ -25,7 +26,8 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             ICustomerService customerService,
             ICargoService cargoService,
             IRouteService routeService,
-            IBillService billService)
+            IBillService billService,
+            IMarketService marketService)
             : base(repository)
         {
             OrderService = orderService;
@@ -36,6 +38,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             CargoService = cargoService;
             RouteService = routeService;
             BillService = billService;
+            MarketService = marketService;
         }
 
         protected new IOrderStateRepository Repository => (IOrderStateRepository)base.Repository;
@@ -55,6 +58,8 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
         protected IRouteService RouteService { get; }
 
         protected IBillService BillService { get; }
+
+        protected IMarketService MarketService { get; }
 
         public async Task<OrderState> GetCurrentState(int orderId)
         {
@@ -78,12 +83,18 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
 
         public async Task New(
             int orderId,
+            int marketId,
             DateTime timeOfDelivery,
             int customerId,
             int cargoId,
             int routeId,
             int billId)
         {
+            if (!await MarketService.IsExist(marketId))
+            {
+                throw new ArgumentException($"MarketId:{cargoId} is null", "Market");
+            }
+
             if (timeOfDelivery.ToUniversalTime() < DateTime.UtcNow)
             {
                 throw new ArgumentException($"Time of delivery can't be lower that NowTime", nameof(timeOfDelivery).FirstCharToUpper());
@@ -102,22 +113,22 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
 
             if (!await CustomerService.IsExist(customerId))
             {
-                throw new EntityNotFoundException($"CustomerId:{customerId} doesn't exist", "Customer");
+                throw new ArgumentException($"CustomerId:{customerId} doesn't exist", "Customer");
             }
 
             if (!await CargoService.IsExist(cargoId))
             {
-                throw new EntityNotFoundException($"CargoId:{cargoId} doesn't exist", "Cargo");
+                throw new ArgumentException($"CargoId:{cargoId} doesn't exist", "Cargo");
             }
 
             if (!await RouteService.IsExist(routeId))
             {
-                throw new EntityNotFoundException($"RouteId:{routeId} doesn't exist", "Route");
+                throw new ArgumentException($"RouteId:{routeId} doesn't exist", "Route");
             }
 
             if (!await BillService.IsExist(billId))
             {
-                throw new EntityNotFoundException($"BillId:{billId} doesn't exist", "Bill");
+                throw new ArgumentException($"BillId:{billId} doesn't exist", "Bill");
             }
 
             if (currentState == null)
@@ -126,6 +137,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             }
 
             currentState.Status = OrderStatus.New;
+            currentState.MarketId = marketId;
             currentState.TimeOfDelivery = timeOfDelivery;
             currentState.CustomerId = customerId;
             currentState.CargoId = cargoId;

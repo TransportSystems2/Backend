@@ -18,6 +18,6 @@ namespace TransportSystems.Backend.Application.Interfaces.Billing
 
         Task<BillItemAM> CalculateBillItem(string key, int value, decimal price, float degreeOfDifficulty);
 
-        Task<BillInfoAM> GetBillInfo(Coordinate coordinate, int catalogItemId);
+        Task<BillInfoAM> GetBillInfo(int pricelistId, int catalogItemId);
     }
 }
