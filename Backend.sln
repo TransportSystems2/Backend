@@ -11,13 +11,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{DE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Core.Services.Interfaces", "Backend\Core\Services.Interfaces\TransportSystems.Backend.Core.Services.Interfaces.csproj", "{9D376AE9-42F3-4C4C-BDFE-A7ED7028C185}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{DC7187E1-4614-4D51-8DE6-F3127214374D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DC7187E1-4614-4D51-8DE6-F3127214374D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Core.UnitTests.Infrastructure.Data", "Backend\Core\UnitTests.Infrastructure.Data\TransportSystems.Backend.Core.UnitTests.Infrastructure.Data.csproj", "{EE0E02DF-6D19-4D96-B663-BB17DFCE46AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Core.Infrastructure.Data.Tests", "Backend\Core\Infrastructure.Data.Tests\TransportSystems.Backend.Core.Infrastructure.Data.Tests.csproj", "{EE0E02DF-6D19-4D96-B663-BB17DFCE46AD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Core.UnitTests.Infrastructure.Business", "Backend\Core\UnitTests.Infrastructure.Business\TransportSystems.Backend.Core.UnitTests.Infrastructure.Business.csproj", "{1B18E644-E0A8-4DC4-8B82-4093D1222F0A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Core.Infrastructure.Business.Tests", "Backend\Core\Infrastructure.Business.Tests\TransportSystems.Backend.Core.Infrastructure.Business.Tests.csproj", "{1B18E644-E0A8-4DC4-8B82-4093D1222F0A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Core.UnitTests.Infrastructure.Http", "Backend\Core\UnitTests.Infrastructure.Http\TransportSystems.Backend.Core.UnitTests.Infrastructure.Http.csproj", "{6F272029-5B7B-47C6-BE34-35D9EC1213D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Core.Infrastructure.Http.Tests", "Backend\Core\Infrastructure.Http.Tests\TransportSystems.Backend.Core.Infrastructure.Http.Tests.csproj", "{6F272029-5B7B-47C6-BE34-35D9EC1213D6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{FCB95F77-FFC3-41A3-9061-0CAAC6191814}"
 EndProject
@@ -49,9 +49,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Models", "Models", "{B72F23
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Application.Models", "Backend\Application\Models\TransportSystems.Backend.Application.Models.csproj", "{3680115E-A701-4D2C-A97D-C53255744C90}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{B8290E70-5EF2-4894-B7BB-7F3B8BE46EB6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B8290E70-5EF2-4894-B7BB-7F3B8BE46EB6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Application.UnitTests.Business", "Backend\Application\UnitTests.Business\TransportSystems.Backend.Application.UnitTests.Business.csproj", "{822881B3-E141-46EA-8A1F-6867204E9C21}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Application.Business.Tests", "Backend\Application\Business.Tests\TransportSystems.Backend.Application.Business.Tests.csproj", "{822881B3-E141-46EA-8A1F-6867204E9C21}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{15E10983-4B4B-4016-A336-1A30D765F29B}"
 EndProject
@@ -83,17 +83,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3C4A9BDC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Identity.Tests", "Backend\Identity\Tests\TransportSystems.Backend.Identity.Tests.csproj", "{67A9A9D5-54A7-474C-A6D0-70BD28DFE15D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests.Controllers", "UnitTests.Controllers", "{420AA2CC-6004-4356-AB9B-E55EF5D58703}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Controllers.Tests", "Controllers.Tests", "{420AA2CC-6004-4356-AB9B-E55EF5D58703}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Identity.UnitTests.Controllers", "Backend\Identity\UnitTests.Controllers\TransportSystems.Backend.Identity.UnitTests.Controllers.csproj", "{17EF5E7A-2FCF-4109-986B-C047F0CC12D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Identity.Controllers.Tests", "Backend\Identity\Controllers.Tests\TransportSystems.Backend.Identity.Controllers.Tests.csproj", "{17EF5E7A-2FCF-4109-986B-C047F0CC12D7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests.Models", "UnitTests.Models", "{BD3584D8-81CF-450D-9D93-C858D6E91770}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Models.Tests", "Models.Tests", "{BD3584D8-81CF-450D-9D93-C858D6E91770}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Identity.UnitTests.Models", "Backend\Identity\UnitTests.Models\TransportSystems.Backend.Identity.UnitTests.Models.csproj", "{B1E4ACAD-4618-4AAF-9644-BC1129474F4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Identity.Models.Tests", "Backend\Identity\Models.Tests\TransportSystems.Backend.Identity.Models.Tests.csproj", "{B1E4ACAD-4618-4AAF-9644-BC1129474F4F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests.Services", "UnitTests.Services", "{B2CC8D25-8C19-401B-AC3E-2B70C52C9538}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services.Tests", "Services.Tests", "{B2CC8D25-8C19-401B-AC3E-2B70C52C9538}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Identity.UnitTests.Services", "Backend\Identity\UnitTests.Services\TransportSystems.Backend.Identity.UnitTests.Services.csproj", "{2A45F6A4-82C3-4AE1-8BDF-B9636564D646}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Identity.Services.Tests", "Backend\Identity\Services.Tests\TransportSystems.Backend.Identity.Services.Tests.csproj", "{2A45F6A4-82C3-4AE1-8BDF-B9636564D646}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{1FB231BD-A38E-49A3-88DE-9DD7C2CBF7F2}"
 EndProject
@@ -103,7 +103,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interfaces", "Interfaces", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Models", "Models", "{676540F4-51F7-448A-8E47-C4A5AC8C72B9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{0A07A0B5-518E-4C91-851B-64F25D79CB1A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0A07A0B5-518E-4C91-851B-64F25D79CB1A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.External.Business", "Backend\External\Business\TransportSystems.Backend.External.Business.csproj", "{735CD7C5-B94F-4BEF-8D1D-EC471026BACE}"
 EndProject
@@ -111,7 +111,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Ex
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.External.Models", "Backend\External\Models\TransportSystems.Backend.External.Models.csproj", "{74793D39-AA1F-4088-9CAC-0BFE46A27994}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.External.UnitTests.Business", "Backend\External\UnitTests.Business\TransportSystems.Backend.External.UnitTests.Business.csproj", "{177D3EB5-D6A1-402D-BCBD-337CF4F8C8F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.External.Business.Tests", "Backend\External\Business.Tests\TransportSystems.Backend.External.Business.Tests.csproj", "{177D3EB5-D6A1-402D-BCBD-337CF4F8C8F7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.Identity.Signin", "Backend\Identity\Signin\TransportSystems.Backend.Identity.Signin.csproj", "{2AE9D9D1-7578-4E52-99EE-1325291279BC}"
 EndProject
@@ -131,11 +131,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Models", "Common\Com
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{49382F5A-9160-4CE6-B4DA-C8285DC96279}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{181D0D4C-0D92-4BF3-A3DB-2CCBC6D80FD1}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{181D0D4C-0D92-4BF3-A3DB-2CCBC6D80FD1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.API", "Backend\API\src\TransportSystems.Backend.API.csproj", "{211933F1-0383-4CB1-8128-3A61312279D0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.API.UnitTests.API", "Backend\API\UnitTests.API\TransportSystems.Backend.API.UnitTests.API.csproj", "{34142660-C280-47EA-AB17-6DE8F767EE9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransportSystems.Backend.API.Tests", "Backend\API\Tests\TransportSystems.Backend.API.Tests.csproj", "{34142660-C280-47EA-AB17-6DE8F767EE9C}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D4D76F89-9478-46F2-BE43-4A8A382F8D21}"
 EndProject
