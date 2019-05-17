@@ -41,7 +41,7 @@ namespace TransportSystems.Backend.Application.Business
 
         protected IApplicationVehicleService VehicleService { get; }
 
-        public async Task SignUpDispatcherCompany(DispatcherCompanyAM dispatcherCompanyModel)
+        public async Task SignUpDispatcherCompany(int identityUserId, DispatcherCompanyAM dispatcherCompanyModel)
         {
             using (var transaction = await TransactionService.BeginTransaction())
             {
@@ -55,14 +55,7 @@ namespace TransportSystems.Backend.Application.Business
                     );
 
                     var domainCompany = await DomainCompanyService.Create(
-                        dispatcherCompanyModel.CompanyName);
-
-                    var domainModerator = await DomainModeratorService.Create(
-                        dispatcherCompanyModel.Dispatcher.FirstName,
-                        dispatcherCompanyModel.Dispatcher.LastName,
-                        dispatcherCompanyModel.Dispatcher.PhoneNumber,
-                        domainCompany.Id
-                    );
+                        dispatcherCompanyModel.Dispatcher.PhoneNumber);
 
                     var domainDispatcher = await DomainDispatcherService.Create(
                         dispatcherCompanyModel.Dispatcher.FirstName,
@@ -81,7 +74,7 @@ namespace TransportSystems.Backend.Application.Business
             }
         }
 
-        public async Task SignUpDriverCompany(DriverCompanyAM driverCompanyModel)
+        public async Task SignUpDriverCompany(int identityUserId, DriverCompanyAM driverCompanyModel)
         {
             using (var transaction = await TransactionService.BeginTransaction())
             {
@@ -95,17 +88,11 @@ namespace TransportSystems.Backend.Application.Business
                     );
 
                     var domainCompany = await DomainCompanyService.Create(
-                        driverCompanyModel.CompanyName);
+                        driverCompanyModel.Driver.PhoneNumber);
 
                     var domainVehicle = await VehicleService.CreateDomainVehicle(
                         domainCompany.Id,
                         driverCompanyModel.Vehicle);
-
-                    var domainModerator = await DomainModeratorService.Create(
-                        driverCompanyModel.Driver.FirstName,
-                        driverCompanyModel.Driver.LastName,
-                        driverCompanyModel.Driver.PhoneNumber,
-                        domainCompany.Id);
 
                     var domainDispatcher = await DomainDispatcherService.Create(
                         driverCompanyModel.Driver.FirstName,

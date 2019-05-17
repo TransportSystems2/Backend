@@ -8,8 +8,6 @@ namespace TransportSystems.Backend.Application.Models.SignUp
     {
         public AddressAM GarageAddress { get; set; }
 
-        public string CompanyName { get; set; }
-
         public DriverAM Driver { get; set; }
 
         public VehicleAM Vehicle { get; set; }
