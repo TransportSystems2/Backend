@@ -5,8 +5,6 @@ namespace TransportSystems.Backend.Application.Interfaces
 {
     public interface ISignUpService : IApplicationTransactionService
     {
-        Task SignUpDriverCompany(int identityUserId, DriverCompanyAM driverCompanyModel);
-
-        Task SignUpDispatcherCompany(int identityUserId, DispatcherCompanyAM dispatcherCompanyModel);
+        Task SignUpCompany(CompanyApplicationAM companyApplication);
     }
 }

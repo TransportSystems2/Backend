@@ -18,14 +18,14 @@ namespace TransportSystems.Backend.API.Controllers.SignUp
         protected ISignUpService SignUpService { get; }
 
         /// <summary>
-        /// Регистрация диспетчера
+        /// Регистрация компании
         /// </summary>
-        /// <response code="200">Диспетчер создан</response>
+        /// <response code="200">Компания создана</response>
         /// <response code="400">Id пользователя не найден в claims</response> 
-        [HttpPost("dispatcher")]
+        [HttpPost("company")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> SignUpDispatcherCompany([FromBody]DispatcherCompanyAM dispatcherCompanyModel)
+        public async Task<IActionResult> SignUpCompany([FromBody]CompanyApplicationAM companyApplication)
         {
             var identityUserId = GetIdentityUserId();
             if (identityUserId == -1)
@@ -40,45 +40,7 @@ namespace TransportSystems.Backend.API.Controllers.SignUp
                 return base.ValidationProblem(problem);
             }
 
-            var phoneNumber = GetIdentityUserPhoneNumber();
-
-            dispatcherCompanyModel.Dispatcher.IdentityUserId = identityUserId;
-            dispatcherCompanyModel.Dispatcher.PhoneNumber = phoneNumber;
-
-            await SignUpService.SignUpDispatcherCompany(dispatcherCompanyModel);
-
-            return Ok();
-        }
-
-        /// <summary>
-        /// Регистрация водителя
-        /// </summary>
-        /// <response code="200">Диспетчер создан</response>
-        /// <response code="400">Id пользователя не найден в claims</response> 
-        [HttpPost("driver")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        public async Task<IActionResult> SignUpDriverCompany([FromBody]DriverCompanyAM driverCompanyModel)
-        {
-            var identityUserId = GetIdentityUserId();
-            if (identityUserId == -1)
-            {
-                var problem = new ValidationProblemDetails
-                {
-                    Title = $"identity user id can't be parsed from claims",
-                    Detail = $"identity user id can't be parsed from claims",
-                    Status = 400
-                };
-
-                return base.ValidationProblem(problem);
-            }
-
-            var phoneNumber = GetIdentityUserPhoneNumber();
-
-            driverCompanyModel.Driver.IdentityUserId = identityUserId;
-            driverCompanyModel.Driver.PhoneNumber = phoneNumber;
-
-            await SignUpService.SignUpDriverCompany(driverCompanyModel);
+            await SignUpService.SignUpCompany(companyApplication);
 
             return Ok();
         }
@@ -88,11 +50,6 @@ namespace TransportSystems.Backend.API.Controllers.SignUp
             var strIdentityUserId = User.FindFirst("sub")?.Value;
 
             return int.Parse(strIdentityUserId);
-        }
-
-        private string GetIdentityUserPhoneNumber()
-        {
-            return User.FindFirst("phone_number")?.Value;
         }
     }
 }

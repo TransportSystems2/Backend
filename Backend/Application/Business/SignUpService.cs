@@ -41,70 +41,37 @@ namespace TransportSystems.Backend.Application.Business
 
         protected IApplicationVehicleService VehicleService { get; }
 
-        public async Task SignUpDispatcherCompany(int identityUserId, DispatcherCompanyAM dispatcherCompanyModel)
+        public async Task SignUpCompany(CompanyApplicationAM companyApplication)
         {
             using (var transaction = await TransactionService.BeginTransaction())
             {
                 try
                 {
                     var domainGarage = await DomainGarageService.GetByAddress(
-                        dispatcherCompanyModel.GarageAddress.Country,
-                        dispatcherCompanyModel.GarageAddress.Province,
-                        dispatcherCompanyModel.GarageAddress.Locality,
-                        dispatcherCompanyModel.GarageAddress.District
+                        companyApplication.GarageAddress.Country,
+                        companyApplication.GarageAddress.Province,
+                        companyApplication.GarageAddress.Locality,
+                        companyApplication.GarageAddress.District
                     );
 
                     var domainCompany = await DomainCompanyService.Create(
-                        dispatcherCompanyModel.Dispatcher.PhoneNumber);
-
-                    var domainDispatcher = await DomainDispatcherService.Create(
-                        dispatcherCompanyModel.Dispatcher.FirstName,
-                        dispatcherCompanyModel.Dispatcher.LastName,
-                        dispatcherCompanyModel.Dispatcher.PhoneNumber,
-                        domainCompany.Id
-                    );
-
-                    transaction.Commit();
-                }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
-        }
-
-        public async Task SignUpDriverCompany(int identityUserId, DriverCompanyAM driverCompanyModel)
-        {
-            using (var transaction = await TransactionService.BeginTransaction())
-            {
-                try
-                {
-                    var domainGarage = await DomainGarageService.GetByAddress(
-                        driverCompanyModel.GarageAddress.Country,
-                        driverCompanyModel.GarageAddress.Province,
-                        driverCompanyModel.GarageAddress.Locality,
-                        driverCompanyModel.GarageAddress.District
-                    );
-
-                    var domainCompany = await DomainCompanyService.Create(
-                        driverCompanyModel.Driver.PhoneNumber);
+                        companyApplication.Dispatcher.PhoneNumber);
 
                     var domainVehicle = await VehicleService.CreateDomainVehicle(
                         domainCompany.Id,
-                        driverCompanyModel.Vehicle);
+                        companyApplication.Vehicle);
 
                     var domainDispatcher = await DomainDispatcherService.Create(
-                        driverCompanyModel.Driver.FirstName,
-                        driverCompanyModel.Driver.LastName,
-                        driverCompanyModel.Driver.PhoneNumber,
+                        companyApplication.Dispatcher.FirstName,
+                        companyApplication.Dispatcher.LastName,
+                        companyApplication.Dispatcher.PhoneNumber,
                         domainCompany.Id
                     );
 
                     var domainDriver = await DomainDriverService.Create(
-                        driverCompanyModel.Driver.FirstName,
-                        driverCompanyModel.Driver.LastName,
-                        driverCompanyModel.Driver.PhoneNumber,
+                        companyApplication.Driver.FirstName,
+                        companyApplication.Driver.LastName,
+                        companyApplication.Driver.PhoneNumber,
                         domainCompany.Id
                     );
 
