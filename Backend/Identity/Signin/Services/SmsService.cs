@@ -11,7 +11,7 @@ namespace TransportSystems.Backend.Identity.Signin.Services
         public SmsService(ILogger<SmsService> logger, IConfiguration configuration)
         {
             Logger = logger;
-            ApiId = configuration["sms_token"];
+            ApiId = configuration["SMS_TOKEN"];
         }
 
         private string ApiId { get; }
