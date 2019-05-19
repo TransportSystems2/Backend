@@ -7,12 +7,13 @@ namespace TransportSystems.Backend.Identity.Signin.Services
 {
     public class SmsService : ISmsService
     {
-        private const string ApiId = "05C73C31-B3EE-B51C-1602-335148E17A9B";
-
-        public SmsService(ILogger<SmsService> logger)
+        public SmsService(ILogger<SmsService> logger, IConfiguration configuration)
         {
             Logger = logger;
+            ApiId = configuration["sms_token"];
         }
+
+        private string ApiId { get; }
 
         private ILogger<SmsService> Logger { get; }
 
