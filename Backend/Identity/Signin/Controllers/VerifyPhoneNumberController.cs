@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using IdentityServer4.Models;
-
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TransportSystems.Backend.Identity.Core.Data.Domain;
 using TransportSystems.Backend.Identity.Signin.Models;
@@ -17,20 +18,26 @@ namespace TransportSystems.Backend.Identity.Signin.Controllers
     [Route("identity/code")]
     public class VerifyPhoneNumberController : ControllerBase
     {
+        private readonly IHostingEnvironment _env;
         private readonly ISmsService _smsService;
+        private readonly ISlackService _slackService;
         private readonly DataProtectorTokenProvider<User> _dataProtectorTokenProvider;
         private readonly PhoneNumberTokenProvider<User> _phoneNumberTokenProvider;
         private readonly UserManager<User> _userManager;
         private readonly ILogger<VerifyPhoneNumberController> _logger;
 
         public VerifyPhoneNumberController(
+            IHostingEnvironment env,
             ISmsService smsService,
+            ISlackService slackService,
             DataProtectorTokenProvider<User> dataProtectorTokenProvider,
             PhoneNumberTokenProvider<User> phoneNumberTokenProvider,
             UserManager<User> userManager,
             ILogger<VerifyPhoneNumberController> logger)
         {
+            _env = env ?? throw new ArgumentNullException(nameof(env));
             _smsService = smsService ?? throw new ArgumentNullException(nameof(smsService));
+            _slackService = slackService ?? throw new ArgumentNullException(nameof(slackService));
             _dataProtectorTokenProvider = dataProtectorTokenProvider ?? throw new ArgumentNullException(nameof(dataProtectorTokenProvider));
             _phoneNumberTokenProvider = phoneNumberTokenProvider ?? throw new ArgumentNullException(nameof(phoneNumberTokenProvider));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
@@ -69,9 +76,9 @@ namespace TransportSystems.Backend.Identity.Signin.Controllers
                 return BadRequest("Invalid resend token");
             }
 
-            var (verifyToken, result) = await SendSmsRequet(phoneModel, user);
-
-            if (!result)
+            var verifyToken = await _phoneNumberTokenProvider.GenerateAsync("verify_number", _userManager, user);
+            var sendResult = await SendRequest(phoneModel.PhoneNumber, verifyToken);
+            if (!sendResult)
             {
                 return BadRequest("Sending sms failed");
             }
@@ -106,9 +113,10 @@ namespace TransportSystems.Backend.Identity.Signin.Controllers
             }
 
             var user = await GetUser(phoneModel);
-            var (verifyToken, result) = await SendSmsRequet(phoneModel, user);
+            var verifyToken = await _phoneNumberTokenProvider.GenerateAsync("verify_number", _userManager, user);
 
-            if (!result)
+            var sendResult = await SendRequest(phoneModel.PhoneNumber, verifyToken);
+            if (!sendResult)
             {
                 return BadRequest("Sending sms failed");
             }
@@ -136,13 +144,32 @@ namespace TransportSystems.Backend.Identity.Signin.Controllers
             return user;
         }
 
-        private async Task<(string VerifyToken, bool Result)> SendSmsRequet(PhoneLoginViewModel model, User user)
+        private async Task<bool> SendRequest(string phoneNumber, string verifyToken)
         {
-            var verifyToken = await _phoneNumberTokenProvider.GenerateAsync("verify_number", _userManager, user);
-            var result = await _smsService.SendAsync(model.PhoneNumber, $"Your login verification code is: {verifyToken}");
-            _logger.LogDebug($"verifyToken: {verifyToken}");
+            if (_env.IsDevelopment())
+            {
+                return await SendSlackRequet(phoneNumber, verifyToken);
+            }
+            else
+            {
+                return await SendSmsRequet(phoneNumber, verifyToken);
+            }
+        }
 
-            return (verifyToken, result);
+        private async Task<bool> SendSmsRequet(string phoneNumber, string verifyToken)
+        {
+            var smsResult = await _smsService.SendAsync(phoneNumber, $"Your login verification code is: {verifyToken}");
+            _logger.LogDebug($"verifyToken: {verifyToken} sended by sms");
+
+            return smsResult;
+        }
+
+        private async Task<bool> SendSlackRequet(string phoneNumber, string verifyToken)
+        {
+            var slackResult = await _slackService.SendAsync($"Login verification code is: {verifyToken} for phone: {phoneNumber}");
+            _logger.LogDebug($"verifyToken: {verifyToken} sended to slack");
+
+            return slackResult;
         }
     }
 }
