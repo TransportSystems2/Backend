@@ -35,16 +35,23 @@ namespace TransportSystems.Backend.Identity.Signin.Services
             return SendAsync(parameters);
         }
 
-        private async Task<bool> SendAsync(Dictionary<string, string> dict)
+        private async Task<bool> SendAsync(Dictionary<string, string> parameters)
         {
+            var slackUri = Configuration.GetValue<string>(SlackEnv);
+            if (string.IsNullOrEmpty(slackUri))
+            {
+                Logger.LogWarning("slack service can't send the code. Check SLACK env." +
+                    "For more information https://github.com/TransportSystems2/Backend/wiki/Переменные-окружения");
+                    
+                return false;
+            }
+
             var result = false;
             try
             {
-                var slackToken = Configuration.GetValue<string>(SlackEnv);
-                var content = new FormUrlEncodedContent(dict);
+                var content = new FormUrlEncodedContent(parameters);
                 var client = new HttpClient();
-                var query = $"https://hooks.slack.com/services/{slackToken}";
-                await client.PostAsync(query, content);
+                await client.PostAsync(slackUri, content);
 
                 Logger.LogInformation("Message was sended");
                 result = true;
