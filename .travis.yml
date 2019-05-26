@@ -2,7 +2,7 @@ language: csharp
 solution: Backend.sln
 mono: none
 dist: xenial
-dotnet: 2.2.103
+dotnet: 2.2
 script:
 - dotnet restore Backend.sln
 - dotnet test Backend.sln
