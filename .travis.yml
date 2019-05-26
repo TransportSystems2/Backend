@@ -1,10 +1,8 @@
 language: csharp
-solution Backend.sln
+solution: Backend.sln
 mono: none
 dist: xenial
 dotnet: 2.2
-install:
-- dotnet restore Backend.sln
 script:
-- dotnet build Backend.sln
-- dotnet test Backend.sln
+- dotnet restore
+- dotnet test
