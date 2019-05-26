@@ -55,8 +55,8 @@ namespace TransportSystems.Backend.Application.Business.Booking
             var result = new BookingResponseAM();
 
             var firstWaypointCoordinate = request.Waypoints.Points.First().ToCoordinate();
-            var domainModerator = await UserService.GetDomainModeratorByIdentityUser(identityUserId); 
-            var markets = await MarketService.GetNearestDomainMarkets(domainModerator.CompanyId, firstWaypointCoordinate);
+            var domainDispatcher = await UserService.GetDomainDispatcherByIdentityUser(identityUserId); 
+            var markets = await MarketService.GetNearestDomainMarkets(domainDispatcher.CompanyId, firstWaypointCoordinate);
 
             var bookingRoutes = await GetBookingRoutes(markets, request.Waypoints, request.Cargo, request.Basket);
             bookingRoutes = bookingRoutes.OrderBy(b => b.Bill.TotalCost).ToList();

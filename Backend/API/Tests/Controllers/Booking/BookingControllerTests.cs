@@ -50,7 +50,7 @@ namespace TransportSystems.Backend.API.Tests.Controllers.Booking
                     User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
                         {
                             new Claim(ClaimTypes.Name, "username"),
-                            new Claim(ClaimTypes.NameIdentifier, identityUserId.ToString())
+                            new Claim("sub", identityUserId.ToString())
                         },
                         UserRole.DispatcherRoleName))
                 }

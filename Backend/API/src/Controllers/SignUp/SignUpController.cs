@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TransportSystems.Backend.API.Controllers.Extensions;
 using TransportSystems.Backend.Application.Interfaces;
 using TransportSystems.Backend.Application.Models.SignUp;
 
@@ -27,7 +28,7 @@ namespace TransportSystems.Backend.API.Controllers.SignUp
         [ProducesResponseType(400)]
         public async Task<IActionResult> SignUpCompany([FromBody]CompanyApplicationAM companyApplication)
         {
-            var identityUserId = GetIdentityUserId();
+            var identityUserId = User.GetIdentityId();
             if (identityUserId == -1)
             {
                 var problem = new ValidationProblemDetails
@@ -43,13 +44,6 @@ namespace TransportSystems.Backend.API.Controllers.SignUp
             await SignUpService.SignUpCompany(companyApplication);
 
             return Ok();
-        }
-
-        private int GetIdentityUserId()
-        {
-            var strIdentityUserId = User.FindFirst("sub")?.Value;
-
-            return int.Parse(strIdentityUserId);
         }
     }
 }

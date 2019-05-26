@@ -103,7 +103,7 @@ namespace TransportSystems.Backend.API.Database
         #region Organization
         private static async Task InitOrganizations()
         {
-            var domainCompany = await InitCompany("ГосЭвакуатор");
+            var domainCompany = await InitCompany("79159882658");
 
             var marketAddresses = new List<AddressAM>
             {

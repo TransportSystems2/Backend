@@ -15,7 +15,6 @@ namespace TransportSystems.API.Controllers
             this.lotRequestService = lotRequestService;
         }
 
-
         /// <summary>
         /// Список лотов
         /// </summary>

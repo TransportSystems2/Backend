@@ -16,12 +16,4 @@
     <ItemGroup>
         <ProjectReference Include="..\Domain.Interfaces\TransportSystems.Backend.Core.Domain.Interfaces.csproj" />
     </ItemGroup>
-    <ItemGroup>
-        <Reference Include="Microsoft.EntityFrameworkCore">
-            <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.entityframeworkcore\2.0.1\lib\netstandard2.0\Microsoft.EntityFrameworkCore.dll</HintPath>
-        </Reference>
-    </ItemGroup>
-    <ItemGroup>
-        <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-    </ItemGroup>
 </Project>

@@ -90,7 +90,8 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             int routeId,
             int billId)
         {
-            if (!await MarketService.IsExist(marketId))
+            var market = await MarketService.Get(marketId);
+            if (market == null)
             {
                 throw new ArgumentException($"MarketId:{cargoId} is null", "Market");
             }
@@ -137,6 +138,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             }
 
             currentState.Status = OrderStatus.New;
+            currentState.GenCompanyId = market.CompanyId;
             currentState.MarketId = marketId;
             currentState.TimeOfDelivery = timeOfDelivery;
             currentState.CustomerId = customerId;
@@ -147,7 +149,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             await AddNewState(currentState);
         }
 
-        public async Task Accept(int orderId, int moderatorId)
+        public async Task Accept(int orderId, int genDispatcherId)
         {
             var currentState = await GetCurrentState(orderId);
             if (currentState.Status != OrderStatus.New)
@@ -155,18 +157,26 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new OrderStatusException("Only new orders can be accepted");
             }
 
-            if (!await ModeratorService.IsExist(moderatorId))
+            var genDispatcher = await DispatcherService.Get(genDispatcherId);
+            if (genDispatcher == null)
             {
-                throw new EntityNotFoundException($"ModeratorId:{moderatorId} not found", "Moderator");
+                throw new EntityNotFoundException($"GenDispatcherId:{genDispatcherId} not found", "GenDispatcher");
             }
 
-            currentState.Status = OrderStatus.Accepted;
-            currentState.ModeratorId = moderatorId;
+            if (!currentState.GenCompanyId.Equals(genDispatcher.CompanyId))
+            {
+                throw new ArgumentException($"CurrentState.GenCompanyId:{currentState.GenCompanyId} must be equal GenDispatcher.CompanyId:{genDispatcher.CompanyId}",
+                "GenDispathcer");
+            }
 
-            await AddNewState(currentState);
+            var newState = (OrderState)currentState.Clone();
+            newState.Status = OrderStatus.Accepted;
+            newState.GenDispatcherId = genDispatcherId;
+
+            await AddNewState(newState);
         }
 
-        public async Task ReadyToTrade(int orderId, int moderatorId)
+        public async Task ReadyToTrade(int orderId, int genDispatcherId)
         {
             var currentState = await GetCurrentState(orderId);
             if (currentState.Status != OrderStatus.Accepted)
@@ -174,14 +184,14 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new OrderStatusException("Only accepted orders can be read for trade");
             }
 
-            if (!await ModeratorService.IsExist(moderatorId))
+            if (!await DispatcherService.IsExist(genDispatcherId))
             {
-                throw new EntityNotFoundException($"ModeratorId:{moderatorId} not found", "Moderator");
+                throw new EntityNotFoundException($"GenDispatcherId:{genDispatcherId} not found", "GenDispatcher");
             }
 
-            if (!currentState.ModeratorId.Equals(moderatorId))
+            if (!currentState.GenDispatcherId.Equals(genDispatcherId))
             {
-                throw new AccessViolationException($"Only an order moderator can change the order state. Order moderatorId:{currentState.ModeratorId}, function moderatorId:{moderatorId}");
+                throw new AccessViolationException($"Only an genDispatcher can change the order state.  GenDispatcher:{currentState.GenDispatcherId}, function moderatorId:{genDispatcherId}");
             }
 
             currentState.Status = OrderStatus.ReadyForTrade;
@@ -200,7 +210,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             await AddNewState(currentState);
         }
 
-        public async Task AssignToDispatcher(int orderId, int dispatcherId)
+        public async Task AssignToSubDispatcher(int orderId, int subDispatcherId)
         {
             var currentState = await GetCurrentState(orderId);
             if ((currentState.Status != OrderStatus.Accepted) && (currentState.Status != OrderStatus.SentToTrading))
@@ -208,17 +218,19 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new OrderStatusException("Only accepted or traded orders can be assigned to dispatcher");
             }
 
-            if (!await DispatcherService.IsExist(dispatcherId))
+            var subDispatcher = await DispatcherService.Get(subDispatcherId);
+            if (subDispatcher == null)
             {
-                throw new EntityNotFoundException($"DispatcherId:{dispatcherId} not found", "Dispatcher");
+                throw new EntityNotFoundException($"SubDispatcherId:{subDispatcherId} not found", "SubDispatcher");
             }
 
             currentState.Status = OrderStatus.AssignedDispatcher;
-            currentState.DispatcherId = dispatcherId;
+            currentState.SubDispatcherId = subDispatcherId;
+            currentState.SubCompanyId = subDispatcher.CompanyId;
             await AddNewState(currentState);
         }
 
-        public async Task AssignToDriver(int orderId, int dispatcherId, int driverId)
+        public async Task AssignToDriver(int orderId, int subDispatcherId, int driverId)
         {
             var currentState = await GetCurrentState(orderId);
             if (currentState.Status != OrderStatus.AssignedDispatcher)
@@ -226,14 +238,14 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new OrderStatusException("Only assigned to dispatcher orders can be assigned to driver");
             }
 
-            if (!await DispatcherService.IsExist(dispatcherId))
+            if (!await DispatcherService.IsExist(subDispatcherId))
             {
-                throw new EntityNotFoundException($"DispatcherId:{dispatcherId} not found", "Dispatcher");
+                throw new EntityNotFoundException($"SubDispatcherId:{subDispatcherId} not found", "SubDispatcher");
             }
 
-            if (currentState.DispatcherId != dispatcherId)
+            if (currentState.SubDispatcherId != subDispatcherId)
             {
-                throw new AccessViolationException("Only a order dispatcher can assign a order to driver");
+                throw new AccessViolationException("Only a order subDispatcher can assign a order to driver");
             }
 
             if (!await DriverService.IsExist(driverId))
