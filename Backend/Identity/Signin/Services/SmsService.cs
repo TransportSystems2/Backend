@@ -15,8 +15,6 @@ namespace TransportSystems.Backend.Identity.Signin.Services
             Configuration = configuration;
         }
 
-        private string ApiId { get; }
-
         private ILogger<SmsService> Logger { get; }
 
         private IConfiguration Configuration { get; }
