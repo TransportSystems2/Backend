@@ -34,8 +34,6 @@ namespace TransportSystems.Backend.Identity.Signin
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<ISmsService, SmsService>();
-
             var connectionString = Configuration.GetConnectionString("db");
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
             services.AddDbContext<IdentityContext>(options =>
@@ -136,6 +134,9 @@ namespace TransportSystems.Backend.Identity.Signin
         {
             services.AddTransient<IRoleService, RoleService>();
             services.AddTransient<IUserService, UserService>();
+
+            services.AddTransient<ISmsService, SmsService>();
+            services.AddTransient<ISlackService, SlackService>();
 
             services.AddTransient<IPushTokenRepository, PushTokenRepository>();
             services.AddTransient<IPushTokenService, PushTokenService>();

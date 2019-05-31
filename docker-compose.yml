@@ -62,6 +62,7 @@ services:
     restart: always
     environment:
       ConnectionStrings:db: Host=db.postgres.identity;Port=5432;Database=ts_identity;Username=identityservice
+      SLACK: "${SLACK}"
       SMS_TOKEN: "${SMS_TOKEN}"
     depends_on:
       - db.postgres.identity
