@@ -68,24 +68,31 @@ namespace TransportSystems.Backend.API.Database
                     KindCatalogItemId = 7
                 };
 
-                var driver = new DriverAM
+                var dispatcher = new DispatcherAM
                 {
                     FirstName = "Павел",
                     LastName = "Федоров",
                     PhoneNumber = "79159882658"
                 };
 
+                var driver = new DriverAM
+                {
+                    FirstName = "Артур",
+                    LastName = "Пирожков",
+                    PhoneNumber = "78912378123"
+                };
+
                 var garageAddress = new AddressAM();
 
-                var driverCompanyModel = new DriverCompanyAM
+                var companyApplication = new CompanyApplicationAM
                 {
+                    Dispatcher = dispatcher,
                     GarageAddress = garageAddress,
-                    CompanyName = companyName,
                     Vehicle = vehicle,
                     Driver = driver
                 };
 
-                await SignUpService.SignUpDriverCompany(driverCompanyModel);
+                await SignUpService.SignUpCompany(companyApplication);
             }
 
             domainCompany = await CompanyService.GetDomainCompany(companyName);
@@ -96,7 +103,7 @@ namespace TransportSystems.Backend.API.Database
         #region Organization
         private static async Task InitOrganizations()
         {
-            var domainCompany = await InitCompany("ГосЭвакуатор");
+            var domainCompany = await InitCompany("79159882658");
 
             var marketAddresses = new List<AddressAM>
             {

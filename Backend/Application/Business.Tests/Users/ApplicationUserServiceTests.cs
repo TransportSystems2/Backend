@@ -16,11 +16,13 @@ namespace TransportSystems.Backend.Application.Business.Tests.Users
         {
             DomainCustomerServiceMock = new Mock<ICustomerService>();
             DomainModeratorServiceMock = new Mock<IModeratorService>();
+            DomainDispatcherServiceMock = new Mock<IDispatcherService>();
 
             Service = new ApplicationUserService(
                 TransactionServiceMock.Object,
                 DomainCustomerServiceMock.Object,
-                DomainModeratorServiceMock.Object);
+                DomainModeratorServiceMock.Object,
+                DomainDispatcherServiceMock.Object);
         }
 
         public IApplicationUserService Service { get; }
@@ -28,6 +30,8 @@ namespace TransportSystems.Backend.Application.Business.Tests.Users
         public Mock<ICustomerService> DomainCustomerServiceMock { get; }
 
         public Mock<IModeratorService> DomainModeratorServiceMock { get; }
+
+        public Mock<IDispatcherService> DomainDispatcherServiceMock { get; }
     }
 
     public class ApplicationUserServiceTests : BaseServiceTests<ApplicationUserServiceTestSuite>
@@ -94,6 +98,41 @@ namespace TransportSystems.Backend.Application.Business.Tests.Users
             var result = await Suite.Service.GetDomainModeratorByIdentityUser(identityUserId);
 
             Assert.Equal(moderator, result);
+        }
+
+        [Fact]
+        public async Task GetDomainDispatcherByIndetityUser()
+        {
+            var commonId = 1;
+            var identityUserId = commonId++;
+            var dispatcher = new Dispatcher
+            {
+                Id = commonId++,
+                IdentityUserId = identityUserId
+            };
+
+            Suite.DomainDispatcherServiceMock
+                .Setup(m => m.GetByIndentityUser(identityUserId))
+                .ReturnsAsync(dispatcher);
+
+            var result = await Suite.Service.GetDomainDispatcherByIdentityUser(identityUserId);
+
+            Assert.Equal(dispatcher, result);
+        }
+
+        [Fact]
+        public async Task GetDomainDispatcher()
+        {
+            var commonId = 1;
+            var dispatcher = new Dispatcher { Id = commonId++ };
+
+            Suite.DomainDispatcherServiceMock
+                .Setup(m => m.Get(dispatcher.Id))
+                .ReturnsAsync(dispatcher);
+
+            var result = await Suite.Service.GetDomainDispatcher(dispatcher.Id);
+
+            Assert.Equal(dispatcher, result);
         }
     }
 }

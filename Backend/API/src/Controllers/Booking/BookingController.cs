@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using TransportSystems.Backend.API.Controllers.Extensions;
 using TransportSystems.Backend.Application.Interfaces.Booking;
 using TransportSystems.Backend.Application.Models.Booking;
 
@@ -19,8 +20,8 @@ namespace TransportSystems.Backend.API.Controllers.Booking
         [HttpPost("calculate")]
         public Task<BookingResponseAM> Calculate([FromBody]BookingRequestAM request)
         {
-            var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return Service.CalculateBooking(int.Parse(identityUserId), request); 
+            var identityUserId = User.GetIdentityId();
+            return Service.CalculateBooking(identityUserId.Value, request); 
         }
     }
 }

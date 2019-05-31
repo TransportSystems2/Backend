@@ -40,7 +40,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
             DomainMarketServiceMock = new Mock<IMarketService>();
             CargoServiceMock = new Mock<IApplicationCargoService>();
             RouteServiceMock = new Mock<IApplicationRouteService>();
-            CustomerServiceMock = new Mock<IApplicationUserService>();
+            UserServiceMock = new Mock<IApplicationUserService>();
             BillServiceMock = new Mock<IApplicationBillService>();
             OrderValidatorServiceMock = new Mock<IApplicationOrderValidatorService>();
             AddressServiceMock = new Mock<IApplicationAddressService>();
@@ -52,7 +52,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
                 DomainMarketServiceMock.Object,
                 CargoServiceMock.Object,
                 RouteServiceMock.Object,
-                CustomerServiceMock.Object,
+                UserServiceMock.Object,
                 BillServiceMock.Object,
                 OrderValidatorServiceMock.Object,
                 AddressServiceMock.Object);
@@ -70,7 +70,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
 
         public Mock<IApplicationRouteService> RouteServiceMock { get; }
 
-        public Mock<IApplicationUserService> CustomerServiceMock { get; }
+        public Mock<IApplicationUserService> UserServiceMock { get; }
 
         public Mock<IApplicationBillService> BillServiceMock { get; }
 
@@ -86,7 +86,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
         {
             var statusesArray = new[] { OrderStatus.New, OrderStatus.Accepted, OrderStatus.IsCarriedOut };
 
-            var orderGroups = await Suite.OrderService.GetOrderGroupsByStatuses(statusesArray);
+            var orderGroups = await Suite.OrderService.GetGroupsByStatuses(statusesArray);
 
             Assert.Equal(3, orderGroups.Count());
         }
@@ -96,7 +96,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
         {
             var statusesArray = new[] { OrderStatus.New, OrderStatus.IsCarriedOut, OrderStatus.Accepted };
 
-            var orderGroups = await Suite.OrderService.GetOrderGroupsByStatuses(statusesArray);
+            var orderGroups = await Suite.OrderService.GetGroupsByStatuses(statusesArray);
 
             Assert.Equal(statusesArray[0], orderGroups.ElementAt(0).Status);
             Assert.Equal(statusesArray[1], orderGroups.ElementAt(1).Status);
@@ -117,7 +117,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
                 .Setup(m => m.GetCountByCurrentStatus(It.IsAny<OrderStatus>()))
                 .Returns<OrderStatus>(status => Task.FromResult(sourceData.First(item => item.Status.Equals(status)).Count));
 
-            var orderGroups = await Suite.OrderService.GetOrderGroupsByStatuses(sourceData.Select(s => s.Status).ToArray());
+            var orderGroups = await Suite.OrderService.GetGroupsByStatuses(sourceData.Select(s => s.Status).ToArray());
 
             Assert.Equal(sourceData[0].Count, orderGroups.ElementAt(0).Count);
             Assert.Equal(sourceData[1].Count, orderGroups.ElementAt(1).Count);
@@ -173,7 +173,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
                 .Setup(m => m.Get(It.IsAny<int[]>()))
                 .ReturnsAsync(domainOrders);
 
-            var orders = await Suite.OrderService.GetOrdersByStatus(OrderStatus.New);
+            var orders = await Suite.OrderService.GetGroupByStatus(OrderStatus.New);
 
             for (var i = 0; i < domainOrders.Count; i++)
             {
@@ -184,10 +184,11 @@ namespace TransportSystems.Backend.Application.Business.Tests
         }
 
         [Fact]
-        public async Task CreateOrder()
+        public async Task CreateOrderWithDispatcher()
         {
             var commonId = 1;
 
+            var genDispatcher = new Dispatcher { Id = commonId++ };
             var domainMarket = new Market { Id = commonId++, AddressId = commonId++ };
 
             var booking = new BookingAM
@@ -196,56 +197,24 @@ namespace TransportSystems.Backend.Application.Business.Tests
                 MarketId = domainMarket.Id,
                 Bill = new BillAM
                 {
-                    Info = new BillInfoAM
-                    {
-                        PriceId = commonId++,
-                        CommissionPercentage = 10,
-                        DegreeOfDifficulty = 1
-                    },
-                    Basket = new BasketAM
-                    {
-                        Distance = Distance.FromKilometers(200),
-                        DitchValue = 0,
-                        LoadingValue = 1,
-                        LockedWheelsValue = 2,
-                        LockedSteeringValue = 1,
-                        OverturnedValue = 0
-                    }
+                    Info = new BillInfoAM(),
+                    Basket = new BasketAM()
                 },
-                Customer = new CustomerAM
-                {
-                    PhoneNumber = "79101112233",
-                    FirstName = "Генадий"
-                },
-                Cargo = new CargoAM
-                {
-                    BrandCatalogItemId = commonId++,
-                    KindCatalogItemId = commonId++,
-                    WeightCatalogItemId = commonId++,
-                    RegistrationNumber = "в100вв76",
-                    Comment = "Не работает пневма"
-                },
-                Waypoints = new WaypointsAM
-                {
-                    Points = new List<AddressAM>
-                    {
-                        new AddressAM { Country = "Россия", Area = "Ярославская область", Province = "Ярославский район", Locality = "Ярославль", Street = "пр-кт Революции", House = "120" },
-                        new AddressAM { Country = "Россия", Area = "Ярославская область", Province = "Пошехонский район", Locality = "Пошехонье", Street = "Солнечная", House = "12" }
-                    },
-                    Comment = "На закрытой парковке. Попросить охраника открыть шлагбаум"
-                }
+                Customer = new CustomerAM(),
+                Cargo = new CargoAM(),
+                Waypoints = new WaypointsAM()
             };
 
             var route = new RouteAM();
             var bill = new BillAM();
-            var marketAddress = new AddressAM { Latitude = 11.2222, Longitude = 22.3333 };
+            var marketAddress = new AddressAM ();
             var domainRoute = new Route { Id = commonId++ };
             var domainCustomer = new Customer { Id = commonId++ };
             var domainCargo = new Cargo { Id = commonId++ };
             var domainBill = new Bill { Id = commonId++ };
             var domainOrder = new Order { Id = commonId++ };
 
-            Suite.CustomerServiceMock
+            Suite.UserServiceMock
                 .Setup(m => m.GetOrCreateDomainCustomer(booking.Customer))
                 .ReturnsAsync(domainCustomer);
             Suite.CargoServiceMock
@@ -272,8 +241,11 @@ namespace TransportSystems.Backend.Application.Business.Tests
             Suite.AddressServiceMock
                 .Setup(m => m.GetAddress(domainMarket.AddressId))
                 .ReturnsAsync(marketAddress);
+            Suite.UserServiceMock
+                .Setup(m => m.GetDomainDispatcher(genDispatcher.Id))
+                .ReturnsAsync(genDispatcher);
 
-            var result = await Suite.OrderService.CreateOrder(booking);
+            var result = await Suite.OrderService.CreateOrder(booking, genDispatcher.Id);
 
             Suite.DomainOrderStateServiceMock
                 .Verify(m => m.New(
@@ -287,21 +259,24 @@ namespace TransportSystems.Backend.Application.Business.Tests
 
             Suite.OrderValidatorServiceMock
                 .Verify(m => m.Validate(booking, route, bill));
+
+            Suite.DomainOrderStateServiceMock
+                .Verify(m => m.Accept(domainOrder.Id, genDispatcher.Id));
             
             Assert.Equal(domainOrder, result);
         }
 
         [Fact]
-        public async void Acept()
+        public async void Accept()
         {
             var commonId = 1;
             var orderId = commonId++;
-            var moderatorId = commonId++;
+            var genDispatcher = commonId++;
 
-            await Suite.OrderService.Accept(orderId, moderatorId);
+            await Suite.OrderService.Accept(orderId, genDispatcher);
 
             Suite.DomainOrderStateServiceMock
-                .Verify(m => m.Accept(orderId, moderatorId));
+                .Verify(m => m.Accept(orderId, genDispatcher));
         }
 
         [Fact]
@@ -309,11 +284,11 @@ namespace TransportSystems.Backend.Application.Business.Tests
         {
             var commonId = 1;
             var orderId = commonId++;
-            var moderatorId = commonId++;
+            var genDispatcherId = commonId++;
 
-            await Suite.OrderService.ReadyToTrade(orderId, moderatorId);
+            await Suite.OrderService.ReadyToTrade(orderId, genDispatcherId);
             Suite.DomainOrderStateServiceMock
-                .Verify(m => m.ReadyToTrade(orderId, moderatorId));
+                .Verify(m => m.ReadyToTrade(orderId, genDispatcherId));
         }
 
         [Fact]
@@ -335,9 +310,9 @@ namespace TransportSystems.Backend.Application.Business.Tests
             var orderId = commonId++;
             var dispatcherId = commonId++;
 
-            await Suite.OrderService.AssignToDispatcher(orderId, dispatcherId);
+            await Suite.OrderService.AssignToSubDispatcher(orderId, dispatcherId);
             Suite.DomainOrderStateServiceMock
-                .Verify(m => m.AssignToDispatcher(orderId, dispatcherId));
+                .Verify(m => m.AssignToSubDispatcher(orderId, dispatcherId));
         }
 
         [Fact]

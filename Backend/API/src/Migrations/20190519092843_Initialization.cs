@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace TransportSystems.Backend.API.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class Initialization : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -260,6 +260,23 @@ namespace TransportSystems.Backend.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Markets",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                    AddedDate = table.Column<DateTime>(nullable: false),
+                    ModifiedDate = table.Column<DateTime>(nullable: false),
+                    CompanyId = table.Column<int>(nullable: false),
+                    PricelistId = table.Column<int>(nullable: false),
+                    AddressId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Markets", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Moderators",
                 columns: table => new
                 {
@@ -305,8 +322,8 @@ namespace TransportSystems.Backend.API.Migrations
                     SubCompanyId = table.Column<int>(nullable: false),
                     GarageId = table.Column<int>(nullable: false),
                     CustomerId = table.Column<int>(nullable: false),
-                    ModeratorId = table.Column<int>(nullable: false),
-                    DispatcherId = table.Column<int>(nullable: false),
+                    GenDispatcherId = table.Column<int>(nullable: false),
+                    SubDispatcherId = table.Column<int>(nullable: false),
                     DriverId = table.Column<int>(nullable: false),
                     VehicleId = table.Column<int>(nullable: false),
                     PathId = table.Column<int>(nullable: false),
@@ -488,6 +505,9 @@ namespace TransportSystems.Backend.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Lots");
+
+            migrationBuilder.DropTable(
+                name: "Markets");
 
             migrationBuilder.DropTable(
                 name: "Moderators");

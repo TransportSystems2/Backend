@@ -8,23 +8,23 @@ namespace TransportSystems.Backend.Application.Interfaces
 {
     public interface IApplicationOrderService : IApplicationTransactionService
     {
-        Task<ICollection<OrderGroupAM>> GetOrderGroupsByStatuses(OrderStatus[] statuses);
+        Task<ICollection<OrderGroupAM>> GetGroupsByStatuses(OrderStatus[] statuses);
 
-        Task<ICollection<OrderInfoAM>> GetOrdersByStatus(OrderStatus status);
+        Task<ICollection<OrderInfoAM>> GetGroupByStatus(OrderStatus status);
 
         Task<ICollection<Order>> GetDomainOrdersByStatus(OrderStatus status);
 
-        Task<Order> CreateOrder(BookingAM booking);
+        Task<Order> CreateOrder(BookingAM booking, int genDispatcherId);
 
-        Task Accept(int orderId, int moderatorId);
+        Task Accept(int orderId, int genDispatcherId);
 
-        Task ReadyToTrade(int orderId, int moderatorId);
+        Task ReadyToTrade(int orderId, int genDispatcherId);
 
         Task Trade(int orderId);
 
-        Task AssignToDispatcher(int orderId, int dispatcherId);
+        Task AssignToSubDispatcher(int orderId, int subDispatcherId);
 
-        Task AssignToDriver(int orderId, int dispatcherId, int driverId);
+        Task AssignToDriver(int orderId, int subDispatcherId, int driverId);
 
         Task ConfirmByDriver(int orderId, int driverId);
 

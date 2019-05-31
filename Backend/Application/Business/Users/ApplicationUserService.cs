@@ -13,16 +13,20 @@ namespace TransportSystems.Backend.Application.Business
         public ApplicationUserService(
             ITransactionService transactionService,
             ICustomerService domainCustomerService,
-            IModeratorService domainModeratorService)
+            IModeratorService domainModeratorService,
+            IDispatcherService domainDispatcherService)
             : base(transactionService)
         {
             DomainCustomerService = domainCustomerService;
             DomainModeratorService = domainModeratorService;
+            DomainDispatcherService = domainDispatcherService;
         }
 
         protected ICustomerService DomainCustomerService { get; }
 
         protected IModeratorService DomainModeratorService { get; }
+
+        protected IDispatcherService DomainDispatcherService { get; }
 
         public async Task<Customer> GetOrCreateDomainCustomer(CustomerAM customer)
         {
@@ -41,6 +45,16 @@ namespace TransportSystems.Backend.Application.Business
         public Task<Moderator> GetDomainModeratorByIdentityUser(int identityUserId)
         {
             return DomainModeratorService.GetByIndentityUser(identityUserId);
+        }
+
+        public Task<Dispatcher> GetDomainDispatcherByIdentityUser(int identityUserId)
+        {
+            return DomainDispatcherService.GetByIndentityUser(identityUserId);
+        }
+
+        public Task<Dispatcher> GetDomainDispatcher(int dispatcherId)
+        {
+            return DomainDispatcherService.Get(dispatcherId);
         }
     }
 }

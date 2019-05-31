@@ -29,7 +29,7 @@ namespace TransportSystems.Backend.Application.Business
             IMarketService domainMarketService,
             IApplicationCargoService cargoService,
             IApplicationRouteService routeService,
-            IApplicationUserService customerService,
+            IApplicationUserService userService,
             IApplicationBillService billService,
             IApplicationOrderValidatorService validatorService,
             IApplicationAddressService addressService)
@@ -40,7 +40,7 @@ namespace TransportSystems.Backend.Application.Business
             DomainMarketService = domainMarketService;
             CargoService = cargoService;
             RouteService = routeService;
-            CustomerService = customerService;
+            UserService = userService;
             BillService = billService;
             ValidatorService = validatorService;
             AddressService = addressService;
@@ -56,7 +56,7 @@ namespace TransportSystems.Backend.Application.Business
 
         protected IApplicationRouteService RouteService { get; }
 
-        protected IApplicationUserService CustomerService { get; }
+        protected IApplicationUserService UserService { get; }
 
         protected IApplicationBillService BillService { get; }
 
@@ -64,13 +64,13 @@ namespace TransportSystems.Backend.Application.Business
 
         protected IApplicationAddressService AddressService { get; }
 
-        public async Task<Order> CreateOrder(BookingAM booking)
+        public async Task<Order> CreateOrder(BookingAM booking, int genDispatcherId)
         {
             using (var transaction = await TransactionService.BeginTransaction())
             {
                 try
                 {
-                    var domainCustomer = await CustomerService.GetOrCreateDomainCustomer(booking.Customer);
+                    var domainCustomer = await UserService.GetOrCreateDomainCustomer(booking.Customer);
                     var domainCargo = await CargoService.CreateDomainCargo(booking.Cargo);
 
                     var domainMarket = await DomainMarketService.Get(booking.MarketId);
@@ -94,6 +94,12 @@ namespace TransportSystems.Backend.Application.Business
                         domainRoute.Id,
                         domainBill.Id);
 
+                    var domainGenDispatcher = await UserService.GetDomainDispatcher(genDispatcherId);
+                    if (domainGenDispatcher != null)
+                    {
+                        await Accept(result.Id, genDispatcherId);
+                    }
+
                     transaction.Commit();
 
                     return result;
@@ -106,14 +112,14 @@ namespace TransportSystems.Backend.Application.Business
             }
         }
 
-        public Task Accept(int orderId, int moderatorId)
+        public async Task Accept(int orderId, int genDispatcherId)
         {
-            return DomainOrderStateService.Accept(orderId, moderatorId);
+            await DomainOrderStateService.Accept(orderId, genDispatcherId);
         }
 
-        public Task ReadyToTrade(int orderId, int moderatorId)
+        public async Task ReadyToTrade(int orderId, int genDispatcherId)
         {
-            return DomainOrderStateService.ReadyToTrade(orderId, moderatorId);
+            await DomainOrderStateService.ReadyToTrade(orderId, genDispatcherId);
         }
 
         public Task Trade(int orderId)
@@ -121,14 +127,14 @@ namespace TransportSystems.Backend.Application.Business
             return DomainOrderStateService.Trade(orderId);
         }
 
-        public Task AssignToDispatcher(int orderId, int dispatcherId)
+        public Task AssignToSubDispatcher(int orderId, int subDispatcherId)
         {
-            return DomainOrderStateService.AssignToDispatcher(orderId, dispatcherId);
+            return DomainOrderStateService.AssignToSubDispatcher(orderId, subDispatcherId);
         }
 
-        public Task AssignToDriver(int orderId, int dispatcherId, int driverId)
+        public Task AssignToDriver(int orderId, int subDispatcherId, int driverId)
         {
-            return DomainOrderStateService.AssignToDriver(orderId, dispatcherId, driverId);
+            return DomainOrderStateService.AssignToDriver(orderId, subDispatcherId, driverId);
         }
 
         public Task ConfirmByDriver(int orderId, int driverId)
@@ -171,7 +177,7 @@ namespace TransportSystems.Backend.Application.Business
             return DomainOrderStateService.Cancel(orderId, driverId);
         }
 
-        public async Task<ICollection<OrderGroupAM>> GetOrderGroupsByStatuses(OrderStatus[] statuses)
+        public async Task<ICollection<OrderGroupAM>> GetGroupsByStatuses(OrderStatus[] statuses)
         {
             var result = new ConcurrentBag<OrderGroupAM>();
             var exceptions = new ConcurrentQueue<Exception>();
@@ -191,7 +197,7 @@ namespace TransportSystems.Backend.Application.Business
 
                         result.Add(group);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         exceptions.Enqueue(e);
                     }
@@ -216,7 +222,7 @@ namespace TransportSystems.Backend.Application.Business
             return await DomainOrderService.Get(ordersIdArray);
         }
 
-        public async Task<ICollection<OrderInfoAM>> GetOrdersByStatus(OrderStatus status)
+        public async Task<ICollection<OrderInfoAM>> GetGroupByStatus(OrderStatus status)
         {
             var result = new ConcurrentBag<OrderInfoAM>();
             var exceptions = new ConcurrentQueue<Exception>();

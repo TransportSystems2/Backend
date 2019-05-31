@@ -2,6 +2,7 @@
 using System;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
 using TransportSystems.Backend.Core.Domain.Core.Ordering;
+using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Core.Domain.Core.Routing;
 using TransportSystems.Backend.Core.Domain.Core.Transport;
 using TransportSystems.Backend.Core.Domain.Core.Users;
@@ -134,7 +135,11 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
             var cargoId = commonId++;
             var routeId = commonId++;
             var billId = commonId++;
-            var marketId = commonId++;
+            var market = new Market
+            {
+                Id = commonId++,
+                CompanyId = commonId++
+            };
 
             suite.OrderServiceMock
                 .Setup(m => m.IsExist(orderId))
@@ -152,33 +157,41 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 .Setup(m => m.IsExist(billId))
                 .ReturnsAsync(true);
             suite.MarketServiceMock
-                .Setup(m => m.IsExist(marketId))
-                .ReturnsAsync(true);
+                .Setup(m => m.Get(market.Id))
+                .ReturnsAsync(market);
 
-            await suite.Service.New(orderId, marketId, timeOfDelivery, customerId, cargoId, routeId, billId);
+            await suite.Service.New(orderId, market.Id, timeOfDelivery, customerId, cargoId, routeId, billId);
             suite.RepositoryMock
                 .Verify(m => m.Add(It.Is<OrderState>(
                     s => s.OrderId.Equals(orderId)
-                    && s.MarketId.Equals(marketId)
+                    && s.MarketId.Equals(market.Id)
                     && s.TimeOfDelivery.Equals(timeOfDelivery)
                     && s.CustomerId.Equals(customerId)
                     && s.CargoId.Equals(cargoId)
                     && s.RouteId.Equals(routeId)
-                    && s.BillId.Equals(billId))));
+                    && s.BillId.Equals(billId)
+                    && s.GenCompanyId.Equals(market.CompanyId))));
         }
 
         [Fact]
         public async void Accept()
         {
             var commonId = 1;
+            var companyId = commonId++;
             var suite = new OrderStateServiceTestSuite();
             var order = new Order { Id = commonId++ };
-            var currentState = new OrderState { Id = commonId++, OrderId = order.Id, Status = OrderStatus.New };
-            var moderator = new Moderator { Id = commonId++ };
+            var currentState = new OrderState
+            {
+                Id = commonId++,
+                OrderId = order.Id,
+                Status = OrderStatus.New,
+                GenCompanyId = companyId
+            };
+            var genDispatcher = new Dispatcher { Id = commonId++, CompanyId = companyId };
 
-            suite.ModeratorServiceMock
-                .Setup(m => m.IsExist(moderator.Id))
-                .ReturnsAsync(true);
+            suite.DispatcherServiceMock
+                .Setup(m => m.Get(genDispatcher.Id))
+                .ReturnsAsync(genDispatcher);
             suite.OrderServiceMock
                 .Setup(m => m.IsExist(order.Id))
                 .ReturnsAsync(true);
@@ -186,13 +199,13 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 .Setup(m => m.GetCurrentState(order.Id))
                 .ReturnsAsync(currentState);
 
-            await suite.Service.Accept(order.Id, moderator.Id);
+            await suite.Service.Accept(order.Id, genDispatcher.Id);
 
             suite.RepositoryMock
                 .Verify(m => m.Add(It.Is<OrderState>(
                     s => s.OrderId.Equals(order.Id)
                     && s.Status.Equals(OrderStatus.Accepted)
-                    && s.ModeratorId.Equals(moderator.Id))));
+                    && s.GenDispatcherId.Equals(genDispatcher.Id))));
         }
 
         [Fact]
@@ -220,16 +233,16 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
         }
 
         [Fact]
-        public async void AcceptWhenModeratorDoesNotExist()
+        public async void AcceptWhenGenDispatcerDoesNotExist()
         {
             var commonId = 1;
             var suite = new OrderStateServiceTestSuite();
             var order = new Order { Id = commonId++ };
             var currentState = new OrderState { Id = commonId++, OrderId = order.Id, Status = OrderStatus.New };
-            var moderator = new Moderator { Id = commonId++ };
+            var genDispatcher = new Dispatcher { Id = commonId++ };
 
-            suite.ModeratorServiceMock
-                .Setup(m => m.IsExist(moderator.Id))
+            suite.DispatcherServiceMock
+                .Setup(m => m.IsExist(genDispatcher.Id))
                 .ReturnsAsync(false);
             suite.OrderServiceMock
                 .Setup(m => m.IsExist(order.Id))
@@ -239,8 +252,8 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 .ReturnsAsync(currentState);
 
             await Assert.ThrowsAsync<EntityNotFoundException>(
-                "Moderator", 
-                () => suite.Service.Accept(order.Id, moderator.Id));
+                "GenDispatcher", 
+                () => suite.Service.Accept(order.Id, genDispatcher.Id));
         }
 
         [Fact]
@@ -272,18 +285,18 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
             var commonId = 1;
             var suite = new OrderStateServiceTestSuite();
 
-            var moderator = new Moderator { Id = commonId++ };
+            var genDispatcher = new Dispatcher { Id = commonId++ };
             var order = new Order { Id = commonId++};
             var currentState = new OrderState
             {
                 Id = commonId++,
                 OrderId = order.Id,
                 Status = OrderStatus.Accepted,
-                ModeratorId = moderator.Id
+                GenDispatcherId = genDispatcher.Id
             };
 
-            suite.ModeratorServiceMock
-                .Setup(m => m.IsExist(moderator.Id))
+            suite.DispatcherServiceMock
+                .Setup(m => m.IsExist(genDispatcher.Id))
                 .ReturnsAsync(true);
             suite.OrderServiceMock
                 .Setup(m => m.IsExist(order.Id))
@@ -292,7 +305,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 .Setup(m => m.GetCurrentState(order.Id))
                 .ReturnsAsync(currentState);
 
-            await suite.Service.ReadyToTrade(order.Id, moderator.Id);
+            await suite.Service.ReadyToTrade(order.Id, genDispatcher.Id);
 
             suite.RepositoryMock
                 .Verify(m => m.Add(It.Is<OrderState>(
@@ -301,23 +314,23 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
         }
 
         [Fact]
-        public async void ReadyToTradeWhenModeratorIsOther()
+        public async void ReadyToTradeWhenDispatcherIsOther()
         {
             var commonId = 1;
             var suite = new OrderStateServiceTestSuite();
 
-            var moderator = new Moderator { Id = commonId++ };
+            var genDispatcher = new Dispatcher { Id = commonId++ };
             var order = new Order { Id = commonId++ };
             var currentState = new OrderState
             {
                 Id = commonId++,
                 OrderId = order.Id,
                 Status = OrderStatus.Accepted,
-                ModeratorId = -1
+                GenDispatcherId = -1
             };
 
-            suite.ModeratorServiceMock
-                .Setup(m => m.IsExist(moderator.Id))
+            suite.DispatcherServiceMock
+                .Setup(m => m.IsExist(genDispatcher.Id))
                 .ReturnsAsync(true);
             suite.OrderServiceMock
                 .Setup(m => m.IsExist(order.Id))
@@ -326,7 +339,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 .Setup(m => m.GetCurrentState(order.Id))
                 .ReturnsAsync(currentState);
 
-            await Assert.ThrowsAsync<AccessViolationException>(() => suite.Service.ReadyToTrade(order.Id, moderator.Id));
+            await Assert.ThrowsAsync<AccessViolationException>(() => suite.Service.ReadyToTrade(order.Id, genDispatcher.Id));
         }
 
         [Fact]
@@ -373,18 +386,19 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
         }
 
         [Fact]
-        public async void AssignOrderToDispatcher()
+        public async void AssignOrderToSubDispatcher()
         {
             var commonId = 1;
             var suite = new OrderStateServiceTestSuite();
 
-            var dispatcher = new Dispatcher { Id = commonId++ };
+            var subCompanyId = commonId++;
+            var subDispatcher = new Dispatcher { Id = commonId++, CompanyId = subCompanyId };
             var order = new Order { Id = commonId++ };
             var currentState = new OrderState { Id = commonId++, OrderId = order.Id, Status = OrderStatus.Accepted };
 
             suite.DispatcherServiceMock
-                .Setup(m => m.IsExist(dispatcher.Id))
-                .ReturnsAsync(true);
+                .Setup(m => m.Get(subDispatcher.Id))
+                .ReturnsAsync(subDispatcher);
             suite.OrderServiceMock
                 .Setup(m => m.IsExist(order.Id))
                 .ReturnsAsync(true);
@@ -392,13 +406,14 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 .Setup(m => m.GetCurrentState(order.Id))
                 .ReturnsAsync(currentState);
 
-            await suite.Service.AssignToDispatcher(order.Id, dispatcher.Id);
+            await suite.Service.AssignToSubDispatcher(order.Id, subDispatcher.Id);
 
             suite.RepositoryMock
                 .Verify(m => m.Add(It.Is<OrderState>(
                     s => s.OrderId.Equals(order.Id)
                     && s.Status.Equals(OrderStatus.AssignedDispatcher)
-                    && s.DispatcherId.Equals(dispatcher.Id))));
+                    && s.SubDispatcherId.Equals(subDispatcher.Id)
+                    && s.SubCompanyId.Equals(subCompanyId))));
         }
 
         [Fact]
@@ -421,7 +436,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 .Setup(m => m.GetCurrentState(order.Id))
                 .ReturnsAsync(currentState);
 
-            await Assert.ThrowsAsync<OrderStatusException>(() => suite.Service.AssignToDispatcher(order.Id, dispatcher.Id));
+            await Assert.ThrowsAsync<OrderStatusException>(() => suite.Service.AssignToSubDispatcher(order.Id, dispatcher.Id));
         }
 
         [Fact]
@@ -430,7 +445,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
             var commonId = 1;
             var suite = new OrderStateServiceTestSuite();
 
-            var dispatcher = new Dispatcher { Id = commonId++ };
+            var subDispatcher = new Dispatcher { Id = commonId++ };
             var driver = new Driver { Id = commonId++ };
             var order = new Order { Id = commonId++ };
             var currentState = new OrderState
@@ -438,14 +453,14 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 Id = commonId++,
                 OrderId = order.Id,
                 Status = OrderStatus.AssignedDispatcher,
-                DispatcherId = dispatcher.Id
+                SubDispatcherId = subDispatcher.Id
             };
 
             suite.DriverServiceMock
                 .Setup(m => m.IsExist(driver.Id))
                 .ReturnsAsync(true);
             suite.DispatcherServiceMock
-                .Setup(m => m.IsExist(dispatcher.Id))
+                .Setup(m => m.IsExist(subDispatcher.Id))
                 .ReturnsAsync(true);
             suite.OrderServiceMock
                 .Setup(m => m.IsExist(order.Id))
@@ -454,7 +469,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 .Setup(m => m.GetCurrentState(order.Id))
                 .ReturnsAsync(currentState);
 
-            await suite.Service.AssignToDriver(order.Id, dispatcher.Id, driver.Id);
+            await suite.Service.AssignToDriver(order.Id, subDispatcher.Id, driver.Id);
 
             suite.RepositoryMock
                 .Verify(m => m.Add(It.Is<OrderState>(
@@ -469,7 +484,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
             var commonId = 1;
             var suite = new OrderStateServiceTestSuite();
 
-            var dispatcher = new Dispatcher { Id = commonId++ };
+            var subDispatcher = new Dispatcher { Id = commonId++ };
             var driver = new Driver { Id = commonId++ };
             var order = new Order { Id = commonId++ };
             var currentState = new OrderState
@@ -477,11 +492,11 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 Id = commonId++,
                 OrderId = order.Id,
                 Status = OrderStatus.New,
-                DispatcherId = dispatcher.Id
+                SubDispatcherId = subDispatcher.Id
             };
 
             suite.DispatcherServiceMock
-                .Setup(m => m.IsExist(dispatcher.Id))
+                .Setup(m => m.IsExist(subDispatcher.Id))
                 .ReturnsAsync(true);
             suite.DriverServiceMock
                 .Setup(m => m.IsExist(driver.Id))
@@ -493,7 +508,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 .Setup(m => m.GetCurrentState(order.Id))
                 .ReturnsAsync(currentState);
 
-            await Assert.ThrowsAsync<OrderStatusException>(() => suite.Service.AssignToDriver(order.Id, dispatcher.Id, driver.Id));
+            await Assert.ThrowsAsync<OrderStatusException>(() => suite.Service.AssignToDriver(order.Id, subDispatcher.Id, driver.Id));
         }
 
         [Fact]
@@ -502,7 +517,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
             var commonId = 1;
             var suite = new OrderStateServiceTestSuite();
 
-            var orderDispatcher = new Dispatcher { Id = commonId++ };
+            var orderSubDispatcher = new Dispatcher { Id = commonId++ };
             var anotherDispatcherId = commonId++;
             var driver = new Driver { Id = commonId++ };
             var order = new Order { Id = commonId++ };
@@ -511,7 +526,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 Id = commonId++,
                 OrderId = order.Id,
                 Status = OrderStatus.AssignedDispatcher,
-                DispatcherId = orderDispatcher.Id
+                SubDispatcherId = orderSubDispatcher.Id
             };
 
             suite.DispatcherServiceMock
@@ -536,7 +551,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
             var commonId = 1;
             var suite = new OrderStateServiceTestSuite();
 
-            var dispatcher = new Dispatcher { Id = commonId++ };
+            var subDispatcher = new Dispatcher { Id = commonId++ };
             var notExistingDriverId = commonId++;
             var order = new Order { Id = commonId++ };
             var currentState = new OrderState
@@ -544,14 +559,14 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 Id = commonId++,
                 OrderId = order.Id,
                 Status = OrderStatus.AssignedDispatcher,
-                DispatcherId = dispatcher.Id
+                SubDispatcherId = subDispatcher.Id
             };
 
             suite.DriverServiceMock
                 .Setup(m => m.IsExist(notExistingDriverId))
                 .ReturnsAsync(false);
             suite.DispatcherServiceMock
-                .Setup(m => m.IsExist(dispatcher.Id))
+                .Setup(m => m.IsExist(subDispatcher.Id))
                 .ReturnsAsync(true);
             suite.OrderServiceMock
                 .Setup(m => m.IsExist(order.Id))
@@ -562,7 +577,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
 
             await Assert.ThrowsAsync<EntityNotFoundException>(
                 "Driver",
-                () => suite.Service.AssignToDriver(order.Id, dispatcher.Id, notExistingDriverId));
+                () => suite.Service.AssignToDriver(order.Id, subDispatcher.Id, notExistingDriverId));
         }
 
         [Fact]
@@ -579,7 +594,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 Id = commonId++,
                 OrderId = order.Id,
                 Status = OrderStatus.AssignedDispatcher,
-                DispatcherId = commonId++
+                SubDispatcherId = commonId++
             };
 
             suite.DriverServiceMock
@@ -595,7 +610,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Ordering
                 .Setup(m => m.GetCurrentState(order.Id))
                 .ReturnsAsync(currentState);
 
-            await Assert.ThrowsAsync<EntityNotFoundException>("Dispatcher", () => suite.Service.AssignToDriver(order.Id, notExistingDispatcher, driver.Id));
+            await Assert.ThrowsAsync<EntityNotFoundException>("SubDispatcher", () => suite.Service.AssignToDriver(order.Id, notExistingDispatcher, driver.Id));
         }
 
         [Fact]

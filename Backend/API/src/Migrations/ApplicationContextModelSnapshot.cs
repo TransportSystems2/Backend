@@ -198,17 +198,15 @@ namespace TransportSystems.Backend.API.Migrations
 
                     b.Property<int>("CustomerId");
 
-                    b.Property<int>("DispatcherId");
-
                     b.Property<int>("DriverId");
 
                     b.Property<int>("GarageId");
 
                     b.Property<int>("GenCompanyId");
 
-                    b.Property<int>("MarketId");
+                    b.Property<int>("GenDispatcherId");
 
-                    b.Property<int>("ModeratorId");
+                    b.Property<int>("MarketId");
 
                     b.Property<DateTime>("ModifiedDate");
 
@@ -221,6 +219,8 @@ namespace TransportSystems.Backend.API.Migrations
                     b.Property<int>("Status");
 
                     b.Property<int>("SubCompanyId");
+
+                    b.Property<int>("SubDispatcherId");
 
                     b.Property<DateTime>("TimeOfDelivery");
 

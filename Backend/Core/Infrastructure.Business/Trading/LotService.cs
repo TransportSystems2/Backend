@@ -95,7 +95,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Trading
             await Repository.Update(lot);
             await Repository.Save();
 
-            await OrderStateService.AssignToDispatcher(lot.OrderId, lot.WinnerDispatcherId);
+            await OrderStateService.AssignToSubDispatcher(lot.OrderId, lot.WinnerDispatcherId);
         }
 
         public async Task Cancel(int lotId)
