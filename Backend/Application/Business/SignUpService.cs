@@ -6,6 +6,7 @@ using TransportSystems.Backend.Core.Services.Interfaces.Organization;
 using TransportSystems.Backend.Core.Services.Interfaces.Users;
 using TransportSystems.Backend.Application.Interfaces;
 using TransportSystems.Backend.Application.Models.SignUp;
+using TransportSystems.Backend.Application.Interfaces.Organization;
 
 namespace TransportSystems.Backend.Application.Business
 {
@@ -17,7 +18,7 @@ namespace TransportSystems.Backend.Application.Business
             IModeratorService domainModeratorService,
             IDispatcherService domainDispatcherService,
             ICompanyService domainCompanyService,
-            IGarageService domainGarageService,
+            IApplicationGarageService garageService,
             IApplicationVehicleService vehicleService)
             : base(transactionService)
         {
@@ -25,7 +26,7 @@ namespace TransportSystems.Backend.Application.Business
             DomainModeratorService = domainModeratorService;
             DomainDispatcherService = domainDispatcherService;
             DomainCompanyService = domainCompanyService;
-            DomainGarageService = domainGarageService;
+            GarageService = garageService;
             VehicleService = vehicleService;
         }
 
@@ -37,7 +38,7 @@ namespace TransportSystems.Backend.Application.Business
 
         protected ICompanyService DomainCompanyService { get; }
 
-        protected IGarageService DomainGarageService { get; }
+        protected IApplicationGarageService GarageService { get; }
 
         protected IApplicationVehicleService VehicleService { get; }
 
@@ -47,15 +48,13 @@ namespace TransportSystems.Backend.Application.Business
             {
                 try
                 {
-                    var domainGarage = await DomainGarageService.GetByAddress(
-                        companyApplication.GarageAddress.Country,
-                        companyApplication.GarageAddress.Province,
-                        companyApplication.GarageAddress.Locality,
-                        companyApplication.GarageAddress.District
-                    );
-
                     var domainCompany = await DomainCompanyService.Create(
                         companyApplication.Dispatcher.PhoneNumber);
+                 
+                    var domainGarage = await GarageService.CreateDomainGarage(
+                        domainCompany.Id,
+                        companyApplication.GarageAddress
+                    );
 
                     var domainVehicle = await VehicleService.CreateDomainVehicle(
                         domainCompany.Id,

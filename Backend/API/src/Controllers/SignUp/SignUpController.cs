@@ -29,7 +29,7 @@ namespace TransportSystems.Backend.API.Controllers.SignUp
         public async Task<IActionResult> SignUpCompany([FromBody]CompanyApplicationAM companyApplication)
         {
             var identityUserId = User.GetIdentityId();
-            if (identityUserId == -1)
+            if (identityUserId == null)
             {
                 var problem = new ValidationProblemDetails
                 {

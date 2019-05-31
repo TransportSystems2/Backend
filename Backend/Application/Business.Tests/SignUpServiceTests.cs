@@ -14,6 +14,7 @@ using TransportSystems.Backend.Application.Models.Transport;
 using TransportSystems.Backend.Application.Models.Users;
 using TransportSystems.Backend.Application.Business.Tests.Suite;
 using Xunit;
+using TransportSystems.Backend.Application.Interfaces.Organization;
 
 namespace TransportSystems.Backend.Application.Business.Tests
 {
@@ -25,7 +26,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
             DomainModeratorServiceMock = new Mock<IModeratorService>();
             DomainDispatcherServiceMock = new Mock<IDispatcherService>();
             DomainCompanyServiceMock = new Mock<ICompanyService>();
-            DomainGarageServiceMock = new Mock<IGarageService>();
+            GarageServiceMock = new Mock<IApplicationGarageService>();
             VehicleServiceMock = new Mock<IApplicationVehicleService>();
 
             SignUpService = new SignUpService(
@@ -34,7 +35,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
                 DomainModeratorServiceMock.Object,
                 DomainDispatcherServiceMock.Object,
                 DomainCompanyServiceMock.Object,
-                DomainGarageServiceMock.Object,
+                GarageServiceMock.Object,
                 VehicleServiceMock.Object);
         }
 
@@ -48,7 +49,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
 
         public Mock<ICompanyService> DomainCompanyServiceMock { get; }
 
-        public Mock<IGarageService> DomainGarageServiceMock { get; }
+        public Mock<IApplicationGarageService> GarageServiceMock { get; }
 
         public Mock<IApplicationVehicleService> VehicleServiceMock { get; }
     }
@@ -136,12 +137,11 @@ namespace TransportSystems.Backend.Application.Business.Tests
 
             await Suite.SignUpService.SignUpCompany(dispatcherCompanyModel);
 
-            Suite.DomainGarageServiceMock
-                 .Verify(m => m.GetByAddress(
-                     garageAddress.Country,
-                     garageAddress.Province,
-                     garageAddress.Locality,
-                     garageAddress.District));
+            Suite.GarageServiceMock
+                 .Verify(m => m.CreateDomainGarage(
+                     domainCompany.Id,
+                     garageAddress
+                 ));
 
             Suite.DomainCompanyServiceMock
                  .Verify(m => m.Create(dispatcherCompanyModel.Dispatcher.PhoneNumber));

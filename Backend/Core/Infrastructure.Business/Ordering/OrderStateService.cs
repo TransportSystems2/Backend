@@ -134,19 +134,20 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
 
             if (currentState == null)
             {
-                currentState = new OrderState { OrderId = orderId};
+                currentState = new OrderState { OrderId = orderId };
             }
 
-            currentState.Status = OrderStatus.New;
-            currentState.GenCompanyId = market.CompanyId;
-            currentState.MarketId = marketId;
-            currentState.TimeOfDelivery = timeOfDelivery;
-            currentState.CustomerId = customerId;
-            currentState.CargoId = cargoId;
-            currentState.RouteId = routeId;
-            currentState.BillId = billId;
+            var newState = CreateState(currentState, OrderStatus.New);
 
-            await AddNewState(currentState);
+            newState.GenCompanyId = market.CompanyId;
+            newState.MarketId = marketId;
+            newState.TimeOfDelivery = timeOfDelivery;
+            newState.CustomerId = customerId;
+            newState.CargoId = cargoId;
+            newState.RouteId = routeId;
+            newState.BillId = billId;
+
+            await AddState(newState);
         }
 
         public async Task Accept(int orderId, int genDispatcherId)
@@ -169,11 +170,10 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 "GenDispathcer");
             }
 
-            var newState = (OrderState)currentState.Clone();
-            newState.Status = OrderStatus.Accepted;
+            var newState = CreateState(currentState, OrderStatus.Accepted);
             newState.GenDispatcherId = genDispatcherId;
 
-            await AddNewState(newState);
+            await AddState(newState);
         }
 
         public async Task ReadyToTrade(int orderId, int genDispatcherId)
@@ -194,9 +194,10 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException($"Only an genDispatcher can change the order state.  GenDispatcher:{currentState.GenDispatcherId}, function moderatorId:{genDispatcherId}");
             }
 
-            currentState.Status = OrderStatus.ReadyForTrade;
-            await AddNewState(currentState);
-        } 
+            var newState = CreateState(currentState, OrderStatus.ReadyForTrade);
+
+            await AddState(newState);
+        }
 
         public async Task Trade(int orderId)
         {
@@ -206,8 +207,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new OrderStatusException("Only read for trade orders can be traded");
             }
 
-            currentState.Status = OrderStatus.SentToTrading;
-            await AddNewState(currentState);
+            var newState = CreateState(currentState, OrderStatus.SentToTrading);
+
+            await AddState(newState);
         }
 
         public async Task AssignToSubDispatcher(int orderId, int subDispatcherId)
@@ -224,10 +226,11 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new EntityNotFoundException($"SubDispatcherId:{subDispatcherId} not found", "SubDispatcher");
             }
 
-            currentState.Status = OrderStatus.AssignedDispatcher;
-            currentState.SubDispatcherId = subDispatcherId;
-            currentState.SubCompanyId = subDispatcher.CompanyId;
-            await AddNewState(currentState);
+            var newState = CreateState(currentState, OrderStatus.AssignedDispatcher);
+            newState.SubDispatcherId = subDispatcher.Id;
+            newState.SubCompanyId = subDispatcher.CompanyId;
+
+            await AddState(newState);
         }
 
         public async Task AssignToDriver(int orderId, int subDispatcherId, int driverId)
@@ -253,9 +256,10 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
             }
 
-            currentState.Status = OrderStatus.AssignedDriver;
-            currentState.DriverId = driverId;
-            await AddNewState(currentState);
+            var newState = CreateState(currentState, OrderStatus.AssignedDriver);
+            newState.DriverId = driverId;
+
+            await AddState(newState);
         }
 
         public async Task ConfirmByDriver(int orderId, int driverId)
@@ -276,8 +280,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only a order driver can confirm the order");
             }
 
-            currentState.Status = OrderStatus.ConfirmedByDriver;
-            await AddNewState(currentState);
+            var newState = CreateState(currentState, OrderStatus.ConfirmedByDriver);
+
+            await AddState(newState);
         }
 
         public async Task GoToCustomer(int orderId, int driverId)
@@ -287,7 +292,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             {
                 throw new OrderStatusException("Only ConfirmedByDriver orders can be gone to customer");
             }
-            
+
             if (!await DriverService.IsExist(driverId))
             {
                 throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
@@ -298,8 +303,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only an owner driver can go to customer");
             }
 
-            currentState.Status = OrderStatus.WentToCustomer;
-            await AddNewState(currentState);
+            var newState = CreateState(currentState, OrderStatus.WentToCustomer);
+
+            await AddState(newState);
         }
 
         public async Task ArriveAtLoadingPlace(int orderId, int driverId)
@@ -309,7 +315,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             {
                 throw new OrderStatusException("Only WentToCustomer orders can be arrived at loading place");
             }
-            
+
             if (!await DriverService.IsExist(driverId))
             {
                 throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
@@ -320,8 +326,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only an owner driver can arrive at loading place");
             }
 
-            currentState.Status = OrderStatus.ArrivedAtLoadingPlace;
-            await AddNewState(currentState);
+            var newState = CreateState(currentState, OrderStatus.ArrivedAtLoadingPlace);
+
+            await AddState(newState);
         }
 
         public async Task LoadTheVehicle(int orderId, int driverId)
@@ -342,8 +349,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only an owner driver can load a vehicle");
             }
 
-            currentState.Status = OrderStatus.VehicleIsLoaded;
-            await AddNewState(currentState);
+            var newState = CreateState(currentState, OrderStatus.VehicleIsLoaded);
+
+            await AddState(newState);
         }
 
         public async Task DeliverTheVehicle(int orderId, int driverId)
@@ -353,7 +361,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             {
                 throw new OrderStatusException("Only VehicleIsLoaded orders can be delivered");
             }
-            
+
             if (!await DriverService.IsExist(driverId))
             {
                 throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
@@ -364,8 +372,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only an owner driver can deliver an vehicle");
             }
 
-            currentState.Status = OrderStatus.VehicleIsDelivered;
-            await AddNewState(currentState);
+            var newState = CreateState(currentState, OrderStatus.VehicleIsDelivered);
+
+            await AddState(newState);
         }
 
         public async Task ReceivePayment(int orderId, int driverId)
@@ -375,7 +384,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             {
                 throw new OrderStatusException("Only VehicleIsDelivered orders can be paymented");
             }
-            
+
             if (!await DriverService.IsExist(driverId))
             {
                 throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
@@ -386,8 +395,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only an owner driver can deliver an vehicle");
             }
 
-            currentState.Status = OrderStatus.PaymentIsReceived;
-            await AddNewState(currentState);
+            var newState = CreateState(currentState, OrderStatus.PaymentIsReceived);
+
+            await AddState(newState);
         }
 
         public async Task Complete(int orderId, int driverId)
@@ -397,7 +407,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             {
                 throw new OrderStatusException("Only paymend orders can be completed");
             }
-            
+
             if (!await DriverService.IsExist(driverId))
             {
                 throw new EntityNotFoundException("Driver");
@@ -408,8 +418,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only owner driver can to complete order");
             }
 
-            currentState.Status = OrderStatus.Completed;
-            await AddNewState(currentState);
+            var newState = CreateState(currentState, OrderStatus.Completed);
+
+            await AddState(newState);
         }
 
         public async Task Cancel(int orderId, int driverId)
@@ -419,7 +430,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             {
                 throw new OrderStatusException("Only executing orders can be canceled");
             }
-            
+
             if (!await DriverService.IsExist(driverId))
             {
                 throw new EntityNotFoundException("Driver");
@@ -430,17 +441,26 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only owner driver can to cancel order");
             }
 
-            currentState.Status = OrderStatus.AssignedDispatcher;
-            currentState.DriverId = 0;
-            await AddNewState(currentState);
+            var newState = CreateState(currentState, OrderStatus.AssignedDispatcher);
+            newState.DriverId = 0;
+
+            await AddState(newState);
         }
 
-        protected async Task AddNewState(OrderState newState)
+        protected async Task AddState(OrderState newState)
         {
             await Verify(newState);
 
             await Repository.Add(newState);
             await Repository.Save();
+        }
+
+        protected OrderState CreateState(OrderState currentState, OrderStatus status)
+        {
+            var result = (OrderState)currentState.Clone();
+            result.Status = status;
+
+            return result;
         }
 
         protected override async Task<bool> DoVerifyEntity(OrderState entity)
