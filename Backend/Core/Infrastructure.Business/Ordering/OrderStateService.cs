@@ -137,7 +137,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 currentState = new OrderState { OrderId = orderId };
             }
 
-            var newState = CreateState(currentState, OrderStatus.New);
+            var newState = CloneState(currentState, OrderStatus.New);
 
             newState.GenCompanyId = market.CompanyId;
             newState.MarketId = marketId;
@@ -170,7 +170,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 "GenDispathcer");
             }
 
-            var newState = CreateState(currentState, OrderStatus.Accepted);
+            var newState = CloneState(currentState, OrderStatus.Accepted);
             newState.GenDispatcherId = genDispatcherId;
 
             await AddState(newState);
@@ -194,7 +194,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException($"Only an genDispatcher can change the order state.  GenDispatcher:{currentState.GenDispatcherId}, function moderatorId:{genDispatcherId}");
             }
 
-            var newState = CreateState(currentState, OrderStatus.ReadyForTrade);
+            var newState = CloneState(currentState, OrderStatus.ReadyForTrade);
 
             await AddState(newState);
         }
@@ -207,7 +207,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new OrderStatusException("Only read for trade orders can be traded");
             }
 
-            var newState = CreateState(currentState, OrderStatus.SentToTrading);
+            var newState = CloneState(currentState, OrderStatus.SentToTrading);
 
             await AddState(newState);
         }
@@ -226,7 +226,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new EntityNotFoundException($"SubDispatcherId:{subDispatcherId} not found", "SubDispatcher");
             }
 
-            var newState = CreateState(currentState, OrderStatus.AssignedDispatcher);
+            var newState = CloneState(currentState, OrderStatus.AssignedDispatcher);
             newState.SubDispatcherId = subDispatcher.Id;
             newState.SubCompanyId = subDispatcher.CompanyId;
 
@@ -256,7 +256,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
             }
 
-            var newState = CreateState(currentState, OrderStatus.AssignedDriver);
+            var newState = CloneState(currentState, OrderStatus.AssignedDriver);
             newState.DriverId = driverId;
 
             await AddState(newState);
@@ -280,7 +280,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only a order driver can confirm the order");
             }
 
-            var newState = CreateState(currentState, OrderStatus.ConfirmedByDriver);
+            var newState = CloneState(currentState, OrderStatus.ConfirmedByDriver);
 
             await AddState(newState);
         }
@@ -303,7 +303,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only an owner driver can go to customer");
             }
 
-            var newState = CreateState(currentState, OrderStatus.WentToCustomer);
+            var newState = CloneState(currentState, OrderStatus.WentToCustomer);
 
             await AddState(newState);
         }
@@ -326,7 +326,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only an owner driver can arrive at loading place");
             }
 
-            var newState = CreateState(currentState, OrderStatus.ArrivedAtLoadingPlace);
+            var newState = CloneState(currentState, OrderStatus.ArrivedAtLoadingPlace);
 
             await AddState(newState);
         }
@@ -349,7 +349,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only an owner driver can load a vehicle");
             }
 
-            var newState = CreateState(currentState, OrderStatus.VehicleIsLoaded);
+            var newState = CloneState(currentState, OrderStatus.VehicleIsLoaded);
 
             await AddState(newState);
         }
@@ -372,7 +372,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only an owner driver can deliver an vehicle");
             }
 
-            var newState = CreateState(currentState, OrderStatus.VehicleIsDelivered);
+            var newState = CloneState(currentState, OrderStatus.VehicleIsDelivered);
 
             await AddState(newState);
         }
@@ -395,7 +395,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only an owner driver can deliver an vehicle");
             }
 
-            var newState = CreateState(currentState, OrderStatus.PaymentIsReceived);
+            var newState = CloneState(currentState, OrderStatus.PaymentIsReceived);
 
             await AddState(newState);
         }
@@ -418,7 +418,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only owner driver can to complete order");
             }
 
-            var newState = CreateState(currentState, OrderStatus.Completed);
+            var newState = CloneState(currentState, OrderStatus.Completed);
 
             await AddState(newState);
         }
@@ -441,7 +441,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
                 throw new AccessViolationException("Only owner driver can to cancel order");
             }
 
-            var newState = CreateState(currentState, OrderStatus.AssignedDispatcher);
+            var newState = CloneState(currentState, OrderStatus.AssignedDispatcher);
             newState.DriverId = 0;
 
             await AddState(newState);
@@ -455,7 +455,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             await Repository.Save();
         }
 
-        protected OrderState CreateState(OrderState currentState, OrderStatus status)
+        protected OrderState CloneState(OrderState currentState, OrderStatus status)
         {
             var result = (OrderState)currentState.Clone();
             result.Status = status;
