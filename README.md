@@ -1,4 +1,4 @@
-[![Documentation Status](https://readthedocs.org/projects/gosevakuator/badge/?version=latest)](https://gosevakuator.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/gosevakuator/badge/?version=latest)](https://gosevakuator.readthedocs.io/en/latest/?badge=latest)[![CodeFactor](https://www.codefactor.io/repository/github/transportsystems2/backend/badge)](https://www.codefactor.io/repository/github/transportsystems2/backend)
 
 master [![Build Status](https://travis-ci.com/TransportSystems2/Backend.svg?branch=master)](https://travis-ci.com/TransportSystems2/Backend)
 
