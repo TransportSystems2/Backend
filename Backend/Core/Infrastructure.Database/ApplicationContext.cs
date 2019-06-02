@@ -17,8 +17,6 @@ namespace TransportSystems.Backend.Core.Infrastructure.Database
 {
     public class ApplicationContext : DbContext, IContext
     {
-        public DbSet<City> Cities { get; set; }
-
         public DbSet<Company> Companies { get; set; }
 
         public DbSet<Garage> Garages { get; set; }
@@ -66,6 +64,8 @@ namespace TransportSystems.Backend.Core.Infrastructure.Database
         public DbSet<Catalog> Catalogs { get; set; }
 
         public DbSet<CatalogItem> CatalogItems { get; set; }
+
+        public DbSet<Market> Markets { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)

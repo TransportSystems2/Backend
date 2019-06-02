@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.IO;
+using System.Reflection;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.Swagger;
 using TransportSystems.Backend.Identity.Core.Business;
 using TransportSystems.Backend.Identity.Core.Data.Domain;
 using TransportSystems.Backend.Identity.Core.Database;
@@ -31,8 +34,6 @@ namespace TransportSystems.Backend.Identity.Signin
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<ISmsService, SmsService>();
-
             var connectionString = Configuration.GetConnectionString("db");
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
             services.AddDbContext<IdentityContext>(options =>
@@ -77,6 +78,15 @@ namespace TransportSystems.Backend.Identity.Signin
                     options.TokenCleanupInterval = 30;
                 });
 
+                services.AddSwaggerGen(c =>
+                {
+                    c.SwaggerDoc("v1", new Info { Title = "Signin", Version = "v1" });
+                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                    c.IncludeXmlComments(xmlPath);
+                });
+
+
             ConfigureCustomServices(services);
         }
 
@@ -108,12 +118,25 @@ namespace TransportSystems.Backend.Identity.Signin
 
             app.UseMvc();
             app.UseMvcWithDefaultRoute();
+            app.UseSwagger(c =>
+            {
+                c.RouteTemplate = "identity/signin/docs/{documentName}/swagger.json";
+            });
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/identity/signin/docs/v1/swagger.json", "Signin api V1");
+                c.RoutePrefix = "identity/signin/docs";
+            });
         }
 
         protected virtual void ConfigureCustomServices(IServiceCollection services)
         {
             services.AddTransient<IRoleService, RoleService>();
             services.AddTransient<IUserService, UserService>();
+
+            services.AddTransient<ISmsService, SmsService>();
+            services.AddTransient<ISlackService, SlackService>();
 
             services.AddTransient<IPushTokenRepository, PushTokenRepository>();
             services.AddTransient<IPushTokenService, PushTokenService>();

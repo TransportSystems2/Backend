@@ -9,19 +9,20 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Ordering
     {
         Task New(
             int orderId,
+            int marketId,
             DateTime timeOfDelivery,
             int customerId,
             int cargoId,
             int routeId,
             int billId);
 
-        Task Accept(int orderId, int moderatorId);
+        Task Accept(int orderId, int genDispatcher);
 
-        Task ReadyToTrade(int orderId, int moderatorId);
+        Task ReadyToTrade(int orderId, int genDispatcher);
 
         Task Trade(int orderId);
 
-        Task AssignToDispatcher(int orderId, int dispatcherId);
+        Task AssignToSubDispatcher(int orderId, int dispatcherId);
 
         Task AssignToDriver(int orderId, int dispatcherId, int driverId);
 

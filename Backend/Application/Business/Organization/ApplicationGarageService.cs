@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Core.Services.Interfaces;
@@ -8,6 +6,8 @@ using TransportSystems.Backend.Core.Services.Interfaces.Organization;
 using TransportSystems.Backend.Application.Interfaces.Geo;
 using TransportSystems.Backend.Application.Interfaces.Organization;
 using TransportSystems.Backend.Application.Models.Geo;
+using TransportSystems.Backend.Application.Interfaces.Pricing;
+using Common.Models.Units;
 
 namespace TransportSystems.Backend.Application.Business.Organization
 {
@@ -16,44 +16,36 @@ namespace TransportSystems.Backend.Application.Business.Organization
         public ApplicationGarageService(
             ITransactionService transactionService,
             IGarageService domainGarageService,
-            IApplicationCityService cityService,
-            IApplicationAddressService addressService)
+            IApplicationAddressService addressService,
+            IApplicationPricelistService pricelistService)
             : base(transactionService)
         {
             DomainGarageService = domainGarageService;
-            CityService = cityService;
             AddressService = addressService;
+            PricelistService = pricelistService;
         }
 
         protected IGarageService DomainGarageService { get; }
 
-        protected IApplicationCityService CityService { get; }
-
         protected IApplicationAddressService AddressService { get; }
 
+        protected IApplicationPricelistService PricelistService { get; }
+
         public async Task<Garage> CreateDomainGarage(
-            bool isPublic,
             int companyId,
-            int cityId,
             AddressAM address)
         {
             using (var transaction = await TransactionService.BeginTransaction())
             {
                 try
                 {
-                    var domainCity = await CityService.GetDomainCity(cityId);
-                    if (domainCity == null)
-                    {
-                        throw new EntityNotFoundException($"CityId: {cityId} doesn't exist.", "City");
-                    }
+                    var priceListBlank = await PricelistService.GetPricelistBlank();
+                    var domainPricelist = await PricelistService.CreateDomainPricelist(priceListBlank);
 
                     var domainAddress = await AddressService.CreateDomainAddress(AddressKind.Garage, address);
                     var result = await DomainGarageService.Create(
-                        isPublic,
                         companyId,
-                        cityId,
-                        domainAddress.Id,
-                        domainCity.PricelistId);
+                        domainAddress.Id);
 
                     transaction.Commit();
                     return result;
@@ -70,20 +62,15 @@ namespace TransportSystems.Backend.Application.Business.Organization
         {
             return DomainGarageService.Get(garageId);
         }
-        
-        public Task<ICollection<string>> GetAvailableProvinces(string country)
+
+        public Task<Garage> GetDomainGarageByAddress(AddressAM address)
         {
-            return DomainGarageService.GetAvailableProvinces(country);
+            return DomainGarageService.GetByAddress(address.Country, address.Province, address.Locality, address.District);
         }
 
-        public Task<ICollection<string>> GetAvailableLocalities(string country, string province)
+        public Task<Garage> GetDomainGarageByCoordinate(Coordinate coordinate)
         {
-            return DomainGarageService.GetAvailableLocalities(country, province);
-        }
-
-        public Task<ICollection<string>> GetAvailableDistricts(string country, string province, string locality)
-        {
-            return DomainGarageService.GetAvailableDistricts(country, province, locality);
+            return DomainGarageService.GetByCoordinate(coordinate.Latitude, coordinate.Longitude);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using TransportSystems.Backend.Application.Models.Billing;
-using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Application.Models.Routing;
 using TransportSystems.Backend.Application.Models.Transport;
 using TransportSystems.Backend.Application.Models.Users;
@@ -9,7 +8,7 @@ namespace TransportSystems.Backend.Application.Models.Booking
 {
     public class BookingAM : BaseAM
     {
-        public AddressAM RootAddress { get; set; }
+        public int MarketId { get; set; }
 
         public WaypointsAM Waypoints { get; set; }
 

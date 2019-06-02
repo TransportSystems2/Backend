@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
 using TransportSystems.Backend.Application.Models.Billing;
+using TransportSystems.Backend.Application.Models.Geo;
 
 namespace TransportSystems.Backend.Application.Interfaces.Billing
 {
@@ -17,6 +18,6 @@ namespace TransportSystems.Backend.Application.Interfaces.Billing
 
         Task<BillItemAM> CalculateBillItem(string key, int value, decimal price, float degreeOfDifficulty);
 
-        Task<BillInfoAM> GetBillInfo(Coordinate coordinate, int catalogItemId);
+        Task<BillInfoAM> GetBillInfo(int pricelistId, int catalogItemId);
     }
 }

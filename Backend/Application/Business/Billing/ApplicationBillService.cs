@@ -1,5 +1,4 @@
-﻿using Common.Models.Units;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
@@ -21,15 +20,13 @@ namespace TransportSystems.Backend.Application.Business.Billing
             IBillService domainBillService,
             IBillItemService domainBillItemService,
             IBasketService domainBasketService,
-            IApplicationPricelistService pricelistService,
-            IApplicationCityService cityService)
+            IApplicationPricelistService pricelistService)
             : base(transactionService)
         {
             DomainBillService = domainBillService;
             DomainBillItemService = domainBillItemService;
             DomainBasketService = domainBasketService;
             PricelistService = pricelistService;
-            CityService = cityService; 
         }
 
         protected IBillService DomainBillService { get; }
@@ -40,7 +37,7 @@ namespace TransportSystems.Backend.Application.Business.Billing
 
         protected IApplicationPricelistService PricelistService { get; }
 
-        protected IApplicationCityService CityService { get; }
+        protected IApplicationGarageService GarageService { get; }
 
         public async Task<BillAM> CalculateBill(BillInfoAM billInfo, BasketAM basket)
         {
@@ -155,10 +152,9 @@ namespace TransportSystems.Backend.Application.Business.Billing
             return DomainBillItemService.Create(billId, billItem.Key, billItem.Value, billItem.Price, billItem.Cost);
         }
 
-        public async Task<BillInfoAM> GetBillInfo(Coordinate coordinate, int catalogItemId)
+        public async Task<BillInfoAM> GetBillInfo(int pricelistId, int catalogItemId)
         {
-            var domainCity = await CityService.GetDomainCityByCoordinate(coordinate);
-            var domainPrice = await PricelistService.GetDomainPrice(domainCity.PricelistId, catalogItemId);
+            var domainPrice = await PricelistService.GetDomainPrice(pricelistId, catalogItemId);
 
             return new BillInfoAM
             {

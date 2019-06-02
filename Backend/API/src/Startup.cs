@@ -149,12 +149,15 @@ namespace TransportSystems.Backend.API
                 app.UseHsts();
             }
 
-            app.UseSwagger();
+            app.UseSwagger(c =>
+            {
+                c.RouteTemplate = "api/docs/{documentName}/swagger.json";
+            });
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "TrasnportSystems API V1");
-                c.RoutePrefix = string.Empty;
+                c.SwaggerEndpoint("/api/docs/v1/swagger.json", "TrasnportSystems API V1");
+                c.RoutePrefix = "api/docs";
             });
 
             app.UseHttpsRedirection();
@@ -222,7 +225,6 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IVehicleRepository, VehicleRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<ICompanyRepository, CompanyRepository>();
-            services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IOrderStateRepository, OrderStateRepository>();
             services.AddScoped<ILotRepository, LotRepository>();
@@ -239,6 +241,7 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IBillItemRepository, BillItemRepository>();
             services.AddScoped<IBasketRepository, BasketRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IMarketRepository, MarketRepository>();
         }
 
         protected virtual void ConfigureCustomServices(IServiceCollection services)
@@ -251,10 +254,8 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IDispatcherService, DispatcherService>();
 
             services.AddScoped<IVehicleService, VehicleService>();
-
             services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<ICompanyService, CompanyService>();
-            services.AddScoped<ICityService, CityService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IOrderStateService, OrderStateService>();
             services.AddScoped<ILotService, LotService>();
@@ -272,8 +273,8 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IBillService, BillService>();
             services.AddScoped<IBillItemService, BillItemService>();
             services.AddScoped<IBasketService, BasketService>();
-
             services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<IMarketService, MarketService>();
 
             var identityUri = Configuration.GetConnectionString("identity_manage");
             var identityUsersAPI = IdentityUsersAPIFactory<IIdentityUsersAPI>.Create(identityUri);
@@ -292,13 +293,13 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IApplicationBillService, ApplicationBillService>();
             services.AddScoped<IApplicationBookingService, ApplicationBookingService>();
             services.AddScoped<IApplicationPricelistService, ApplicationPricelistService>();
-            services.AddScoped<IApplicationCityService, ApplicationCityService>();
             services.AddScoped<IApplicationRouteService, ApplicationRouteService>();
             services.AddScoped<IApplicationOrderService, ApplicationOrderService>();
             services.AddScoped<IApplicationOrderValidatorService, ApplicationOrderValidatorService>();
-            services.AddScoped<IApplicationCustomerService, ApplicationCustomerService>();
+            services.AddScoped<IApplicationUserService, ApplicationUserService>();
             services.AddScoped<IApplicationPrognosisService, ApplicationPrognosisService>();
             services.AddScoped<IApplicationCompanyService, ApplicationCompanyService>();
+            services.AddScoped<IApplicationMarketService, ApplicationMarketService>();
         }
 
         protected virtual void ConfigureExternalServices(IServiceCollection services)

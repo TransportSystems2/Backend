@@ -4,17 +4,19 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.Application.Business.Geo;
 using TransportSystems.Backend.Application.Interfaces.Billing;
 using TransportSystems.Backend.Application.Interfaces.Booking;
 using TransportSystems.Backend.Application.Interfaces.Geo;
+using TransportSystems.Backend.Application.Interfaces.Organization;
+using TransportSystems.Backend.Application.Interfaces.Prognosing;
 using TransportSystems.Backend.Application.Interfaces.Routing;
+using TransportSystems.Backend.Application.Interfaces.Users;
 using TransportSystems.Backend.Application.Models.Billing;
 using TransportSystems.Backend.Application.Models.Booking;
 using TransportSystems.Backend.Application.Models.Routing;
 using TransportSystems.Backend.Application.Models.Transport;
-using TransportSystems.Backend.Application.Interfaces.Prognosing;
+using TransportSystems.Backend.Core.Domain.Core.Organization;
 
 namespace TransportSystems.Backend.Application.Business.Booking
 {
@@ -24,12 +26,16 @@ namespace TransportSystems.Backend.Application.Business.Booking
                 IApplicationAddressService addressService,
                 IApplicationBillService billService,
                 IApplicationRouteService routeService,
-                IApplicationPrognosisService prognosisService)
+                IApplicationPrognosisService prognosisService,
+                IApplicationMarketService marketService,
+                IApplicationUserService userService)
         {
             AddressService = addressService;
             BillService = billService;
             RouteService = routeService;
             PrognosisService = prognosisService;
+            MarketService = marketService;
+            UserService = userService;
         }
 
         protected IApplicationAddressService AddressService { get; }
@@ -40,15 +46,19 @@ namespace TransportSystems.Backend.Application.Business.Booking
 
         protected IApplicationPrognosisService PrognosisService { get; }
 
-        public async Task<BookingResponseAM> CalculateBooking(BookingRequestAM request)
+        protected IApplicationMarketService MarketService { get; }
+
+        protected IApplicationUserService UserService { get; }
+
+        public async Task<BookingResponseAM> CalculateBooking(int identityUserId, BookingRequestAM request)
         {
             var result = new BookingResponseAM();
 
             var firstWaypointCoordinate = request.Waypoints.Points.First().ToCoordinate();
-            var rootAddresses = await AddressService.GetNearestAddresses(AddressKind.City, firstWaypointCoordinate);
+            var domainDispatcher = await UserService.GetDomainDispatcherByIdentityUser(identityUserId); 
+            var markets = await MarketService.GetNearestDomainMarkets(domainDispatcher.CompanyId, firstWaypointCoordinate);
 
-            var possibleRoutes = await RouteService.GetPossibleRoutes(rootAddresses, request.Waypoints);
-            var bookingRoutes = await GetBookingRoutes(possibleRoutes, request.Cargo, request.Basket);
+            var bookingRoutes = await GetBookingRoutes(markets, request.Waypoints, request.Cargo, request.Basket);
             bookingRoutes = bookingRoutes.OrderBy(b => b.Bill.TotalCost).ToList();
 
             result.Routes.AddRange(bookingRoutes);
@@ -56,15 +66,22 @@ namespace TransportSystems.Backend.Application.Business.Booking
             return result;
         }
 
-        public async Task<BookingRouteAM> CalculateBookingRoute(RouteAM route, CargoAM cargo, BasketAM requestBasket)
+        public async Task<BookingRouteAM> CalculateBookingRoute(
+            Market market,
+            WaypointsAM waypoints,
+            CargoAM cargo,
+            BasketAM requestBasket)
         {
+            var marketAddress = await AddressService.GetAddress(market.AddressId);
+            var route = await RouteService.GetRoute(marketAddress, waypoints);
+
             var rootAddress = RouteService.GetRootAddress(route);
-            var rootAddressTimeBelt = await AddressService.GetTimeBeltByAddress(rootAddress);
+            var marketTimeBelt = await AddressService.GetTimeBeltByAddress(rootAddress);
             var feedDistance = RouteService.GetFeedDistance(route);
             var totalDistance = RouteService.GetTotalDistance(route);
             var avgDeliveryTime = await PrognosisService.GetAvgDeliveryTime(route, cargo, requestBasket);
 
-            var billInfo = await BillService.GetBillInfo(rootAddress.ToCoordinate(), cargo.WeightCatalogItemId);
+            var billInfo = await BillService.GetBillInfo(market.PricelistId, cargo.WeightCatalogItemId);
 
             // клонируем т.к. количество километров для каждого маршрута - индивидуально, а параметром передается общий объект
             var basket = requestBasket.Clone() as BasketAM;
@@ -75,8 +92,8 @@ namespace TransportSystems.Backend.Application.Business.Booking
 
             return new BookingRouteAM
             {
-                RootAddress = rootAddress,
-                RootAddressTimeBelt = rootAddressTimeBelt,
+                MarketId = market.Id,
+                MarketTimeBelt = marketTimeBelt,
                 FeedDistance = feedDistance,
                 TotalDistance = totalDistance,
                 Bill = bill,
@@ -85,17 +102,21 @@ namespace TransportSystems.Backend.Application.Business.Booking
             };
         }
 
-        private async Task<ICollection<BookingRouteAM>> GetBookingRoutes(ICollection<RouteAM> possibleRoutes, CargoAM cargo, BasketAM basket)
+        private async Task<ICollection<BookingRouteAM>> GetBookingRoutes(
+            ICollection<Market> markets,
+            WaypointsAM wayPoints,
+            CargoAM cargo,
+            BasketAM basket)
         {
             var result = new ConcurrentBag<BookingRouteAM>();
             var exceptions = new ConcurrentQueue<Exception>();
 
-            await possibleRoutes.ParallelForEachAsync(
-                async route =>
+            await markets.ParallelForEachAsync(
+                async market =>
                 {
                     try
                     {
-                        var bookingRoute = await CalculateBookingRoute(route, cargo, basket);
+                        var bookingRoute = await CalculateBookingRoute(market, wayPoints, cargo, basket);
                         result.Add(bookingRoute);
                     }
                     catch (Exception e)

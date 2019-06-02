@@ -2,8 +2,6 @@
 {
     public class UserAM : BaseAM
     {
-        public int IdentityUserId { get; set; }
-
         public string FirstName { get; set; }
 
         public string LastName { get; set; }

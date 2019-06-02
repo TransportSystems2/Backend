@@ -3,7 +3,7 @@
     public enum AddressKind
     {
         Other,
-        City,
+        Market,
         Garage,
         Vehicle
     }

@@ -22,7 +22,7 @@ namespace TransportSystems.Backend.Application.Interfaces.Geo
 
         Task<string> GetShortTitle(int addressId);
 
-        Task<ICollection<AddressAM>> GetNearestAddresses(AddressKind kind, Coordinate originCoordinate, double distance = 500, int maxResultCount = 5);
+        Task<ICollection<Address>> GetNearestDomainAddresses(AddressKind kind, Coordinate originCoordinate, double distance = 500, int maxResultCount = 5);
 
         Task<ICollection<AddressAM>> Geocode(string request, int maxResultCount = 5);
 

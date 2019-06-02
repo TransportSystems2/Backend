@@ -14,8 +14,6 @@ namespace TransportSystems.Backend.Console
             identityUsersAPI.AsignToRoles(2, new [] { "Driver" }).GetAwaiter().GetResult();
 
             inDriverRole = identityUsersAPI.IsInRole(2, "Driver").GetAwaiter().GetResult();
-
-            var t = "stop";
         }
     }
 }
