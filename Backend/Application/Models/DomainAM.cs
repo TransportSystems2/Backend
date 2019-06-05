@@ -5,6 +5,7 @@ namespace TransportSystems.Backend.Application.Models
     public class DomainAM : BaseAM
     {
         public DomainAM()
+            : this(null)
         {
         }
 
