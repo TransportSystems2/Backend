@@ -7,8 +7,15 @@
 =========================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
+
+   market
+   garages
+   orders
+   usersaction
+   myorders
+
 
 Indices and tables
 ==================
