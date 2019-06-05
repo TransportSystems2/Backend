@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
@@ -15,7 +16,16 @@ namespace TransportSystems.Backend.Core.Infrastructure.Database.Billing
 
         public async Task<decimal> GetTotalCost(int billId)
         {
-            return await Entities.Where(b => b.BillId.Equals(billId)).Select(b => b.Cost).SumAsync();
+            return await Entities
+                .Where(b => b.BillId.Equals(billId))
+                .Select(b => b.Cost).SumAsync();
+        }
+
+        public async Task<ICollection<BillItem>> GetAll(int billId)
+        {
+            return await Entities
+                .Where(b => b.BillId.Equals(billId))
+                .ToListAsync();
         }
     }
 }

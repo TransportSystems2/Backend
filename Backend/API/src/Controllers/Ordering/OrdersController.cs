@@ -46,6 +46,12 @@ namespace TransportSystems.API.Controllers
             return Ok();
         }
 
+        [HttpGet("detail_info")]
+        public Task<DetailOrderInfoAM> GetDetailInfo(int orderId)
+        {
+            return Service.GetDetailInfo(orderId);
+        }
+
         [HttpGet("groups")]
         public Task<ICollection<OrderGroupAM>> GetGroups(OrderStatus[] statuses)
         {

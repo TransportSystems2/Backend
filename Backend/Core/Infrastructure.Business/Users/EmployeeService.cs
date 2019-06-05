@@ -31,7 +31,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
             if (!await CompanyService.IsExist(companyId))
             {
                 throw new EntityNotFoundException("CompanyId");
-            };
+            }
 
             return await Repository.GetByCompany(companyId);
         }

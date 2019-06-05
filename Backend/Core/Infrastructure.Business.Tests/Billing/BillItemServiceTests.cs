@@ -1,5 +1,6 @@
 ﻿using Moq;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
 using TransportSystems.Backend.Core.Domain.Interfaces.Billing;
@@ -17,9 +18,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Billing
             BillItemRepositoryMock = new Mock<IBillItemRepository>();
             BillServiceMock = new Mock<IBillService>();
 
-            BillItemService = new BillItemService(BillItemRepositoryMock.Object, BillServiceMock.Object);
+            Service = new BillItemService(BillItemRepositoryMock.Object, BillServiceMock.Object);
         }
-        public IBillItemService BillItemService { get; }
+        public IBillItemService Service { get; }
 
         public Mock<IBillItemRepository> BillItemRepositoryMock { get; }
 
@@ -54,7 +55,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Billing
                 .Setup(m => m.GetTotalCost(billId))
                 .ReturnsAsync(totalCost);
 
-            var result = await Suite.BillItemService.Create(billId, key, value, price, cost);
+            var result = await Suite.Service.Create(billId, key, value, price, cost);
 
             Suite.BillItemRepositoryMock
                 .Verify(m => m.Add(It.Is<BillItem>(
@@ -93,7 +94,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Billing
                 .Setup(m => m.IsExist(billId))
                 .ReturnsAsync(false);
 
-            await Assert.ThrowsAsync<EntityNotFoundException>("Bill", () => Suite.BillItemService.Create(billId, key, value, price, cost));
+            await Assert.ThrowsAsync<EntityNotFoundException>("Bill", () => Suite.Service.Create(billId, key, value, price, cost));
         }
 
         [Fact]
@@ -110,7 +111,27 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Billing
                 .Setup(m => m.IsExist(billId))
                 .ReturnsAsync(true);
 
-            await Assert.ThrowsAsync<ArgumentException>("Cost", () => Suite.BillItemService.Create(billId, key, value, price, cost));
+            await Assert.ThrowsAsync<ArgumentException>("Cost", () => Suite.Service.Create(billId, key, value, price, cost));
+        }
+
+        [Fact]
+        public async Task GetAll()
+        {
+            var billId = 1;
+
+            Suite.BillServiceMock
+                .Setup(m => m.IsExist(billId))
+                .ReturnsAsync(true);
+
+            var billItems = new List<BillItem>();
+
+            Suite.BillItemRepositoryMock
+                .Setup(m => m.GetAll(billId))
+                .ReturnsAsync(billItems);
+
+            var result = await Suite.Service.GetAll(billId);
+
+            Assert.Equal(billItems, result);
         }
     }
 }

@@ -15,11 +15,15 @@ namespace TransportSystems.Backend.Application.Interfaces.Routing
 
         Task<Route> CreateDomainRoute(RouteAM route);
 
-        Task<RouteAM> GetRoute(AddressAM rootAddress, WaypointsAM waypoints);
+        Task<RouteAM> GetRoute(int routeId);
+
+        Task<RouteLegAM> GetRouteLeg(RouteLeg source);
+
+        Task<RouteAM> FindRoute(AddressAM rootAddress, WaypointsAM waypoints);
 
         Task<RouteAM> FromExternalRoute(AddressAM origin, AddressAM destination, WaypointsAM waypoints, RouteEM externalRoute);
 
-        Task<ICollection<RouteAM>> GetPossibleRoutes(ICollection<AddressAM> rootAddresses, WaypointsAM waypoints);
+        Task<ICollection<RouteAM>> FindRoutes(ICollection<AddressAM> rootAddresses, WaypointsAM waypoints);
 
         AddressAM GetRootAddress(RouteAM route);
 

@@ -71,5 +71,18 @@ namespace TransportSystems.Backend.API.Tests.Controllers.Ordering
             Suite.ServiceMock
                 .Verify(m => m.CreateOrder(booking, dispatcher.Id));
         }
+
+        [Fact]
+        public async Task GetDetailInfo()
+        {
+            var commonId = 1;
+
+            var orderId = commonId++;
+            
+            await Suite.Controller.GetDetailInfo(orderId);
+
+            Suite.ServiceMock
+                .Verify(m => m.GetDetailInfo(orderId));
+        }
     }
 }

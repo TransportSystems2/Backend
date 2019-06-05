@@ -12,12 +12,14 @@ namespace TransportSystems.Backend.Application.Interfaces.Billing
 
         Task<Bill> CreateDomainBill(BillAM bill);
 
+        Task<BillAM> GetBill(int billId);
+        
         Task<BillItem> CreateDomainBillItem(int billId, BillItemAM billItem);
 
         Task<BillAM> CalculateBill(BillInfoAM billInfo, BasketAM basket);
 
         Task<BillItemAM> CalculateBillItem(string key, int value, decimal price, float degreeOfDifficulty);
 
-        Task<BillInfoAM> GetBillInfo(int pricelistId, int catalogItemId);
+        Task<BillInfoAM> GetDefaultBillInfo(int pricelistId, int catalogItemId);
     }
 }

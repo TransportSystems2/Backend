@@ -12,7 +12,7 @@ namespace TransportSystems.Backend.API.Tests.Controllers.Catalogs
             CatalogController = new CatalogController(CatalogService.Object);
         }
 
-        public Mock<IApplicationCatalogService> CatalogService {get;}
+        public Mock<IApplicationCatalogService> CatalogService { get; }
 
         public CatalogController CatalogController { get; }
     }

@@ -14,7 +14,7 @@ namespace TransportSystems.Backend.Application.Models.Booking
 
         public DateTime TimeOfDelivery { get; set; }
 
-        public CustomerAM Customer {get;set;}
+        public CustomerAM Customer { get; set; } 
 
         public CargoAM Cargo { get; set; }
 

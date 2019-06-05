@@ -8,6 +8,7 @@ using TransportSystems.Backend.Application.Interfaces.Billing;
 using TransportSystems.Backend.Application.Interfaces.Organization;
 using TransportSystems.Backend.Application.Interfaces.Pricing;
 using TransportSystems.Backend.Application.Models.Billing;
+using TransportSystems.Backend.Application.Interfaces.Mapping;
 
 namespace TransportSystems.Backend.Application.Business.Billing
 {
@@ -17,17 +18,21 @@ namespace TransportSystems.Backend.Application.Business.Billing
     {
         public ApplicationBillService(
             ITransactionService transactionService,
+            IMappingService mappingService,
             IBillService domainBillService,
             IBillItemService domainBillItemService,
             IBasketService domainBasketService,
             IApplicationPricelistService pricelistService)
             : base(transactionService)
         {
+            MappingService = mappingService;
             DomainBillService = domainBillService;
             DomainBillItemService = domainBillItemService;
             DomainBasketService = domainBasketService;
             PricelistService = pricelistService;
         }
+
+        protected IMappingService MappingService { get; }
 
         protected IBillService DomainBillService { get; }
 
@@ -152,7 +157,42 @@ namespace TransportSystems.Backend.Application.Business.Billing
             return DomainBillItemService.Create(billId, billItem.Key, billItem.Value, billItem.Price, billItem.Cost);
         }
 
-        public async Task<BillInfoAM> GetBillInfo(int pricelistId, int catalogItemId)
+        public async Task<BillAM> GetBill(int billId)
+        {
+            var domainBill = await DomainBillService.Get(billId);
+            if (domainBill == null)
+            {
+                throw new ArgumentException($"BillId:{billId} is null", "Bill");
+            }
+
+            var billInfo = new BillInfoAM
+            {
+                PriceId = domainBill.PriceId,
+                CommissionPercentage = domainBill.CommissionPercentage,
+                DegreeOfDifficulty = domainBill.DegreeOfDifficulty
+            };
+
+            var domainBasket = await DomainBasketService.Get(domainBill.BasketId);
+            var basket = MappingService.Map<BasketAM>(domainBasket);
+
+            var result = new BillAM
+            {
+                TotalCost = domainBill.TotalCost,
+                Info = billInfo,
+                Basket = basket,
+            };
+
+            var domainBillItems = await DomainBillItemService.GetAll(billId);
+            foreach(var domainBillItem in domainBillItems)
+            {
+                var billItem = MappingService.Map<BillItemAM>(domainBillItem);
+                result.Items.Add(billItem);
+            }
+
+            return result;
+        }
+
+        public async Task<BillInfoAM> GetDefaultBillInfo(int pricelistId, int catalogItemId)
         {
             var domainPrice = await PricelistService.GetDomainPrice(pricelistId, catalogItemId);
 

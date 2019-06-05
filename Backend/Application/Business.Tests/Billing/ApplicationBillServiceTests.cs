@@ -15,6 +15,7 @@ using TransportSystems.Backend.Application.Business.Tests.Suite;
 using Xunit;
 using DotNetDistance;
 using TransportSystems.Backend.Application.Models.Geo;
+using TransportSystems.Backend.Application.Interfaces.Mapping;
 
 namespace TransportSystems.Backend.Application.Business.Tests.Billing
 {
@@ -29,6 +30,7 @@ namespace TransportSystems.Backend.Application.Business.Tests.Billing
 
             Service = new ApplicationBillService(
                 TransactionServiceMock.Object,
+                MappingService,
                 DomainBillServiceMock.Object,
                 DomainBillItemServiceMock.Object,
                 DomainBasketServiceMock.Object,
@@ -412,7 +414,7 @@ namespace TransportSystems.Backend.Application.Business.Tests.Billing
                 .Setup(m => m.GetDomainPrice(domainPricelistId, catalogItemId))
                 .ReturnsAsync(domainPrice);
 
-            var result = await Suite.Service.GetBillInfo(domainPricelistId, catalogItemId);
+            var result = await Suite.Service.GetDefaultBillInfo(domainPricelistId, catalogItemId);
 
             Assert.Equal(domainPrice.Id, result.PriceId);
             Assert.Equal(domainPrice.CommissionPercentage, result.CommissionPercentage);

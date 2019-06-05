@@ -86,7 +86,6 @@ namespace TransportSystems.Backend.Identity.Signin
                     c.IncludeXmlComments(xmlPath);
                 });
 
-
             ConfigureCustomServices(services);
         }
 

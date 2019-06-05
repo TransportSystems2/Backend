@@ -130,7 +130,7 @@ namespace TransportSystems.Backend.Application.Business.Tests.Booking
                 .Setup(m => m.GetAddress(domainMarket.AddressId))
                 .ReturnsAsync(marketAddress);
             Suite.RouteServiceMock
-                .Setup(m => m.GetRoute(marketAddress, waypoints))
+                .Setup(m => m.FindRoute(marketAddress, waypoints))
                 .ReturnsAsync(route);
             Suite.PrognosisServiceMock
                 .Setup(m => m.GetAvgDeliveryTime(route, cargo, basket))
@@ -149,7 +149,7 @@ namespace TransportSystems.Backend.Application.Business.Tests.Booking
                 .ReturnsAsync(rootAddressTimeBelt);
 
             Suite.BillServiceMock
-                .Setup(m => m.GetBillInfo(domainMarket.PricelistId, cargo.WeightCatalogItemId))
+                .Setup(m => m.GetDefaultBillInfo(domainMarket.PricelistId, cargo.WeightCatalogItemId))
                 .ReturnsAsync(billInfo);
             Suite.BillServiceMock
                 .Setup(m => m.CalculateBill(

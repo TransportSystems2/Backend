@@ -4,6 +4,5 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
 {
     public abstract class BaseService : IService
     {
-
     }
 }
