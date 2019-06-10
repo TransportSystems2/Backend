@@ -188,9 +188,7 @@ namespace TransportSystems.Backend.Identity.Manage.Controllers.Users
                 return NotFound($"not found user with id: {userId}");
             }
 
-            var roleList = roles.ToList();
-            roleList.Add(UserRole.UserRoleName);
-            var result = await AsignRolesToUser(user, roleList);
+            var result = await AsignRolesToUser(user, roles);
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
@@ -288,12 +286,7 @@ namespace TransportSystems.Backend.Identity.Manage.Controllers.Users
             return userModels;
         }
 
-        private Task<IdentityResult> AsignRolesToUser(User user, string[] roles)
-        {
-            return AsignRolesToUser(user, roles.ToList());
-        }
-
-        private async Task<IdentityResult> AsignRolesToUser(User user, List<string> roles)
+        private async Task<IdentityResult> AsignRolesToUser(User user, string[] roles)
         {
             if (roles == null)
             {

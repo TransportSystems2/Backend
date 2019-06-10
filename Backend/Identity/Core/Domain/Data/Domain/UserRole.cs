@@ -4,19 +4,16 @@ namespace TransportSystems.Backend.Identity.Core.Data.Domain
 {
     public class UserRole : IdentityRole<int>
     {
-        public const string AdminRoleName = "admin";
+        public const string AdminRoleName = "Admin";
 
-        public const string UserRoleName = "user";
+        public const string ModeratorRoleName = "Moderator";
 
-        public const string ModeratorRoleName = "moderator";
+        public const string DispatcherRoleName = "Dispatcher";
 
-        public const string DispatcherRoleName = "dispatcher";
+        public const string DriverRoleName = "Driver";
 
-        public const string DriverRoleName = "driver";
+        public const string CustomerRoleName = "Customer";
 
-        public const string CustomerRoleName = "customer";
-
-        public const string EmployeeRoleName = "employee";
 
         public UserRole()
         {

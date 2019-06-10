@@ -52,7 +52,7 @@ namespace TransportSystems.Backend.API.Tests.Controllers.Booking
                             new Claim(ClaimTypes.Name, "username"),
                             new Claim("sub", identityUserId.ToString())
                         },
-                        UserRole.DispatcherRoleName))
+                        IdentityUser.DispatcherRoleName))
                 }
             };
 

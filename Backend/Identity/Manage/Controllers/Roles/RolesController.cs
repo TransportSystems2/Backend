@@ -25,9 +25,9 @@ namespace TransportSystems.Backend.Identity.Manage.Controllers.Roles
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody]UserRoleModel model)
+        public async Task<IActionResult> Create([FromBody]string roleName)
         {
-            var role = new UserRole(model.Name);
+            var role = new UserRole(roleName);
 
             var result = await RoleService.CreateAsync(role);
             if (result.Succeeded)
@@ -41,9 +41,9 @@ namespace TransportSystems.Backend.Identity.Manage.Controllers.Roles
         }
 
         [HttpPost("delete")]
-        public async Task<IActionResult> Delete([FromBody]UserRoleModel model)
+        public async Task<IActionResult> Delete([FromBody]string roleName)
         {
-            var role = await RoleService.FindByNameAsync(model.Name);
+            var role = await RoleService.FindByNameAsync(roleName);
             if (role == null)
             {
                 return NotFound();

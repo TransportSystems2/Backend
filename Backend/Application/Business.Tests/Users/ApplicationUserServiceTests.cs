@@ -17,15 +17,13 @@ namespace TransportSystems.Backend.Application.Business.Tests.Users
             DomainCustomerServiceMock = new Mock<ICustomerService>();
             DomainModeratorServiceMock = new Mock<IModeratorService>();
             DomainDispatcherServiceMock = new Mock<IDispatcherService>();
-            IdentityUserServiceMock = new Mock<IIdentityUserService>();
 
             Service = new ApplicationUserService(
                 TransactionServiceMock.Object,
                 MappingService,
                 DomainCustomerServiceMock.Object,
                 DomainModeratorServiceMock.Object,
-                DomainDispatcherServiceMock.Object,
-                IdentityUserServiceMock.Object);
+                DomainDispatcherServiceMock.Object);
         }
 
         public IApplicationUserService Service { get; }
@@ -35,8 +33,6 @@ namespace TransportSystems.Backend.Application.Business.Tests.Users
         public Mock<IModeratorService> DomainModeratorServiceMock { get; }
 
         public Mock<IDispatcherService> DomainDispatcherServiceMock { get; }
-
-        public Mock<IIdentityUserService> IdentityUserServiceMock { get; }
     }
 
     public class ApplicationUserServiceTests : BaseServiceTests<ApplicationUserServiceTestSuite>
@@ -89,18 +85,16 @@ namespace TransportSystems.Backend.Application.Business.Tests.Users
         public async Task GetDomainModeratorByIndetityUser()
         {
             var commonId = 1;
-            var identityUserId = commonId++;
             var moderator = new Moderator
             {
                 Id = commonId++,
-                IdentityUserId = identityUserId
             };
 
             Suite.DomainModeratorServiceMock
-                .Setup(m => m.GetByIndentityUser(identityUserId))
+                .Setup(m => m.Get(moderator.Id))
                 .ReturnsAsync(moderator);
 
-            var result = await Suite.Service.GetDomainModeratorByIdentityUser(identityUserId);
+            var result = await Suite.Service.GetDomainModerator(moderator.Id);
 
             Assert.Equal(moderator, result);
         }
@@ -109,18 +103,16 @@ namespace TransportSystems.Backend.Application.Business.Tests.Users
         public async Task GetDomainDispatcherByIndetityUser()
         {
             var commonId = 1;
-            var identityUserId = commonId++;
             var dispatcher = new Dispatcher
             {
                 Id = commonId++,
-                IdentityUserId = identityUserId
             };
 
             Suite.DomainDispatcherServiceMock
-                .Setup(m => m.GetByIndentityUser(identityUserId))
+                .Setup(m => m.Get(dispatcher.Id))
                 .ReturnsAsync(dispatcher);
 
-            var result = await Suite.Service.GetDomainDispatcherByIdentityUser(identityUserId);
+            var result = await Suite.Service.GetDomainDispatcher(dispatcher.Id);
 
             Assert.Equal(dispatcher, result);
         }

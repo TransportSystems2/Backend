@@ -7,22 +7,18 @@ using TransportSystems.Backend.Core.Services.Interfaces.Users;
 
 namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
 {
-    public class CustomerService : UserService<Customer>, ICustomerService
+    public class CustomerService : IdentityUserService<Customer>, ICustomerService
     {
-        public CustomerService(
-            ICustomerRepository repository,
-            IIdentityUserService identityUserService)
-            : base(repository, identityUserService)
+        public CustomerService(ICustomerRepository repository)
+            : base(repository)
         {
         }
 
         protected new ICustomerRepository Repository => (ICustomerRepository)base.Repository;
 
-        public override Task<string[]> GetSpecificRoles()
+        public override string[] GetSpecificRoles()
         {
-            var result = new string[] { UserRole.CustomerRoleName };
-            
-            return Task.FromResult(result);
+            return new [] { IdentityUser.CustomerRoleName };
         }
     }
 }

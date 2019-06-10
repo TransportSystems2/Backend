@@ -12,8 +12,11 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
 {
     public class DriverService : EmployeeService<Driver>, IDriverService
     {
-        public DriverService(IDriverRepository repository, IIdentityUserService identityUserService, ICompanyService companyService, IVehicleService vehicleService)
-            : base(repository, identityUserService, companyService)
+        public DriverService(
+            IDriverRepository repository,
+            ICompanyService companyService,
+            IVehicleService vehicleService)
+            : base(repository, companyService)
         {
             VehicleService = vehicleService;
         }
@@ -52,15 +55,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
             await Repository.Save();
         }
 
-        public override async Task<string[]> GetSpecificRoles()
+        public override string[] GetSpecificRoles()
         {
-            var baseSpecificRoles = await base.GetSpecificRoles();
-            var specificRoles = new List<string>(baseSpecificRoles)
-            {
-                UserRole.DriverRoleName
-            };
-
-            return specificRoles.ToArray();
+            return new [] { IdentityUser.DriverRoleName };
         }
     }
 }

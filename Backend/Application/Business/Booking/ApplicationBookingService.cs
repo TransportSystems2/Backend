@@ -50,12 +50,12 @@ namespace TransportSystems.Backend.Application.Business.Booking
 
         protected IApplicationUserService UserService { get; }
 
-        public async Task<BookingResponseAM> CalculateBooking(int identityUserId, BookingRequestAM request)
+        public async Task<BookingResponseAM> CalculateBooking(int disparcherId, BookingRequestAM request)
         {
             var result = new BookingResponseAM();
 
             var firstWaypointCoordinate = request.Waypoints.Points.First().ToCoordinate();
-            var domainDispatcher = await UserService.GetDomainDispatcherByIdentityUser(identityUserId); 
+            var domainDispatcher = await UserService.GetDomainDispatcher(disparcherId); 
             var markets = await MarketService.GetNearestDomainMarkets(domainDispatcher.CompanyId, firstWaypointCoordinate);
 
             var bookingRoutes = await GetBookingRoutes(markets, request.Waypoints, request.Cargo, request.Basket);

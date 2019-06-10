@@ -8,9 +8,7 @@ namespace TransportSystems.Backend.Application.Interfaces.Users
     {
         Task<Customer> GetOrCreateDomainCustomer(CustomerAM customer);
 
-        Task<Moderator> GetDomainModeratorByIdentityUser(int identityUserId);
-
-        Task<Dispatcher> GetDomainDispatcherByIdentityUser(int identityUserId);
+        Task<Moderator> GetDomainModerator(int moderatorId);
 
         Task<Dispatcher> GetDomainDispatcher(int dispatcherId);
 

@@ -16,16 +16,13 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Users
         {
             DispatcherRepositoryMock = new Mock<IDispatcherRepository>();
             CompanyServiceMock = new Mock<ICompanyService>();
-            IdentityUserServiceMock = new Mock<IIdentityUserService>();
 
-            DispatcherService = new DispatcherService(DispatcherRepositoryMock.Object, IdentityUserServiceMock.Object, CompanyServiceMock.Object);
+            DispatcherService = new DispatcherService(DispatcherRepositoryMock.Object, CompanyServiceMock.Object);
         }
 
         public Mock<IDispatcherRepository> DispatcherRepositoryMock { get; }
 
         public Mock<ICompanyService> CompanyServiceMock { get; }
-
-        public Mock<IIdentityUserService> IdentityUserServiceMock { get; }
 
         public IDispatcherService DispatcherService { get; }
     }
@@ -40,11 +37,11 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Users
         protected DispatcherServiceTestSuite Suite { get; }
 
         [Fact]
-        public async Task GetSpecificRoles()
+        public void GetSpecificRoles()
         {
-            var roles = await Suite.DispatcherService.GetSpecificRoles();
+            var roles = Suite.DispatcherService.GetSpecificRoles();
 
-            Assert.Contains(UserRole.DispatcherRoleName, roles);
+            Assert.Contains(IdentityUser.DispatcherRoleName, roles);
         }
     }
 }

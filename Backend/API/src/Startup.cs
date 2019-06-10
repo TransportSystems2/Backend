@@ -12,7 +12,6 @@ using System;
 using System.IO;
 using System.Reflection;
 using TransportSystems.Backend.API.Database;
-using TransportSystems.Backend.API.Mapping;
 using TransportSystems.Backend.Application.Business;
 using TransportSystems.Backend.Application.Business.Billing;
 using TransportSystems.Backend.Application.Business.Booking;
@@ -67,7 +66,6 @@ using TransportSystems.Backend.Core.Infrastructure.Database.Organization;
 using TransportSystems.Backend.Core.Infrastructure.Database.Pricing;
 using TransportSystems.Backend.Core.Infrastructure.Database.Routing;
 using TransportSystems.Backend.Core.Infrastructure.Database.Trading;
-using TransportSystems.Backend.Core.Infrastructure.Database.Users;
 using TransportSystems.Backend.Core.Infrastructure.Http.Users;
 using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Billing;
@@ -184,11 +182,6 @@ namespace TransportSystems.Backend.API
         protected virtual void ConfigureMapper(IServiceCollection services)
         {
             services.AddAutoMapper();
-
-            Mapper.Initialize(cfg =>
-            {
-                cfg.AddProfile<UsersProfile>();
-            });
         }
 
         protected virtual void ConfigureAuthentication(IServiceCollection services)
@@ -217,10 +210,10 @@ namespace TransportSystems.Backend.API
                 provider => provider.GetService<ApplicationContext>()
             );
 
-            services.AddScoped<IIdentityUserRepository, IdentityUserRepository>();
             services.AddScoped<IModeratorRepository, ModeratorRepository>();
             services.AddScoped<IDriverRepository, DriverRepository>();
             services.AddScoped<IDispatcherRepository, DispatcherRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             services.AddScoped<IVehicleRepository, VehicleRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
@@ -240,7 +233,6 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IBillRepository, BillRepository>();
             services.AddScoped<IBillItemRepository, BillItemRepository>();
             services.AddScoped<IBasketRepository, BasketRepository>();
-            services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IMarketRepository, MarketRepository>();
         }
 
@@ -248,10 +240,10 @@ namespace TransportSystems.Backend.API
         {
             services.AddScoped<ITransactionService, TransactionService>();
 
-            services.AddScoped<IIdentityUserService, IdentityUserService>();
             services.AddScoped<IModeratorService, ModeratorService>();
             services.AddScoped<IDriverService, DriverService>();
             services.AddScoped<IDispatcherService, DispatcherService>();
+            services.AddScoped<ICustomerService, CustomerService>();
 
             services.AddScoped<IVehicleService, VehicleService>();
             services.AddScoped<IAddressService, AddressService>();
@@ -273,7 +265,6 @@ namespace TransportSystems.Backend.API
             services.AddScoped<IBillService, BillService>();
             services.AddScoped<IBillItemService, BillItemService>();
             services.AddScoped<IBasketService, BasketService>();
-            services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IMarketService, MarketService>();
 
             var identityUri = Configuration.GetConnectionString("identity_manage");

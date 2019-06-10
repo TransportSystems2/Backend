@@ -16,15 +16,13 @@ namespace TransportSystems.Backend.Application.Business
             IMappingService mappingService,
             ICustomerService domainCustomerService,
             IModeratorService domainModeratorService,
-            IDispatcherService domainDispatcherService,
-            IIdentityUserService identityUserService)
+            IDispatcherService domainDispatcherService)
             : base(transactionService)
         {
             MappingService = mappingService;
             DomainCustomerService = domainCustomerService;
             DomainModeratorService = domainModeratorService;
             DomainDispatcherService = domainDispatcherService;
-            IdentityUserService = identityUserService;
         }
 
         protected IMappingService MappingService { get; }
@@ -34,8 +32,6 @@ namespace TransportSystems.Backend.Application.Business
         protected IModeratorService DomainModeratorService { get; }
 
         protected IDispatcherService DomainDispatcherService { get; }
-
-        protected IIdentityUserService IdentityUserService { get; }
 
         public async Task<Customer> GetOrCreateDomainCustomer(CustomerAM customer)
         {
@@ -51,14 +47,9 @@ namespace TransportSystems.Backend.Application.Business
             return result;
         }
 
-        public Task<Moderator> GetDomainModeratorByIdentityUser(int identityUserId)
+        public Task<Moderator> GetDomainModerator(int moderatorId)
         {
-            return DomainModeratorService.GetByIndentityUser(identityUserId);
-        }
-
-        public Task<Dispatcher> GetDomainDispatcherByIdentityUser(int identityUserId)
-        {
-            return DomainDispatcherService.GetByIndentityUser(identityUserId);
+            return DomainModeratorService.Get(moderatorId);
         }
 
         public Task<Dispatcher> GetDomainDispatcher(int dispatcherId)
@@ -69,16 +60,8 @@ namespace TransportSystems.Backend.Application.Business
         public async Task<CustomerAM> GetCustomer(int customerId)
         {
             var domainCustomer = await DomainCustomerService.Get(customerId);
-            var identityUser = await IdentityUserService.GetUser(domainCustomer.IdentityUserId);
-            var result = new CustomerAM
-            {
-                Id = customerId,
-                FirstName = identityUser.FirstName,
-                LastName = identityUser.LastName,
-                PhoneNumber = identityUser.PhoneNumber
-            };
 
-            return result;
+            return MappingService.Map<CustomerAM>(domainCustomer);
         }
     }
 }

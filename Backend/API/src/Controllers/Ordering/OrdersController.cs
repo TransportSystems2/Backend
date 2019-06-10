@@ -29,12 +29,12 @@ namespace TransportSystems.API.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody]BookingAM booking)
         {
-            var userIdentityId = User.GetIdentityId();
+            var userId = User.GetIdentityId();
 
             var dispatcherId = 0;
-            if (userIdentityId != null)
+            if (userId != null)
             {
-                var dispatcher = await UserService.GetDomainDispatcherByIdentityUser(userIdentityId.Value);
+                var dispatcher = await UserService.GetDomainDispatcher(userId.Value);
                 if (dispatcher != null)
                 {
                     dispatcherId = dispatcher.Id;
@@ -67,8 +67,8 @@ namespace TransportSystems.API.Controllers
         [HttpGet("accept")]
         public async Task<IActionResult> Accept(int orderId)
         {
-            var userIdentityId = User.GetIdentityId();
-            var dispatcher = await UserService.GetDomainDispatcherByIdentityUser(userIdentityId.Value);
+            var userId = User.GetIdentityId();
+            var dispatcher = await UserService.GetDomainDispatcher(userId.Value);
 
             await Service.Accept(orderId, dispatcher.Id);
 
@@ -78,8 +78,8 @@ namespace TransportSystems.API.Controllers
         [HttpGet("readyToTrade")]
         public async Task<IActionResult> ReadyToTrade(int orderId)
         {
-            var userIdentityId = User.GetIdentityId();
-            var dispatcher = await UserService.GetDomainDispatcherByIdentityUser(userIdentityId.Value);
+            var userId = User.GetIdentityId();
+            var dispatcher = await UserService.GetDomainDispatcher(userId.Value);
 
             await Service.ReadyToTrade(orderId, dispatcher.Id);
 
@@ -105,8 +105,8 @@ namespace TransportSystems.API.Controllers
         [HttpGet("assignToDriver")]
         public async Task<IActionResult> AssignToDriver(int orderId, int driverId)
         {
-            var userIdentityId = User.GetIdentityId();
-            var subDispatcher = await UserService.GetDomainDispatcherByIdentityUser(userIdentityId.Value);
+            var userId = User.GetIdentityId();
+            var subDispatcher = await UserService.GetDomainDispatcher(userId.Value);
 
             await Service.AssignToDriver(orderId, subDispatcher.Id, driverId);
 

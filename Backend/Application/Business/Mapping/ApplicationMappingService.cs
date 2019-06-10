@@ -4,7 +4,7 @@ using TransportSystems.Backend.Application.Interfaces.Mapping;
 
 namespace TransportSystems.Backend.Application.Business.Mapping
 {
-    public class ApplicationMappingService : ApplicationBaseService, IMappingService
+    public class ApplicationMappingService : IMappingService
     {
         public ApplicationMappingService(IMapper mapper)
         {

@@ -11,23 +11,16 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
     {
         public ModeratorService(
             IModeratorRepository repository,
-            IIdentityUserService identityUserService,
             ICompanyService companyService)
-            : base(repository, identityUserService, companyService)
+            : base(repository, companyService)
         {
         }
 
         protected new IModeratorRepository Repository => (IModeratorRepository)base.Repository;
 
-        public override async Task<string[]> GetSpecificRoles()
+        public override string[] GetSpecificRoles()
         {
-            var baseSpecificRoles = await base.GetSpecificRoles();
-            var specificRoles = new List<string>(baseSpecificRoles)
-            {
-                UserRole.ModeratorRoleName
-            };
-
-            return specificRoles.ToArray();
+            return new [] { IdentityUser.ModeratorRoleName };
         }
     }
 }

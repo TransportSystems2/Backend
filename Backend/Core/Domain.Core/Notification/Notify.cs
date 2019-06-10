@@ -6,7 +6,7 @@ namespace TransportSystems.Backend.Core.Domain.Core.Notification
 {
     public struct Notify
     {
-        public Notify(IEnumerable<User> users, string subject, string text, NotificationChanelKind chanelKind)
+        public Notify(IEnumerable<IdentityUser> users, string subject, string text, NotificationChanelKind chanelKind)
         {
             Users = users;
             Subject = subject;
@@ -14,7 +14,7 @@ namespace TransportSystems.Backend.Core.Domain.Core.Notification
             ChanelKind = chanelKind;
         }
 
-        public IEnumerable<User> Users { get; }
+        public IEnumerable<IdentityUser> Users { get; }
 
         public string Subject { get; }
 

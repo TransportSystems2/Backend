@@ -9,15 +9,14 @@ using TransportSystems.Backend.Core.Services.Interfaces.Users;
 namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
 {
     public abstract class EmployeeService<T> :
-        UserService<T>,
+        IdentityUserService<T>,
         IEmployeeService<T>
         where T : Employee, new ()
     {
         public EmployeeService(
             IEmployeeRepository<T> repository,
-            IIdentityUserService identityUserService,
             ICompanyService companyService)
-            : base(repository, identityUserService)
+            : base(repository)
         {
             CompanyService = companyService;
         }
@@ -26,14 +25,14 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
 
         protected ICompanyService CompanyService { get; }
 
-        public async Task<ICollection<T>> GetByCompany(int companyId)
+        public async Task<ICollection<T>> GetByCompany(int companyId, string role)
         {
             if (!await CompanyService.IsExist(companyId))
             {
                 throw new EntityNotFoundException("CompanyId");
             }
 
-            return await Repository.GetByCompany(companyId);
+            return await Repository.GetByCompany(companyId, role);
         }
 
         public async Task<T> Create(string firstName, string lastName, string phoneNumber, int companyId)
@@ -50,13 +49,6 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
             await Repository.Save();
 
             return result;
-        }
-
-        public override Task<string[]> GetSpecificRoles()
-        {
-            var specificRoles = new string[] { UserRole.EmployeeRoleName };
-
-            return Task.FromResult(specificRoles);
         }
     }
 }

@@ -9,22 +9,16 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
 {
     public class DispatcherService : EmployeeService<Dispatcher>, IDispatcherService
     {
-        public DispatcherService(IDispatcherRepository repository, IIdentityUserService identityUserService, ICompanyService companyService)
-            : base(repository, identityUserService, companyService)
+        public DispatcherService(IDispatcherRepository repository, ICompanyService companyService)
+            : base(repository, companyService)
         {
         }
 
         protected new IDispatcherRepository Repository => (IDispatcherRepository)base.Repository;
 
-        public override async Task<string[]> GetSpecificRoles()
+        public override string[] GetSpecificRoles()
         {
-            var baseSpecificRoles = await base.GetSpecificRoles();
-            var specificRoles = new List<string>(baseSpecificRoles)
-            {
-                UserRole.DispatcherRoleName
-            };
-
-            return specificRoles.ToArray();
+            return new [] { IdentityUser.DispatcherRoleName };
         }
     }
 }

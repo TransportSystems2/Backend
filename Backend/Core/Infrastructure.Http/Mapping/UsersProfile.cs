@@ -3,7 +3,7 @@
 using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Identity.Core.Data.External.Users;
 
-namespace TransportSystems.Backend.API.Mapping
+namespace TransportSystems.Backend.Core.Infrastructure.Http.Mapping
 {
     public class UsersProfile : Profile
     {
