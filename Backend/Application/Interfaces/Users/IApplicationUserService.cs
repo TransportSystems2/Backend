@@ -13,5 +13,7 @@ namespace TransportSystems.Backend.Application.Interfaces.Users
         Task<Dispatcher> GetDomainDispatcherByIdentityUser(int identityUserId);
 
         Task<Dispatcher> GetDomainDispatcher(int dispatcherId);
+
+        Task<CustomerAM> GetCustomer(int customerId);
     }
 }

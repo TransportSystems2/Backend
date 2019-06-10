@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
 using TransportSystems.Backend.Core.Domain.Interfaces.Billing;
@@ -41,6 +42,16 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Billing
             await UpdateTotalCost(billId);
 
             return billItem;
+        }
+
+        public async Task<ICollection<BillItem>> GetAll(int billId)
+        {
+            if (!await BillService.IsExist(billId))
+            {
+                throw new ArgumentException($"BillId:{billId} is null", "Bill");
+            }
+
+            return await Repository.GetAll(billId);
         }
 
         public async Task UpdateTotalCost(int billId)

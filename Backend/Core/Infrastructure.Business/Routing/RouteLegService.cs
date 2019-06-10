@@ -73,7 +73,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Routing
 
             var legs = await Repository.GetByRoute(routeId, kind);
 
-            return legs.Sum(l => l.Distance); ;
+            return legs.Sum(l => l.Distance);
         }
 
         protected override async Task<bool> DoVerifyEntity(RouteLeg entity)

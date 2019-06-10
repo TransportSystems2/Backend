@@ -11,5 +11,4 @@ namespace TransportSystems.Backend.API.Controllers.Identity
             return Ok("server is ok");
         }
     }
-}
-    
+}   

@@ -14,6 +14,12 @@ namespace TransportSystems.Backend.Application.Interfaces
 
         Task<ICollection<Order>> GetDomainOrdersByStatus(OrderStatus status);
 
+        Task<OrderInfoAM> GetInfo(int orderId);
+        
+        Task<OrderInfoAM> GetInfo(OrderState orderState);
+
+        Task<DetailOrderInfoAM> GetDetailInfo(int orderId);
+
         Task<Order> CreateOrder(BookingAM booking, int genDispatcherId);
 
         Task Accept(int orderId, int genDispatcherId);

@@ -13,7 +13,6 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Billing
 {
     public class BasketService : DomainService<Basket>, IBasketService
     {
-
         public BasketService(
             IBasketRepository repository)
             : base(repository)

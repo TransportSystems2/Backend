@@ -136,7 +136,6 @@ namespace TransportSystems.Backend.Application.Business.Geo
             return result;
         }
 
-
         public AddressAM FromExternalAddress(AddressEM source)
         {
             var destination = new AddressAM();

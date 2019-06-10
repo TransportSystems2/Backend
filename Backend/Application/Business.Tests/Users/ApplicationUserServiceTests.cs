@@ -17,12 +17,15 @@ namespace TransportSystems.Backend.Application.Business.Tests.Users
             DomainCustomerServiceMock = new Mock<ICustomerService>();
             DomainModeratorServiceMock = new Mock<IModeratorService>();
             DomainDispatcherServiceMock = new Mock<IDispatcherService>();
+            IdentityUserServiceMock = new Mock<IIdentityUserService>();
 
             Service = new ApplicationUserService(
                 TransactionServiceMock.Object,
+                MappingService,
                 DomainCustomerServiceMock.Object,
                 DomainModeratorServiceMock.Object,
-                DomainDispatcherServiceMock.Object);
+                DomainDispatcherServiceMock.Object,
+                IdentityUserServiceMock.Object);
         }
 
         public IApplicationUserService Service { get; }
@@ -32,6 +35,8 @@ namespace TransportSystems.Backend.Application.Business.Tests.Users
         public Mock<IModeratorService> DomainModeratorServiceMock { get; }
 
         public Mock<IDispatcherService> DomainDispatcherServiceMock { get; }
+
+        public Mock<IIdentityUserService> IdentityUserServiceMock { get; }
     }
 
     public class ApplicationUserServiceTests : BaseServiceTests<ApplicationUserServiceTestSuite>

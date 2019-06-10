@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
 
 namespace TransportSystems.Backend.Core.Services.Interfaces.Billing
@@ -13,5 +14,7 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Billing
             decimal cost);
 
         Task UpdateTotalCost(int billId);
+
+        Task<ICollection<BillItem>> GetAll(int billId);
     }
 }

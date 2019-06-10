@@ -157,7 +157,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Trading
         {
             var suite = new LotRequestServiceTestSuite();
 
-            var lotId = 1 ;
+            var lotId = 1;
 
             suite.LotServiceMock
                 .Setup(m => m.IsExist(lotId))
@@ -186,7 +186,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Trading
             var suite = new LotRequestServiceTestSuite();
 
             var lotId = 1;
-            var dispatcherId = 2 ;
+            var dispatcherId = 2;
             var lotRequest = new LotRequest { Id = 3, LotId = lotId, DispatcherId = dispatcherId, Status = LotRequestStatus.Bet };
             suite.LotServiceMock
                 .Setup(m => m.IsExist(lotId))

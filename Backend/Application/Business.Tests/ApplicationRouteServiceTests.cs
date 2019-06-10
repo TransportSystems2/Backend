@@ -31,17 +31,20 @@ namespace TransportSystems.Backend.Application.Business.Tests
             DomainRouteLegServiceMock = new Mock<IRouteLegService>();
             AddressServiceMock = new Mock<IApplicationAddressService>();
 
-            Service = new ApplicationRouteService(
+            ServiceMock = new Mock<ApplicationRouteService>(
                 TransactionServiceMock.Object,
                 DirectionServiceMock.Object,
                 DomainRouteServiceMock.Object,
                 DomainRouteLegServiceMock.Object,
                 AddressServiceMock.Object);
+            ServiceMock.CallBase = true;
         }
 
-        public IApplicationRouteService Service { get; }
+        public IApplicationRouteService Service => ServiceMock.Object;
 
-        public Mock<IDirectionService> DirectionServiceMock { get; } 
+        public Mock<ApplicationRouteService> ServiceMock {get; }
+
+        public Mock<IDirectionService> DirectionServiceMock { get; }
 
         public Mock<IRouteService> DomainRouteServiceMock { get; }
 
@@ -130,7 +133,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
                 .ReturnsAsync(domainRoute);
 
             var result = await Suite.Service.CreateDomainRoute(route);
-            
+
             Suite.DomainRouteServiceMock
                 .Verify(m => m.Create(route.Comment));
 
@@ -167,6 +170,73 @@ namespace TransportSystems.Backend.Application.Business.Tests
 
         [Fact]
         public async Task GetRoute()
+        {
+            var commonId = 1;
+            var domainRoute = new Route
+            {
+                Id = commonId++,
+                Comment = "Some comment"
+            };
+
+            var domainLegs = new List<RouteLeg>
+            {
+                new RouteLeg(),
+                new RouteLeg(),
+                new RouteLeg()
+            };
+
+            Suite.DomainRouteServiceMock
+                .Setup(m => m.Get(domainRoute.Id))
+                .ReturnsAsync(domainRoute);
+            Suite.DomainRouteLegServiceMock
+                .Setup(m => m.GetByRoute(domainRoute.Id, RouteLegKind.All))
+                .ReturnsAsync(domainLegs);
+            Suite.ServiceMock
+                .Setup(m => m.GetRouteLeg(It.IsAny<RouteLeg>()))
+                .ReturnsAsync(new RouteLegAM());
+
+            var result = await Suite.Service.GetRoute(domainRoute.Id);
+
+            Assert.Equal(domainRoute.Comment, result.Comment);
+            Assert.Equal(domainLegs.Count, result.Legs.Count);
+        }
+
+        [Fact]
+        public async Task GetRouteLegByDomain()
+        {
+            var commonId = 1;
+
+            var domainRouteLeg = new RouteLeg
+            {
+                Id = commonId++,
+                StartAddressId = commonId++,
+                EndAddressId = commonId++,
+                Duration = TimeSpan.FromHours(3),
+                Distance = Distance.FromKilometers(10),
+                Kind = RouteLegKind.Feed
+            };
+
+            var startAddress = new AddressAM();
+            var endAddress = new AddressAM();
+
+            Suite.AddressServiceMock
+                .Setup(m => m.GetAddress(domainRouteLeg.StartAddressId))
+                .ReturnsAsync(startAddress);
+            Suite.AddressServiceMock
+                .Setup(m => m.GetAddress(domainRouteLeg.EndAddressId))
+                .ReturnsAsync(endAddress);
+
+            var result = await Suite.Service.GetRouteLeg(domainRouteLeg);
+
+            Assert.Equal(startAddress, result.StartAddress);
+            Assert.Equal(endAddress, result.EndAddress);
+            Assert.Equal(domainRouteLeg.Duration, result.Duration);
+            Assert.Equal(domainRouteLeg.Distance, result.Distance);
+            Assert.Equal(domainRouteLeg.Kind, result.Kind);
+        }
+
+        [Fact]
+        public async Task FindRoute()
         {
             var rootAddress = new AddressAM
             {
@@ -248,7 +318,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
                 .Setup(m => m.GetNearestAddress(secondWaypointCoordinate, It.IsAny<IEnumerable<AddressAM>>()))
                 .ReturnsAsync(secondWaypointAddress);
 
-            var result = await Suite.Service.GetRoute(rootAddress, waypoints);
+            var result = await Suite.Service.FindRoute(rootAddress, waypoints);
 
             Assert.Equal(3, result.Legs.Count);
 
@@ -284,7 +354,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
         }
 
         [Fact]
-        public async Task GetPossibleRoutes()
+        public async Task FindRoutes()
         {
             var coordinate = new Coordinate { Latitude = 1, Longitude = 1 };
             var waypoints = new WaypointsAM
@@ -339,7 +409,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
                 .Setup(m => m.GetNearestAddress(coordinate, It.IsAny<IEnumerable<AddressAM>>()))
                 .ReturnsAsync(new AddressAM { Latitude = 1, Longitude = 1 });
 
-            var result = await Suite.Service.GetPossibleRoutes(rootAddresses, waypoints);
+            var result = await Suite.Service.FindRoutes(rootAddresses, waypoints);
 
             Assert.Equal(rootAddresses.Count, result.Count);
         }
@@ -370,7 +440,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
                 Points = new List<AddressAM>
                 {
                     firstWaypointAddress,
-                    secondWaypointAddress    
+                    secondWaypointAddress
                 },
                 Comment = "Машина на охраняемой парковке. Пароль:\"Нраииттьься\""
             };

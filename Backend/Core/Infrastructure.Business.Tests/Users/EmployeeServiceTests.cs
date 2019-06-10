@@ -101,6 +101,5 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Users
 
             Assert.Contains(UserRole.EmployeeRoleName, roles);
         }
-
     }
 }

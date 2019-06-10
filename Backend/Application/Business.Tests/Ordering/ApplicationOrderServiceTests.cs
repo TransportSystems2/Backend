@@ -28,6 +28,7 @@ using TransportSystems.Backend.Core.Services.Interfaces.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Ordering;
 using TransportSystems.Backend.Core.Services.Interfaces.Organization;
 using Xunit;
+using TransportSystems.Backend.Application.Models.Ordering;
 
 namespace TransportSystems.Backend.Application.Business.Tests
 {
@@ -45,7 +46,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
             OrderValidatorServiceMock = new Mock<IApplicationOrderValidatorService>();
             AddressServiceMock = new Mock<IApplicationAddressService>();
 
-            OrderService = new ApplicationOrderService(
+            OrderServiceMock = new Mock<ApplicationOrderService>(
                 TransactionServiceMock.Object,
                 DomainOrderServiceMock.Object,
                 DomainOrderStateServiceMock.Object,
@@ -56,9 +57,12 @@ namespace TransportSystems.Backend.Application.Business.Tests
                 BillServiceMock.Object,
                 OrderValidatorServiceMock.Object,
                 AddressServiceMock.Object);
+            OrderServiceMock.CallBase = true;
         }
 
-        public IApplicationOrderService OrderService { get; }
+        public Mock<ApplicationOrderService> OrderServiceMock { get; }
+
+        public IApplicationOrderService OrderService => OrderServiceMock.Object;
 
         public Mock<IOrderService> DomainOrderServiceMock { get; }
 
@@ -184,6 +188,53 @@ namespace TransportSystems.Backend.Application.Business.Tests
         }
 
         [Fact]
+        public async Task GetDetailInfo()
+        {
+            var commonId = 1;
+            
+            var orderId = commonId++;
+            var domainOrderState = new OrderState
+            {
+                Id = commonId++,
+                OrderId = orderId,
+                CargoId = commonId++,
+                BillId = commonId++,
+                RouteId = commonId
+            };
+
+            var cargo = new CargoAM();
+            var route = new RouteAM();
+            var bill = new BillAM();
+
+            var orderInfo = new OrderInfoAM
+            {
+                Id = orderId,
+            };
+
+            Suite.DomainOrderStateServiceMock
+                .Setup(m => m.GetCurrentState(orderId))
+                .ReturnsAsync(domainOrderState);
+            Suite.OrderServiceMock
+                .Setup(m => m.GetInfo(domainOrderState))
+                .ReturnsAsync(orderInfo);
+            Suite.CargoServiceMock
+                .Setup(m => m.GetCargo(domainOrderState.CargoId))
+                .ReturnsAsync(cargo);
+            Suite.RouteServiceMock
+                .Setup(m => m.GetRoute(domainOrderState.RouteId))
+                .ReturnsAsync(route);
+            Suite.BillServiceMock
+                .Setup(m => m.GetBill(domainOrderState.BillId))
+                .ReturnsAsync(bill);
+
+            var result = await Suite.OrderService.GetDetailInfo(orderId);
+
+            Assert.Equal(cargo, result.Cargo);
+            Assert.Equal(route, result.Route);
+            Assert.Equal(bill, result.Bill);
+        }
+
+        [Fact]
         public async Task CreateOrderWithDispatcher()
         {
             var commonId = 1;
@@ -221,7 +272,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
                 .Setup(m => m.CreateDomainCargo(booking.Cargo))
                 .ReturnsAsync(domainCargo);
             Suite.RouteServiceMock
-                .Setup(m => m.GetRoute(marketAddress, booking.Waypoints))
+                .Setup(m => m.FindRoute(marketAddress, booking.Waypoints))
                 .ReturnsAsync(route);
             Suite.RouteServiceMock
                 .Setup(m => m.CreateDomainRoute(route))

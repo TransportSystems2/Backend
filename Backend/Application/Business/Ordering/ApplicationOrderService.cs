@@ -76,7 +76,7 @@ namespace TransportSystems.Backend.Application.Business
                     var domainMarket = await DomainMarketService.Get(booking.MarketId);
                     var marketAddress = await AddressService.GetAddress(domainMarket.AddressId);
 
-                    var orderRoute = await RouteService.GetRoute(marketAddress, booking.Waypoints);
+                    var orderRoute = await RouteService.FindRoute(marketAddress, booking.Waypoints);
                     var orderBill = await BillService.CalculateBill(booking.Bill.Info, booking.Bill.Basket);
 
                     await ValidatorService.Validate(booking, orderRoute, orderBill);
@@ -222,6 +222,32 @@ namespace TransportSystems.Backend.Application.Business
             return await DomainOrderService.Get(ordersIdArray);
         }
 
+        public virtual async Task<OrderInfoAM> GetInfo(int orderId)
+        {
+            var domainCurrentState = await DomainOrderStateService.GetCurrentState(orderId);
+            
+            return await GetInfo(domainCurrentState);
+        }
+
+        public virtual async Task<OrderInfoAM> GetInfo(OrderState orderState)
+        {
+            //var cargo = await CargoService.GetEntity(domainOrder.CargoId);
+            var routeTitle = await RouteService.GetShortTitle(orderState.RouteId);
+            var totalDistance = await RouteService.GetTotalDistance(orderState.RouteId);
+            var totalCost = await BillService.GetTotalCost(orderState.BillId);
+
+            var result = new OrderInfoAM
+            {
+                TimeOfDelivery = orderState.TimeOfDelivery,
+                Id = orderState.OrderId,
+                Title = routeTitle,
+                Cost = totalCost,
+                Distance = totalDistance
+            };
+
+            return result;
+        }
+
         public async Task<ICollection<OrderInfoAM>> GetGroupByStatus(OrderStatus status)
         {
             var result = new ConcurrentBag<OrderInfoAM>();
@@ -234,19 +260,7 @@ namespace TransportSystems.Backend.Application.Business
                 {
                     try
                     {
-                        //var cargo = await CargoService.GetEntity(domainOrder.CargoId);
-                        var routeTitle = await RouteService.GetShortTitle(domainOrderState.RouteId);
-                        var totalDistance = await RouteService.GetTotalDistance(domainOrderState.RouteId);
-                        var totalCost = await BillService.GetTotalCost(domainOrderState.BillId);
-
-                        var orderInfo = new OrderInfoAM
-                        {
-                            TimeOfDelivery = domainOrderState.TimeOfDelivery,
-                            Id = domainOrderState.OrderId,
-                            Title = routeTitle,
-                            Cost = totalCost,
-                            Distance = totalDistance
-                        };
+                        var orderInfo = await GetInfo(domainOrderState);
 
                         result.Add(orderInfo);
                     }
@@ -265,6 +279,26 @@ namespace TransportSystems.Backend.Application.Business
             var orderedResult = result.OrderBy(o => o.Id).ToList();
 
             return orderedResult;
+        }
+
+        public async Task<DetailOrderInfoAM> GetDetailInfo(int orderId)
+        {
+            var domainOrderState = await DomainOrderStateService.GetCurrentState(orderId);
+            if (domainOrderState == null)
+            {
+                throw new ArgumentException($"OrderId:{orderId} is null", "Order");
+            }
+
+            var orderInfo = await GetInfo(domainOrderState);
+            var result = new DetailOrderInfoAM(orderInfo)
+            {
+                Cargo = await CargoService.GetCargo(domainOrderState.CargoId),
+                Route = await RouteService.GetRoute(domainOrderState.RouteId),
+                Bill = await BillService.GetBill(domainOrderState.BillId),
+                Customer = await UserService.GetCustomer(domainOrderState.CustomerId)
+            };
+
+            return result;
         }
 
         private Task<ICollection<OrderState>> GetDomainStatesByCurrentStatus(OrderStatus status)

@@ -63,7 +63,41 @@ namespace TransportSystems.Backend.Application.Business
             return domainRoute;
         }
 
-        public async Task<ICollection<RouteAM>> GetPossibleRoutes(ICollection<AddressAM> rootAddresses, WaypointsAM waypoints)
+        public async Task<RouteAM> GetRoute(int routeId)
+        {
+            var domainRoute = await DomainRouteService.Get(routeId);
+            if (domainRoute == null)
+            {
+                throw new ArgumentException($"RouteId:{routeId} is null", "Route");
+            }
+
+            var result = new RouteAM { Comment = domainRoute.Comment };
+            
+            var domainLegs = await DomainRouteLegService.GetByRoute(routeId);
+            foreach(var domainLeg in domainLegs)
+            {
+                var leg = await GetRouteLeg(domainLeg);
+                result.Legs.Add(leg);
+            }
+
+            return result;
+        }
+
+        public virtual async Task<RouteLegAM> GetRouteLeg(RouteLeg source)
+        {
+            var result = new RouteLegAM
+            {
+                StartAddress = await AddressService.GetAddress(source.StartAddressId),
+                EndAddress = await AddressService.GetAddress(source.EndAddressId),
+                Duration = source.Duration,
+                Distance = source.Distance,
+                Kind = source.Kind
+            };
+            
+            return result;
+        }
+
+        public async Task<ICollection<RouteAM>> FindRoutes(ICollection<AddressAM> rootAddresses, WaypointsAM waypoints)
         {
             var exceptions = new ConcurrentQueue<Exception>();
 
@@ -74,7 +108,7 @@ namespace TransportSystems.Backend.Application.Business
                 {
                     try
                     {
-                        var route = await GetRoute(rootAddress, waypoints);
+                        var route = await FindRoute(rootAddress, waypoints);
                         if (route.Legs.Any())
                         {
                             result.Add(route);
@@ -95,7 +129,7 @@ namespace TransportSystems.Backend.Application.Business
             return result.ToList();
         }
 
-        public async Task<RouteAM> GetRoute(AddressAM rootAddress, WaypointsAM waypoints)
+        public async Task<RouteAM> FindRoute(AddressAM rootAddress, WaypointsAM waypoints)
         {
             var rootCoordinate = rootAddress.ToCoordinate();
             var waypointsCoordinate = waypoints.Points.Select(p => p.ToCoordinate());
@@ -208,7 +242,7 @@ namespace TransportSystems.Backend.Application.Business
 
         public RouteLegAM GetLeg(RouteAM route, RouteLegKind legKind)
         {
-            return route.Legs.FirstOrDefault(l => l.Kind.Equals(RouteLegKind.Feed));
+            return route.Legs.FirstOrDefault(l => l.Kind.Equals(legKind));
         }
 
         private List<string> GetNormalizedShortTitles(List<string> shortTitles)

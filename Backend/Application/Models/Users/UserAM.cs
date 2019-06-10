@@ -1,6 +1,6 @@
 ﻿namespace TransportSystems.Backend.Application.Models.Users
 {
-    public class UserAM : BaseAM
+    public class UserAM : DomainAM
     {
         public string FirstName { get; set; }
 

@@ -73,7 +73,7 @@ namespace TransportSystems.Backend.Application.Business.Booking
             BasketAM requestBasket)
         {
             var marketAddress = await AddressService.GetAddress(market.AddressId);
-            var route = await RouteService.GetRoute(marketAddress, waypoints);
+            var route = await RouteService.FindRoute(marketAddress, waypoints);
 
             var rootAddress = RouteService.GetRootAddress(route);
             var marketTimeBelt = await AddressService.GetTimeBeltByAddress(rootAddress);
@@ -81,7 +81,7 @@ namespace TransportSystems.Backend.Application.Business.Booking
             var totalDistance = RouteService.GetTotalDistance(route);
             var avgDeliveryTime = await PrognosisService.GetAvgDeliveryTime(route, cargo, requestBasket);
 
-            var billInfo = await BillService.GetBillInfo(market.PricelistId, cargo.WeightCatalogItemId);
+            var billInfo = await BillService.GetDefaultBillInfo(market.PricelistId, cargo.WeightCatalogItemId);
 
             // клонируем т.к. количество километров для каждого маршрута - индивидуально, а параметром передается общий объект
             var basket = requestBasket.Clone() as BasketAM;

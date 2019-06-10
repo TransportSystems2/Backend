@@ -292,7 +292,6 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Routing
             Suite.PushTokenRepositoryMock.Verify(m => m.Remove(token1), Times.Once);
             Suite.PushTokenRepositoryMock.Verify(m => m.Remove(token2), Times.Once);
             Suite.PushTokenRepositoryMock.Verify(m => m.Remove(token3), Times.Once);
-
         }
     }
 }
