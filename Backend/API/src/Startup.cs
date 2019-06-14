@@ -66,6 +66,7 @@ using TransportSystems.Backend.Core.Infrastructure.Database.Organization;
 using TransportSystems.Backend.Core.Infrastructure.Database.Pricing;
 using TransportSystems.Backend.Core.Infrastructure.Database.Routing;
 using TransportSystems.Backend.Core.Infrastructure.Database.Trading;
+using TransportSystems.Backend.Core.Infrastructure.Http.Mapping;
 using TransportSystems.Backend.Core.Infrastructure.Http.Users;
 using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Billing;
@@ -182,6 +183,11 @@ namespace TransportSystems.Backend.API
         protected virtual void ConfigureMapper(IServiceCollection services)
         {
             services.AddAutoMapper();
+            
+            Mapper.Initialize(cfg =>
+            {
+                cfg.AddProfile<UsersProfile>();
+            });
         }
 
         protected virtual void ConfigureAuthentication(IServiceCollection services)

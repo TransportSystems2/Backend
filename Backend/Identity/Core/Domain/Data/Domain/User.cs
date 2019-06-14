@@ -7,5 +7,9 @@ namespace TransportSystems.Backend.Identity.Core.Data.Domain
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
+
+        public int CompanyId { get; set; }
+
+        public int VehicleId { get; set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Users;
@@ -16,13 +15,15 @@ namespace TransportSystems.Backend.Application.Business
             IMappingService mappingService,
             ICustomerService domainCustomerService,
             IModeratorService domainModeratorService,
-            IDispatcherService domainDispatcherService)
+            IDispatcherService domainDispatcherService,
+            IDriverService domainDriverService)
             : base(transactionService)
         {
             MappingService = mappingService;
             DomainCustomerService = domainCustomerService;
             DomainModeratorService = domainModeratorService;
             DomainDispatcherService = domainDispatcherService;
+            DomainDriverService = domainDriverService;
         }
 
         protected IMappingService MappingService { get; }
@@ -32,17 +33,12 @@ namespace TransportSystems.Backend.Application.Business
         protected IModeratorService DomainModeratorService { get; }
 
         protected IDispatcherService DomainDispatcherService { get; }
+        
+        protected IDriverService DomainDriverService { get; }
 
         public async Task<Customer> GetOrCreateDomainCustomer(CustomerAM customer)
         {
-            var result = await DomainCustomerService.GetByPhoneNumber(customer.PhoneNumber);
-            if (result == null)
-            {
-                result = await DomainCustomerService.Create(
-                    customer.FirstName,
-                    customer.LastName,
-                    customer.PhoneNumber);
-            }
+            var result = await CreateDomainUser(DomainCustomerService, customer);
 
             return result;
         }
@@ -62,6 +58,56 @@ namespace TransportSystems.Backend.Application.Business
             var domainCustomer = await DomainCustomerService.Get(customerId);
 
             return MappingService.Map<CustomerAM>(domainCustomer);
+        }
+
+        public Task<Dispatcher> CreateDomainDispatcher(DispatcherAM dispatcher, int companyId)
+        {
+            return CreateDomainEmployee(DomainDispatcherService, dispatcher, companyId);
+        }
+
+        public async Task<Driver> CreateDomainDriver(DriverAM driver, int companyId, int vehicleId)
+        {
+            var domainDriver = await CreateDomainEmployee(DomainDriverService, driver, companyId);
+            domainDriver = await DomainDriverService.AssignVehicle(domainDriver.Id, vehicleId);
+
+            return domainDriver;
+        }
+
+        protected async Task<TUser> CreateDomainUser<TUser>(
+            IIdentityUserService<TUser> domainUserService,
+            UserAM user)
+            where TUser : IdentityUser
+        {
+            var domainUser = await domainUserService.GetByPhoneNumber(user.PhoneNumber);
+
+            if (domainUser == null)
+            {
+                domainUser = await domainUserService.Create(user.PhoneNumber); 
+            }
+
+            if (await domainUserService.IsNeedAssignName(domainUser.Id))
+            {
+                domainUser = await domainUserService.AsignName(domainUser.Id, user.FirstName, user.LastName);
+            }
+
+            return domainUser;
+        }
+
+
+        protected async Task<TEmployee> CreateDomainEmployee<TEmployee>(
+            IEmployeeService<TEmployee> domainEmployeeService,
+            UserAM employee,
+            int companyId)
+            where TEmployee : Employee
+        {
+            var domainEmployee = await CreateDomainUser(domainEmployeeService, employee);
+
+            if (!domainEmployee.CompanyId.Equals(companyId))
+            {
+                domainEmployee = await domainEmployeeService.AssignCompany(domainEmployee.Id, companyId);
+            }
+
+            return domainEmployee;
         }
     }
 }

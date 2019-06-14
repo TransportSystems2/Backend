@@ -35,27 +35,15 @@ namespace TransportSystems.Backend.Application.Business.Organization
             int companyId,
             AddressAM address)
         {
-            using (var transaction = await TransactionService.BeginTransaction())
-            {
-                try
-                {
-                    var priceListBlank = await PricelistService.GetPricelistBlank();
-                    var domainPricelist = await PricelistService.CreateDomainPricelist(priceListBlank);
+            var priceListBlank = await PricelistService.GetPricelistBlank();
+            var domainPricelist = await PricelistService.CreateDomainPricelist(priceListBlank);
 
-                    var domainAddress = await AddressService.CreateDomainAddress(AddressKind.Garage, address);
-                    var result = await DomainGarageService.Create(
-                        companyId,
-                        domainAddress.Id);
+            var domainAddress = await AddressService.CreateDomainAddress(AddressKind.Garage, address);
+            var result = await DomainGarageService.Create(
+                companyId,
+                domainAddress.Id);
 
-                    transaction.Commit();
-                    return result;
-                }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
+            return result;
         }
 
         public Task<Garage> GetDomainGarage(int garageId)

@@ -105,7 +105,7 @@ namespace TransportSystems.Backend.Identity.Manage.Controllers.Users
         }
 
         [HttpPut("update/{id}")]
-        public async virtual Task<IActionResult> Update(int id, [FromBody] UserModel userModel)
+        public async virtual Task<IActionResult> Update(int id, [FromBody]UserModel userModel)
         {
             var user = await UserService.FindByIdAsync(id);
             if (user == null)
@@ -126,6 +126,26 @@ namespace TransportSystems.Backend.Identity.Manage.Controllers.Users
             if (!string.IsNullOrEmpty(userModel.PhoneNumber))
             {
                 user.PhoneNumber = userModel.PhoneNumber;
+            }
+
+            if (!string.IsNullOrEmpty(userModel.FirstName))
+            {
+                user.FirstName = userModel.FirstName;
+            }
+
+            if (!string.IsNullOrEmpty(userModel.LastName))
+            {
+                user.LastName = userModel.LastName;
+            }
+
+            if (userModel.CompanyId != 0)
+            {
+                user.CompanyId = userModel.CompanyId;
+            }
+
+            if (userModel.VehicleId != 0)
+            {
+                user.VehicleId = userModel.VehicleId;
             }
 
             var result = await UserService.UpdateAsync(user);
@@ -286,6 +306,9 @@ namespace TransportSystems.Backend.Identity.Manage.Controllers.Users
             return userModels;
         }
 
+        /// TODO: разделить на два метода, AddToRolesAsync и RemoveFromRolesAsync.
+        /// Удобней вызывать API с добавлением или удалением конкретных ролей,
+        /// а не запрашивать все роли для клиента и удалять/добавлять нужные.
         private async Task<IdentityResult> AsignRolesToUser(User user, string[] roles)
         {
             if (roles == null)

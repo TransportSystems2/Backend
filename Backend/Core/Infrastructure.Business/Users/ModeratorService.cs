@@ -18,9 +18,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
 
         protected new IModeratorRepository Repository => (IModeratorRepository)base.Repository;
 
-        public override string[] GetSpecificRoles()
+        public override string GetDefaultRole()
         {
-            return new [] { IdentityUser.ModeratorRoleName };
+            return IdentityUser.ModeratorRoleName;
         }
     }
 }

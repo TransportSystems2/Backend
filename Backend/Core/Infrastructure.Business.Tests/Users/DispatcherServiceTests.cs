@@ -39,7 +39,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Users
         [Fact]
         public void GetSpecificRoles()
         {
-            var roles = Suite.DispatcherService.GetSpecificRoles();
+            var roles = Suite.DispatcherService.GetDefaultRole();
 
             Assert.Contains(IdentityUser.DispatcherRoleName, roles);
         }

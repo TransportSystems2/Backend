@@ -17,13 +17,15 @@ namespace TransportSystems.Backend.Application.Business.Tests.Users
             DomainCustomerServiceMock = new Mock<ICustomerService>();
             DomainModeratorServiceMock = new Mock<IModeratorService>();
             DomainDispatcherServiceMock = new Mock<IDispatcherService>();
+            DomainDriverServiceMock = new Mock<IDriverService>();
 
             Service = new ApplicationUserService(
                 TransactionServiceMock.Object,
                 MappingService,
                 DomainCustomerServiceMock.Object,
                 DomainModeratorServiceMock.Object,
-                DomainDispatcherServiceMock.Object);
+                DomainDispatcherServiceMock.Object,
+                DomainDriverServiceMock.Object);
         }
 
         public IApplicationUserService Service { get; }
@@ -33,6 +35,8 @@ namespace TransportSystems.Backend.Application.Business.Tests.Users
         public Mock<IModeratorService> DomainModeratorServiceMock { get; }
 
         public Mock<IDispatcherService> DomainDispatcherServiceMock { get; }
+
+        public Mock<IDriverService> DomainDriverServiceMock { get; }
     }
 
     public class ApplicationUserServiceTests : BaseServiceTests<ApplicationUserServiceTestSuite>
@@ -47,14 +51,30 @@ namespace TransportSystems.Backend.Application.Business.Tests.Users
                 PhoneNumber = "79998887766"
             };
 
+            var domainCustomer = new Customer
+            {
+                Id = 2
+            };
+
             Suite.DomainCustomerServiceMock
                 .Setup(m => m.GetByPhoneNumber(customer.PhoneNumber))
                 .Returns(Task.FromResult<Customer>(null));
+
+            Suite.DomainCustomerServiceMock
+                .Setup(m => m.Create(customer.PhoneNumber))
+                .ReturnsAsync(domainCustomer);
+
+            Suite.DomainCustomerServiceMock
+                .Setup(m => m.IsNeedAssignName(domainCustomer.Id))
+                .ReturnsAsync(true);
             
             await Suite.Service.GetOrCreateDomainCustomer(customer);
 
             Suite.DomainCustomerServiceMock
-                .Verify(m => m.Create(customer.FirstName, customer.LastName, customer.PhoneNumber));
+                .Verify(m => m.Create(customer.PhoneNumber));
+                
+            Suite.DomainCustomerServiceMock
+                .Verify(m => m.AsignName(domainCustomer.Id, customer.FirstName, customer.LastName));
         }
 
         [Fact]
@@ -76,7 +96,20 @@ namespace TransportSystems.Backend.Application.Business.Tests.Users
                 .Setup(m => m.GetByPhoneNumber(customer.PhoneNumber))
                 .ReturnsAsync(domainCustomer);
 
+            Suite.DomainCustomerServiceMock
+                .Setup(m => m.IsNeedAssignName(domainCustomer.Id))
+                .ReturnsAsync(false);
+
             var result = await Suite.Service.GetOrCreateDomainCustomer(customer);
+
+            Suite.DomainCustomerServiceMock
+                .Verify(m => m.Create(
+                    It.IsAny<string>()),
+                    Times.Never);
+            Suite.DomainCustomerServiceMock
+                .Verify(m => m.AsignName(
+                    It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
+                    Times.Never);
 
             Assert.Equal(domainCustomer.Id, result.Id);
         }

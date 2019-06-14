@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TransportSystems.Backend.Application.Business;
 using TransportSystems.Backend.Application.Business.Geo;
 using TransportSystems.Backend.Application.Interfaces.Geo;
 using TransportSystems.Backend.Application.Interfaces.Routing;
@@ -119,13 +118,13 @@ namespace TransportSystems.Backend.Application.Business.Tests
             var secondDomainWaypoinAddress = new Address { Id = commonId++ };
 
             Suite.AddressServiceMock
-                .Setup(m => m.GetOrCreateDomainAddress(rootAddress))
+                .Setup(m => m.GetOrCreateDomainAddress(AddressKind.Market, rootAddress))
                 .ReturnsAsync(domainRouteAddress);
             Suite.AddressServiceMock
-                .Setup(m => m.GetOrCreateDomainAddress(firstWaypointAddress))
+                .Setup(m => m.GetOrCreateDomainAddress(AddressKind.Waypoint, firstWaypointAddress))
                 .ReturnsAsync(firstDomainWaypointAddress);
             Suite.AddressServiceMock
-                .Setup(m => m.GetOrCreateDomainAddress(secondWaypointAddress))
+                .Setup(m => m.GetOrCreateDomainAddress(AddressKind.Waypoint, secondWaypointAddress))
                 .ReturnsAsync(secondDomainWaypoinAddress);
 
             Suite.DomainRouteServiceMock

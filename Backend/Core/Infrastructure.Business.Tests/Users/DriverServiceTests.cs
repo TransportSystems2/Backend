@@ -46,7 +46,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Users
         [Fact]
         public void GetSpecificRoles()
         {
-            var specificRoles = Suite.DriverService.GetSpecificRoles();
+            var specificRoles = Suite.DriverService.GetDefaultRole();
 
             Assert.Contains(IdentityUser.DriverRoleName, specificRoles);
         }

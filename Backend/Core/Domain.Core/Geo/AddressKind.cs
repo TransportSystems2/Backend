@@ -5,6 +5,7 @@
         Other,
         Market,
         Garage,
-        Vehicle
+        Vehicle,
+        Waypoint
     }
 }

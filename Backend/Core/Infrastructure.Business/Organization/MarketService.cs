@@ -1,6 +1,6 @@
-﻿using Common.Models.Units;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Core.Domain.Interfaces.Organization;
 using TransportSystems.Backend.Core.Services.Interfaces;
@@ -51,12 +51,12 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
 
         public async Task<Market> GetByCoordinate(double latitude, double longitude)
         {
-            var garageAddress = await AddressService.GetByCoordinate(latitude, longitude);
+            var address = await AddressService.GetByCoordinate(AddressKind.Market, latitude, longitude);
 
             Market result = null;
-            if (garageAddress != null)
+            if (address != null)
             {
-                result = await Repository.GetByAddress(garageAddress.Id);
+                result = await Repository.GetByAddress(address.Id);
             }
 
             return result;
@@ -73,7 +73,8 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
 
             await Repository.Add(market);
             await Repository.Save();
-        }
+        }
+
         protected override async Task<bool> DoVerifyEntity(Market entity)
         {
             if (!await CompanyService.IsExist(entity.CompanyId))

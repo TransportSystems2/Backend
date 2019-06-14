@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace TransportSystems.Backend.API.Migrations
 {
-    public partial class Initialization : Migration
+    public partial class InitialConfig : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -162,54 +162,6 @@ namespace TransportSystems.Backend.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Customers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    AddedDate = table.Column<DateTime>(nullable: false),
-                    ModifiedDate = table.Column<DateTime>(nullable: false),
-                    IdentityUserId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Customers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Dispatchers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    AddedDate = table.Column<DateTime>(nullable: false),
-                    ModifiedDate = table.Column<DateTime>(nullable: false),
-                    IdentityUserId = table.Column<int>(nullable: false),
-                    CompanyId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Dispatchers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Drivers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    AddedDate = table.Column<DateTime>(nullable: false),
-                    ModifiedDate = table.Column<DateTime>(nullable: false),
-                    IdentityUserId = table.Column<int>(nullable: false),
-                    CompanyId = table.Column<int>(nullable: false),
-                    VehicleId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Drivers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Garages",
                 columns: table => new
                 {
@@ -274,22 +226,6 @@ namespace TransportSystems.Backend.API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Markets", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Moderators",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    AddedDate = table.Column<DateTime>(nullable: false),
-                    ModifiedDate = table.Column<DateTime>(nullable: false),
-                    IdentityUserId = table.Column<int>(nullable: false),
-                    CompanyId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Moderators", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -489,15 +425,6 @@ namespace TransportSystems.Backend.API.Migrations
                 name: "Companies");
 
             migrationBuilder.DropTable(
-                name: "Customers");
-
-            migrationBuilder.DropTable(
-                name: "Dispatchers");
-
-            migrationBuilder.DropTable(
-                name: "Drivers");
-
-            migrationBuilder.DropTable(
                 name: "Garages");
 
             migrationBuilder.DropTable(
@@ -508,9 +435,6 @@ namespace TransportSystems.Backend.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Markets");
-
-            migrationBuilder.DropTable(
-                name: "Moderators");
 
             migrationBuilder.DropTable(
                 name: "Orders");

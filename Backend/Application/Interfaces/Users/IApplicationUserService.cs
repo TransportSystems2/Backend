@@ -13,5 +13,9 @@ namespace TransportSystems.Backend.Application.Interfaces.Users
         Task<Dispatcher> GetDomainDispatcher(int dispatcherId);
 
         Task<CustomerAM> GetCustomer(int customerId);
+        
+        Task<Dispatcher> CreateDomainDispatcher(DispatcherAM dispatcher, int companyId);
+        
+        Task<Driver> CreateDomainDriver(DriverAM driver, int companyId, int vehicleId);
     }
 }

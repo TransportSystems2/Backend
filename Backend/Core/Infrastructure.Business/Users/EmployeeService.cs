@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Domain.Interfaces.Users;
@@ -35,20 +36,25 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
             return await Repository.GetByCompany(companyId, role);
         }
 
-        public async Task<T> Create(string firstName, string lastName, string phoneNumber, int companyId)
+        public async Task<T> AssignCompany(int id, int companyId)
         {
+            var user = await Get(id);
+            if (user == null)
+            {
+                throw new ArgumentException($"Id:{id} is null", "Id");
+            }
+
             if (!await CompanyService.IsExist(companyId))
             {
                 throw new EntityNotFoundException($"Company with id = {companyId}, doesn't exist", "Company");
             }
 
-            var result = await Create(firstName, lastName, phoneNumber);
-            result.CompanyId = companyId;
+            user.CompanyId = companyId;
 
-            await Repository.Update(result);
+            await Repository.Update(user);
             await Repository.Save();
 
-            return result;
+            return user;
         }
     }
 }

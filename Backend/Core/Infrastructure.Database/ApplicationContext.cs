@@ -10,7 +10,6 @@ using TransportSystems.Backend.Core.Domain.Core.Pricing;
 using TransportSystems.Backend.Core.Domain.Core.Routing;
 using TransportSystems.Backend.Core.Domain.Core.Trading;
 using TransportSystems.Backend.Core.Domain.Core.Transport;
-using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Domain.Interfaces;
 
 namespace TransportSystems.Backend.Core.Infrastructure.Database
@@ -34,14 +33,6 @@ namespace TransportSystems.Backend.Core.Infrastructure.Database
         public DbSet<Address> Address { get; set; }
 
         public DbSet<Cargo> Cargoes { get; set; }
-
-        public DbSet<Moderator> Moderators { get; set; }
-
-        public DbSet<Dispatcher> Dispatchers { get; set; }
-
-        public DbSet<Driver> Drivers { get; set; }
-
-        public DbSet<Customer> Customers { get; set; }
 
         public DbSet<Vehicle> Vehicles { get; set; }
 

@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 
 namespace TransportSystems.Backend.Core.Services.Interfaces.Users
 {
     public interface IIdentityUserService<T> : IDomainService<T> where T : IdentityUser
     {
-        Task<T> Create(string phoneNumber, string firstName, string lastName);
+        Task<T> Create(string phoneNumber);
 
-        Task AsignName(int id, string firstName, string lastName);
+        Task<T> AsignName(int id, string firstName, string lastName);
+
+        Task<bool> IsNeedAssignName(int id);
 
         Task<bool> IsExistByPhoneNumber(string phoneNumber);
 
@@ -20,6 +21,6 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Users
 
         Task<T> GetByPhoneNumber(string phoneNumber);
 
-         string[] GetSpecificRoles();
+        string GetDefaultRole();
     }
 }

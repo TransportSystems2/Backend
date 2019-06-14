@@ -1,10 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Moq;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Domain.Interfaces.Users;
-using TransportSystems.Backend.Core.Infrastructure.Business.Users;
 using TransportSystems.Backend.Core.Services.Interfaces;
-using TransportSystems.Backend.Core.Services.Interfaces.Users;
 using Xunit;
 
 namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Users
@@ -21,9 +20,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Users
         {
         }
 
-        public override string[] GetSpecificRoles()
+        public override string GetDefaultRole()
         {
-            return new string[] { };
+            return "TestRole";
         }
     }
 
@@ -57,24 +56,25 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Users
         [Fact]
         public async Task Create()
         {
-            var firstName = "Alexandr";
-            var lastName = "Fadeev";
             var phoneNumber = "79998887766";
 
             Suite.UserRepositoryMock
                 .Setup(m => m.IsExistByPhoneNumber(phoneNumber))
                 .ReturnsAsync(false);
 
-            var result = await Suite.Service.Create(firstName, lastName, phoneNumber);
+            var result = await Suite.Service.Create(phoneNumber);
 
             Suite.UserRepositoryMock
                 .Verify(m => m.Add(It.Is<TestUser>(
-                    u => u.FirstName.Equals(firstName)
-                        && u.LastName.Equals(lastName)
-                        && u.PhoneNumber.Equals(phoneNumber))));
+                    u => u.PhoneNumber.Equals(phoneNumber))));
 
             Suite.UserRepositoryMock
                 .Verify(m => m.Save());
+
+            Suite.UserRepositoryMock
+                .Verify(m => m.AsignToRoles(It.IsAny<int>(), It.Is<string[]>(
+                    roles => Array.Exists(roles, i => i.Equals(Suite.Service.GetDefaultRole()))
+                )));
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Users
                 .Setup(m => m.IsExistByPhoneNumber(phoneNumber))
                 .ReturnsAsync(true);
 
-            await Assert.ThrowsAsync<EntityAlreadyExistsException>(() => Suite.Service.Create("firstName", "lastName", phoneNumber));
+            await Assert.ThrowsAsync<EntityAlreadyExistsException>(() => Suite.Service.Create(phoneNumber));
         }
 
         [Fact]

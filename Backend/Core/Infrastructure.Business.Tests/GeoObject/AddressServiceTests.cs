@@ -213,6 +213,8 @@ namespace TransportSystems.Infrastructure.Business.Tests.Geo
         [Fact]
         public async Task GetAddressByCoordinate()
         {
+            var kind = AddressKind.Garage;
+
             var address = new Address
             {
                 Latitude = 11.1111,
@@ -222,10 +224,10 @@ namespace TransportSystems.Infrastructure.Business.Tests.Geo
             var suite = new AddressServiceTestSuite();
 
             suite.AddressRepositoryMock
-                .Setup(m => m.GetByCoordinate(address.Latitude, address.Longitude))
+                .Setup(m => m.GetByCoordinate(kind, address.Latitude, address.Longitude))
                 .ReturnsAsync(address);
 
-            var result = await suite.AddressService.GetByCoordinate(address.Latitude, address.Longitude);
+            var result = await suite.AddressService.GetByCoordinate(kind, address.Latitude, address.Longitude);
 
             Assert.Equal(address, result);
         }

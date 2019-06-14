@@ -40,38 +40,5 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Users
         }
 
         protected EmployeeServiceTestSuite Suite { get; }
-
-        [Fact]
-        public async Task Create()
-        {
-            var commonId = 1;
-            var companyId = commonId++;
-            var firstName = "Alexandr";
-            var lastName = "Fadeev";
-            var phoneNumber = "79998887766";
-
-            var identityUser = new Dispatcher
-            {
-                Id = commonId++,
-                CompanyId = companyId
-            };
-
-            Suite.CompanyServiceMock
-                .Setup(m => m.IsExist(companyId))
-                .ReturnsAsync(true);
-
-            Suite.EmployeeRepositoryMock
-                .Setup(m => m.IsExistByPhoneNumber(phoneNumber))
-                .ReturnsAsync(false);
-
-            var result = await Suite.Service.Create(firstName, lastName, phoneNumber, companyId);
-
-            Suite.EmployeeRepositoryMock
-                .Verify(m => m.Update(
-                    It.Is<Dispatcher>(e => e.CompanyId.Equals(companyId))));
-
-            Suite.EmployeeRepositoryMock
-                .Verify(m => m.Save());
-        }
     }
 }

@@ -70,7 +70,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Organization
 
         public async Task<Garage> GetByCoordinate(double latitude, double longitude)
         {
-            var garageAddress = await AddressService.GetByCoordinate(latitude, longitude);
+            var garageAddress = await AddressService.GetByCoordinate(AddressKind.Garage, latitude, longitude);
 
             Garage result = null;
             if (garageAddress != null)

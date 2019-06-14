@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.Core.Domain.Interfaces;
@@ -225,7 +222,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Data.Tests.GeoObject
             await Repository.AddRange(entities);
             await Repository.Save();
 
-            var result = await Repository.GetByCoordinate(1.6, 2);
+            var result = await Repository.GetByCoordinate(AddressKind.Garage, 1.6, 2);
 
             Assert.Equal(5, result.Id);
         }

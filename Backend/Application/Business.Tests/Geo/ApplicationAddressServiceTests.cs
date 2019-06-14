@@ -52,6 +52,7 @@ namespace TransportSystems.Backend.Application.Business.Tests.Geo
         [Fact]
         public async Task GetDomainAddressByApplicationAddressWhenDomainAddressDoesNotExist()
         {
+            var addressKind = AddressKind.Waypoint;
             var ApplicationAddress = new AddressAM
             {
                 Country = "Россия",
@@ -70,14 +71,14 @@ namespace TransportSystems.Backend.Application.Business.Tests.Geo
             };
 
             Suite.DomainAddressServiceMock
-                .Setup(m => m.GetByCoordinate(ApplicationAddress.Latitude, ApplicationAddress.Longitude))
+                .Setup(m => m.GetByCoordinate(addressKind, ApplicationAddress.Latitude, ApplicationAddress.Longitude))
                 .Returns(Task.FromResult<Address>(null));
 
-            await Suite.AddressService.GetOrCreateDomainAddress(ApplicationAddress);
+            await Suite.AddressService.GetOrCreateDomainAddress(addressKind, ApplicationAddress);
 
             Suite.DomainAddressServiceMock
                 .Verify(m => m.Create(
-                    AddressKind.Other,
+                    addressKind,
                     ApplicationAddress.Request,
                     ApplicationAddress.Country,
                     ApplicationAddress.Province,
@@ -95,6 +96,8 @@ namespace TransportSystems.Backend.Application.Business.Tests.Geo
         [Fact]
         public async Task GetDomainAddressByApplicationAddressWhenDomainAddressExist()
         {
+            var addressKind = AddressKind.Waypoint;
+
             var ApplicationAddress = new AddressAM
             {
                 Latitude = 55.771899,
@@ -108,10 +111,10 @@ namespace TransportSystems.Backend.Application.Business.Tests.Geo
             };
 
             Suite.DomainAddressServiceMock
-                .Setup(m => m.GetByCoordinate(ApplicationAddress.Latitude, ApplicationAddress.Longitude))
+                .Setup(m => m.GetByCoordinate(addressKind, ApplicationAddress.Latitude, ApplicationAddress.Longitude))
                 .ReturnsAsync(domainAddress);
 
-            var result = await Suite.AddressService.GetOrCreateDomainAddress(ApplicationAddress);
+            var result = await Suite.AddressService.GetOrCreateDomainAddress(addressKind, ApplicationAddress);
 
             Suite.DomainAddressServiceMock
                 .Verify(m => m.Create(
@@ -282,6 +285,7 @@ namespace TransportSystems.Backend.Application.Business.Tests.Geo
         [Fact]
         public async Task GetDomainAddressByCoordinate()
         {
+            var addressKind = AddressKind.Waypoint;
             var coordinate = new Coordinate
             {
                 Latitude = 11.1111,
@@ -291,10 +295,10 @@ namespace TransportSystems.Backend.Application.Business.Tests.Geo
             var domainAddress = new Address();
 
             Suite.DomainAddressServiceMock
-                .Setup(m => m.GetByCoordinate(coordinate.Latitude, coordinate.Longitude))
+                .Setup(m => m.GetByCoordinate(addressKind, coordinate.Latitude, coordinate.Longitude))
                 .ReturnsAsync(domainAddress);
 
-            var result = await Suite.AddressService.GetDomainAddressByCoordinate(coordinate);
+            var result = await Suite.AddressService.GetDomainAddressByCoordinate(addressKind, coordinate);
 
             Assert.Equal(domainAddress, result);
         }
