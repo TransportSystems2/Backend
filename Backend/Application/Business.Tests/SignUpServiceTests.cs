@@ -98,8 +98,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
             Suite.UserServiceMock
                  .Setup(m => m.CreateDomainDriver(
                      driver,
-                     domainCompany.Id,
-                     domainVehicle.Id))
+                     domainCompany.Id))
                  .ReturnsAsync(domainDriver);
 
             Suite.TransactionServiceMock
@@ -130,8 +129,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
             Suite.UserServiceMock
                  .Verify(m => m.CreateDomainDriver(
                      driver,
-                     domainCompany.Id,
-                     domainVehicle.Id));
+                     domainCompany.Id));
 
             Suite.TransactionMock
                  .Verify(m => m.Commit());

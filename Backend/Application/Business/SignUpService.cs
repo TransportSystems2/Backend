@@ -57,8 +57,7 @@ namespace TransportSystems.Backend.Application.Business
 
                     var domainDriver = await UserService.CreateDomainDriver(
                         companyApplication.Driver,
-                        domainCompany.Id,
-                        domainVehicle.Id
+                        domainCompany.Id
                     );
 
                     transaction.Commit();
