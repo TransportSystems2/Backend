@@ -1,31 +1,26 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 
 namespace TransportSystems.Backend.Core.Services.Interfaces.Users
 {
-    public interface IIdentityUserService
+    public interface IIdentityUserService<T> : IDomainService<T> where T : IdentityUser
     {
-        Task <IdentityUser> Create(string firstName, string lastName, string phoneNumber);
+        Task<T> Create(string phoneNumber);
 
-        Task<bool> IsExistById(int id);
+        Task<T> AsignName(int id, string firstName, string lastName);
+
+        Task<bool> IsNeedAssignName(int id);
 
         Task<bool> IsExistByPhoneNumber(string phoneNumber);
 
-        Task<bool> IsInRole(int userId, string role);
+        Task<bool> IsInRole(int id, string role);
 
-        Task<bool> IsUndefined(int userId);
+        Task<bool> IsUndefined(int id);
 
         Task AsignToRoles(int id, string[] roles);
 
-        Task AssignName(int id, string firstName, string lastName);
+        Task<T> GetByPhoneNumber(string phoneNumber);
 
-        Task<ICollection<IdentityUser>> GetUsers();
-
-        Task<IdentityUser> GetUser(int id);
-
-        Task DeleteUser(int id);
-
-        Task<IdentityUser> GetUserByPhoneNumber(string phoneNumber);
+        string GetDefaultRole();
     }
 }

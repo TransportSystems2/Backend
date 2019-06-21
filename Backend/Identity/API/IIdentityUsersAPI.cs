@@ -13,22 +13,25 @@ namespace TransportSystems.Backend.Identity.API
         Task<UserModel> Create([Body(BodySerializationMethod.Json)] UserModel userModel);
 
         [Post("/identity/manage/users/all")]
-        Task<IEnumerable<UserModel>> GetAllAsync();
+        Task<ICollection<UserModel>> GetAllAsync();
+
+        [Get("/identity/manage/users/bycompany")]
+        Task<ICollection<UserModel>> GetByCompany(int companyId, string role);
 
         [Post("/identity/manage/users/{id}")]
         Task<UserModel> ByIdAsync(int id);
 
         [Post("/identity/manage/users")]
-        Task<IEnumerable<UserModel>> ByIdsAsync(IEnumerable<int> ids);
+        Task<ICollection<UserModel>> ByIdsAsync(int[] ids);
 
         [Post("/identity/manage/users/asigntoroles/{userId}")]
-        Task AsignToRoles(int userId, [Body(BodySerializationMethod.Json)] IEnumerable<string> roles);
+        Task AsignToRoles(int userId, [Body(BodySerializationMethod.Json)] string[] roles);
 
         [Post("/identity/manage/users/byrole/{role}")]
-        Task<IEnumerable<UserModel>> ByRole(string role);
+        Task<ICollection<UserModel>> ByRole(string role);
 
         [Post("/identity/manage/users/byroles")]
-        Task<IEnumerable<UserModel>> ByRoles(IEnumerable<string> roles);
+        Task<ICollection<UserModel>> ByRoles(string[] roles);
 
         [Post("/identity/manage/users/byphonenumber/{phoneNumber}")]
         Task<UserModel> FindByPhoneNumberAsync(string phoneNumber);

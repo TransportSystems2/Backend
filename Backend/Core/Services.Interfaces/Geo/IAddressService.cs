@@ -22,7 +22,7 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Geo
             double adjustedLatitude = 0,
             double adjustedLongitude = 0);
 
-        Task<Address> GetByCoordinate(double latitude, double longitude);
+        Task<Address> GetByCoordinate(AddressKind kind, double latitude, double longitude);
 
         Task<ICollection<Address>> GetByCoordinateBounds(AddressKind kind, double minLatitude, double minLongitude, double maxLatitude, double maxLongitude);
 

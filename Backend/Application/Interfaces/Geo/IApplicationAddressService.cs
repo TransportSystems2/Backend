@@ -12,11 +12,11 @@ namespace TransportSystems.Backend.Application.Interfaces.Geo
     {
         Task<Address> GetDomainAddress(int addressId);
 
-        Task<Address> GetDomainAddressByCoordinate(Coordinate coordinate);
+        Task<Address> GetDomainAddressByCoordinate(AddressKind kind, Coordinate coordinate);
 
         Task<Address> CreateDomainAddress(AddressKind kind, AddressAM address);
 
-        Task<Address> GetOrCreateDomainAddress(AddressAM address);
+        Task<Address> GetOrCreateDomainAddress(AddressKind kind, AddressAM address);
 
         Task<AddressAM> GetAddress(int addressId);
 

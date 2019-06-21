@@ -19,16 +19,13 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Users
         public DriverServiceTestSuite()
         {
             DriverRepositoryMock = new Mock<IDriverRepository>();
-            IdentityUserServiceMock = new Mock<IIdentityUserService>();
             CompanyServiceMock = new Mock<ICompanyService>();
             VehicleServiceMock = new Mock<IVehicleService>();
 
-            DriverService = new DriverService(DriverRepositoryMock.Object, IdentityUserServiceMock.Object, CompanyServiceMock.Object, VehicleServiceMock.Object);
+            DriverService = new DriverService(DriverRepositoryMock.Object, CompanyServiceMock.Object, VehicleServiceMock.Object);
         }
 
         public Mock<IDriverRepository> DriverRepositoryMock { get; }
-
-        public Mock<IIdentityUserService> IdentityUserServiceMock { get; }
 
         public Mock<ICompanyService> CompanyServiceMock { get; }
 
@@ -47,11 +44,11 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Users
         protected DriverServiceTestSuite Suite { get; }
 
         [Fact]
-        public async Task GetSpecificRoles()
+        public void GetSpecificRoles()
         {
-            var specificRoles = await Suite.DriverService.GetSpecificRoles();
+            var specificRoles = Suite.DriverService.GetDefaultRole();
 
-            Assert.Contains(UserRole.DriverRoleName, specificRoles);
+            Assert.Contains(IdentityUser.DriverRoleName, specificRoles);
         }
 
         [Fact]

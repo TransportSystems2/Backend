@@ -94,7 +94,7 @@ namespace TransportSystems.Infrastructure.Business.Tests.Oraganization
             };
 
             Suite.AddressServiceMock
-                .Setup(m => m.GetByCoordinate(address.Latitude, address.Longitude))
+                .Setup(m => m.GetByCoordinate(AddressKind.Garage, address.Latitude, address.Longitude))
                 .ReturnsAsync(address);
             Suite.RepositoryMock
                 .Setup(m => m.GetByAddress(address.Id))

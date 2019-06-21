@@ -10,8 +10,8 @@ using TransportSystems.Backend.Core.Infrastructure.Database;
 namespace TransportSystems.Backend.API.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20190519092843_Initialization")]
-    partial class Initialization
+    [Migration("20190614130116_InitialConfig")]
+    partial class InitialConfig
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -499,78 +499,6 @@ namespace TransportSystems.Backend.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Vehicles");
-                });
-
-            modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Users.Customer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("AddedDate");
-
-                    b.Property<int>("IdentityUserId");
-
-                    b.Property<DateTime>("ModifiedDate");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Customers");
-                });
-
-            modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Users.Dispatcher", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("AddedDate");
-
-                    b.Property<int>("CompanyId");
-
-                    b.Property<int>("IdentityUserId");
-
-                    b.Property<DateTime>("ModifiedDate");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Dispatchers");
-                });
-
-            modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Users.Driver", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("AddedDate");
-
-                    b.Property<int>("CompanyId");
-
-                    b.Property<int>("IdentityUserId");
-
-                    b.Property<DateTime>("ModifiedDate");
-
-                    b.Property<int>("VehicleId");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Drivers");
-                });
-
-            modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Users.Moderator", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("AddedDate");
-
-                    b.Property<int>("CompanyId");
-
-                    b.Property<int>("IdentityUserId");
-
-                    b.Property<DateTime>("ModifiedDate");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Moderators");
                 });
 
             modelBuilder.Entity("TransportSystems.Backend.Core.Domain.Core.Billing.Basket", b =>

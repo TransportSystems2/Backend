@@ -53,9 +53,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Geo
             return Create(address);
         }
 
-        public Task<Address> GetByCoordinate(double latitude, double longitude)
+        public Task<Address> GetByCoordinate(AddressKind kind, double latitude, double longitude)
         {
-            return Repository.GetByCoordinate(latitude, longitude);
+            return Repository.GetByCoordinate(kind, latitude, longitude);
         }
 
         public Task<ICollection<string>> GetProvinces(AddressKind kind, string country, OrderingKind orderingKind = OrderingKind.None)

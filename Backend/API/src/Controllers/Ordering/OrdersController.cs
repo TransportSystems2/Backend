@@ -7,7 +7,6 @@ using TransportSystems.Backend.Application.Interfaces.Users;
 using TransportSystems.Backend.Application.Models.Booking;
 using TransportSystems.Backend.Application.Models.Ordering;
 using TransportSystems.Backend.Core.Domain.Core.Ordering;
-using TransportSystems.Backend.Core.Domain.Core.Users;
 
 namespace TransportSystems.API.Controllers
 {
@@ -29,19 +28,8 @@ namespace TransportSystems.API.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody]BookingAM booking)
         {
-            var userIdentityId = User.GetIdentityId();
-
-            var dispatcherId = 0;
-            if (userIdentityId != null)
-            {
-                var dispatcher = await UserService.GetDomainDispatcherByIdentityUser(userIdentityId.Value);
-                if (dispatcher != null)
-                {
-                    dispatcherId = dispatcher.Id;
-                }
-            }
-
-            await Service.CreateOrder(booking, dispatcherId);
+            var userId = User.GetIdentityId();
+            await Service.CreateOrder(booking, userId ?? 0);
 
             return Ok();
         }
@@ -67,10 +55,8 @@ namespace TransportSystems.API.Controllers
         [HttpGet("accept")]
         public async Task<IActionResult> Accept(int orderId)
         {
-            var userIdentityId = User.GetIdentityId();
-            var dispatcher = await UserService.GetDomainDispatcherByIdentityUser(userIdentityId.Value);
-
-            await Service.Accept(orderId, dispatcher.Id);
+            var userId = User.GetIdentityId();
+            await Service.Accept(orderId, userId.Value);
 
             return Ok();
         }
@@ -78,10 +64,8 @@ namespace TransportSystems.API.Controllers
         [HttpGet("readyToTrade")]
         public async Task<IActionResult> ReadyToTrade(int orderId)
         {
-            var userIdentityId = User.GetIdentityId();
-            var dispatcher = await UserService.GetDomainDispatcherByIdentityUser(userIdentityId.Value);
-
-            await Service.ReadyToTrade(orderId, dispatcher.Id);
+            var userId = User.GetIdentityId();
+            await Service.ReadyToTrade(orderId, userId.Value);
 
             return Ok();
         }
@@ -105,10 +89,8 @@ namespace TransportSystems.API.Controllers
         [HttpGet("assignToDriver")]
         public async Task<IActionResult> AssignToDriver(int orderId, int driverId)
         {
-            var userIdentityId = User.GetIdentityId();
-            var subDispatcher = await UserService.GetDomainDispatcherByIdentityUser(userIdentityId.Value);
-
-            await Service.AssignToDriver(orderId, subDispatcher.Id, driverId);
+            var userId = User.GetIdentityId();
+            await Service.AssignToDriver(orderId, userId.Value, driverId);
 
             return Ok();
         }

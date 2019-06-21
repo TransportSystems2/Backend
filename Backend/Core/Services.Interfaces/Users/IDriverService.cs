@@ -5,6 +5,6 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Users
 {
     public interface IDriverService : IEmployeeService<Driver>
     {
-        Task AssignVehicle(int driverId, int vehicleId);
+        Task<Driver> AssignVehicle(int driverId, int vehicleId);
     }
 }

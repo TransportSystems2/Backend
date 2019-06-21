@@ -75,14 +75,6 @@ namespace TransportSystems.Backend.Identity.Signin.Validation
                             await _events.RaiseAsync(new UserLoginFailureEvent(phoneNumber, resultCreation.Errors.Select(x => x.Description).Aggregate((a, b) => a + ", " + b), false));
                             return;
                         }
-
-                        var resultAssignedRole = await _userManager.AddToRoleAsync(user, UserRole.UserRoleName);
-                        if (resultAssignedRole != IdentityResult.Success)
-                        {
-                            _logger.LogInformation(" Assign User to role failed: {username}, reason: invalid user", phoneNumber);
-                            await _events.RaiseAsync(new UserLoginFailureEvent(phoneNumber, resultCreation.Errors.Select(x => x.Description).Aggregate((a, b) => a + ", " + b), false));
-                            return;
-                        }
                     }
 
                     _logger.LogInformation("Credentials validated for username: {phoneNumber}", phoneNumber);

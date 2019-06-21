@@ -51,9 +51,12 @@ namespace TransportSystems.Backend.Core.Infrastructure.Database.Geo
                 && (i.Longitude >= minLongitude) && (i.Longitude <= maxLongitude)).ToListAsync();
         }
 
-        public Task<Address> GetByCoordinate(double latitude, double longitude)
+        public Task<Address> GetByCoordinate(AddressKind kind, double latitude, double longitude)
         {
-            return Entities.SingleOrDefaultAsync(i => i.Latitude.Equals(latitude) && i.Longitude.Equals(longitude));
+            return Entities.SingleOrDefaultAsync(i =>
+                i.Kind.Equals(kind)
+                && i.Latitude.Equals(latitude)
+                && i.Longitude.Equals(longitude));
         }
     }
 }

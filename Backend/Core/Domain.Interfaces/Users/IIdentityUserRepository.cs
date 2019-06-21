@@ -3,18 +3,16 @@ using TransportSystems.Backend.Core.Domain.Core.Users;
 
 namespace TransportSystems.Backend.Core.Domain.Interfaces.Users
 {
-    public interface IIdentityUserRepository : IRepository<IdentityUser>
+    public interface IIdentityUserRepository<T> : IRepository<T> where T : IdentityUser
     {
-        new Task<IdentityUser> Add(IdentityUser identityUser);
-
         Task<bool> IsExistByPhoneNumber(string phoneNumber);
-
-        Task<bool> IsInRole(int userId, string role);
 
         Task<bool> IsUndefined(int userId);
 
         Task<bool> AsignToRoles(int userId, string[] roles);
 
-        Task<IdentityUser> GetByPhoneNumber(string phoneNumber);
+        Task<bool> IsInRole(int userId, string role);
+
+        Task<T> GetByPhoneNumber(string phoneNumber);
     }
 }

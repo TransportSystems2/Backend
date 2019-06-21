@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using TransportSystems.Backend.Identity.Core.Database;
 using TransportSystems.Backend.Identity.Core.Domain.Data.Domain;
 using TransportSystems.Backend.Identity.Core.Domain.Data.Domain.Exceptions;
 using TransportSystems.Backend.Identity.Core.Domain.Interfaces;

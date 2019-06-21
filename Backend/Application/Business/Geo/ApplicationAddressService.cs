@@ -62,12 +62,12 @@ namespace TransportSystems.Backend.Application.Business.Geo
                     address.AdjustedLongitude);
         }
 
-        public async Task<Address> GetOrCreateDomainAddress(AddressAM address)
+        public async Task<Address> GetOrCreateDomainAddress(AddressKind kind, AddressAM address)
         {
-            var result = await DomainAddressService.GetByCoordinate(address.Latitude, address.Longitude);
+            var result = await DomainAddressService.GetByCoordinate(kind, address.Latitude, address.Longitude);
             if (result == null)
             {
-                result = await CreateDomainAddress(AddressKind.Other, address);
+                result = await CreateDomainAddress(kind, address);
             }
 
             return result;
@@ -177,9 +177,9 @@ namespace TransportSystems.Backend.Application.Business.Geo
             return source.Select(i => FromDomainAddress(i)).ToList();
         }
 
-        public Task<Address> GetDomainAddressByCoordinate(Coordinate coordinate)
+        public Task<Address> GetDomainAddressByCoordinate(AddressKind kind, Coordinate coordinate)
         {
-            return DomainAddressService.GetByCoordinate(coordinate.Latitude, coordinate.Longitude);
+            return DomainAddressService.GetByCoordinate(kind, coordinate.Latitude, coordinate.Longitude);
         }
 
         public Task<TimeBelt> GetTimeBeltByAddress(AddressAM address)

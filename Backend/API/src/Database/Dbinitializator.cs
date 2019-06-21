@@ -72,7 +72,7 @@ namespace TransportSystems.Backend.API.Database
                 {
                     FirstName = "Павел",
                     LastName = "Федоров",
-                    PhoneNumber = "79159882658"
+                    PhoneNumber = companyName
                 };
 
                 var driver = new DriverAM
@@ -82,7 +82,18 @@ namespace TransportSystems.Backend.API.Database
                     PhoneNumber = "78912378123"
                 };
 
-                var garageAddress = new AddressAM();
+                var garageAddress = new AddressAM
+                {
+                    Country = "Россия",
+                    Province = "Ярославская",
+                    Area = "Рыбинский район",
+                    Locality = "Рыбинск",
+                    District = "Центральный",
+                    Street = "Пр. Серова",
+                    House = "1",
+                    Latitude = 58.0569028,
+                    Longitude = 38.780219
+                };
 
                 var companyApplication = new CompanyApplicationAM
                 {

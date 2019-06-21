@@ -10,6 +10,7 @@ using TransportSystems.Backend.Application.Interfaces.Geo;
 using TransportSystems.Backend.Application.Interfaces.Routing;
 using TransportSystems.Backend.Application.Models.Geo;
 using TransportSystems.Backend.Application.Models.Routing;
+using TransportSystems.Backend.Core.Domain.Core.Geo;
 using TransportSystems.Backend.Core.Domain.Core.Routing;
 using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Routing;
@@ -48,8 +49,21 @@ namespace TransportSystems.Backend.Application.Business
 
             foreach (var leg in route.Legs)
             {
-                var startDomainAddress = await AddressService.GetOrCreateDomainAddress(leg.StartAddress);
-                var endDomainAddress = await AddressService.GetOrCreateDomainAddress(leg.EndAddress);
+                var startAddressKind = AddressKind.Waypoint;
+                var endAddressKind  = AddressKind.Waypoint;
+
+                if (leg.Kind.Equals(RouteLegKind.Feed))
+                {
+                    startAddressKind = AddressKind.Market;
+                }
+
+                if (leg.Kind.Equals(RouteLegKind.WayBack))
+                {
+                    endAddressKind = AddressKind.Market;
+                }
+
+                var startDomainAddress = await AddressService.GetOrCreateDomainAddress(startAddressKind, leg.StartAddress);
+                var endDomainAddress = await AddressService.GetOrCreateDomainAddress(endAddressKind, leg.EndAddress);
 
                 var routeLeg = await DomainRouteLegService.Create(
                     domainRoute.Id,

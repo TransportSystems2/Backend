@@ -6,7 +6,7 @@ namespace TransportSystems.Backend.Core.Domain.Interfaces.Geo
 {
     public interface IAddressRepository : IRepository<Address>
     {
-        Task<Address> GetByCoordinate(double latitude, double longitude);
+        Task<Address> GetByCoordinate(AddressKind kind, double latitude, double longitude);
 
         Task<ICollection<string>> GetProvinces(AddressKind kind, string country, OrderingKind orderingKind = OrderingKind.None);
 

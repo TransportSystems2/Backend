@@ -34,15 +34,6 @@ namespace TransportSystems.Backend.Identity.Core.Database
                 await roleService.CreateAsync(new UserRole(UserRole.AdminRoleName));
             }
 
-            if (await roleService.FindByNameAsync(UserRole.UserRoleName) == null)
-            {
-                await roleService.CreateAsync(new UserRole(UserRole.UserRoleName));
-            }
-            if (await roleService.FindByNameAsync(UserRole.EmployeeRoleName) == null)
-            {
-                await roleService.CreateAsync(new UserRole(UserRole.EmployeeRoleName));
-            }
-
             if (await roleService.FindByNameAsync(UserRole.ModeratorRoleName) == null)
             {
                 await roleService.CreateAsync(new UserRole(UserRole.ModeratorRoleName));
@@ -66,33 +57,28 @@ namespace TransportSystems.Backend.Identity.Core.Database
 
         private static async Task InitUsers(IUserService userService, IRoleService roleService)
         {
-            var roles = new List<string> { UserRole.UserRoleName, UserRole.AdminRoleName };
+            var roles = new List<string> { UserRole.AdminRoleName };
             await CreateUserIfNotExists(userService, roleService, "admin", "Admin", "Adminovich", roles);
 
-            roles = new List<string> { UserRole.UserRoleName, UserRole.ModeratorRoleName };
+            roles = new List<string> { UserRole.ModeratorRoleName };
             await CreateUserIfNotExists(userService, roleService, "moderator1", "Moderator1", "Moderatorovich1", roles);
             await CreateUserIfNotExists(userService, roleService, "moderator2", "Moderator2", "Moderatorovich2", roles);
             await CreateUserIfNotExists(userService, roleService, "moderator3", "Moderator2", "Moderatorovich2", roles);
 
-            roles = new List<string> { UserRole.UserRoleName, UserRole.DispatcherRoleName };
+            roles = new List<string> { UserRole.DispatcherRoleName };
             await CreateUserIfNotExists(userService, roleService, "dispatcher1", "Dispatcher1", "Dispatcherivich1", roles);
             await CreateUserIfNotExists(userService, roleService, "dispatcher2", "Dispatcher2", "Dispatcherivich2", roles);
             await CreateUserIfNotExists(userService, roleService, "dispatcher3", "Dispatcher3", "Dispatcherivich3", roles);
 
-            roles = new List<string> { UserRole.UserRoleName, UserRole.DriverRoleName };
+            roles = new List<string> { UserRole.DriverRoleName };
             await CreateUserIfNotExists(userService, roleService, "driver1", "Driver1", "Driverovich1", roles);
             await CreateUserIfNotExists(userService, roleService, "driver2", "Driver2", "Driverovich2", roles);
             await CreateUserIfNotExists(userService, roleService, "driver3", "Driver3", "Driverovich3", roles);
 
-            roles = new List<string> { UserRole.UserRoleName, UserRole.CustomerRoleName };
+            roles = new List<string> { UserRole.CustomerRoleName };
             await CreateUserIfNotExists(userService, roleService, "customer1", "Customer1", "Customerovich1", roles);
             await CreateUserIfNotExists(userService, roleService, "customer2", "Customer2", "Customerovich2", roles);
             await CreateUserIfNotExists(userService, roleService, "customer3", "Customer3", "Customerovich3", roles);
-
-            roles = new List<string> { UserRole.UserRoleName };
-            await CreateUserIfNotExists(userService, roleService, "user1", "User1", "Userovich1", roles);
-            await CreateUserIfNotExists(userService, roleService, "user2", "User2", "Userovich2", roles);
-            await CreateUserIfNotExists(userService, roleService, "user3", "User3", "Userovich3", roles);
         }
 
         private static async Task<bool> CreateUserIfNotExists(IUserService userService, IRoleService roleService, string name, string firstName, string lastName, List<string> roles)

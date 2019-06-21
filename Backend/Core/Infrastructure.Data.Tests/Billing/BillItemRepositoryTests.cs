@@ -33,7 +33,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Data.Tests.Billing
             Assert.Equal(totalCost, result);
         }
 
-                [Fact]
+        [Fact]
         public async Task GetAll()
         {
             var billId = 2;

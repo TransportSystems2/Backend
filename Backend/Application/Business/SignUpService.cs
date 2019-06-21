@@ -1,12 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using TransportSystems.Backend.Core.Domain.Core.Organization;
+﻿using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Organization;
-using TransportSystems.Backend.Core.Services.Interfaces.Users;
 using TransportSystems.Backend.Application.Interfaces;
 using TransportSystems.Backend.Application.Models.SignUp;
 using TransportSystems.Backend.Application.Interfaces.Organization;
+using TransportSystems.Backend.Application.Interfaces.Users;
 
 namespace TransportSystems.Backend.Application.Business
 {
@@ -14,29 +12,21 @@ namespace TransportSystems.Backend.Application.Business
     {
         public SignUpService(
             ITransactionService transactionService,
-            IDriverService domainDriverService,
-            IModeratorService domainModeratorService,
-            IDispatcherService domainDispatcherService,
             ICompanyService domainCompanyService,
+            IApplicationUserService userService,
             IApplicationGarageService garageService,
             IApplicationVehicleService vehicleService)
             : base(transactionService)
         {
-            DomainDriverService = domainDriverService;
-            DomainModeratorService = domainModeratorService;
-            DomainDispatcherService = domainDispatcherService;
             DomainCompanyService = domainCompanyService;
+            UserService = userService;
             GarageService = garageService;
             VehicleService = vehicleService;
         }
 
-        protected IDriverService DomainDriverService { get; }
-
-        protected IModeratorService DomainModeratorService { get; }
-
-        protected IDispatcherService DomainDispatcherService { get; }
-
         protected ICompanyService DomainCompanyService { get; }
+
+        protected IApplicationUserService UserService { get; }
 
         protected IApplicationGarageService GarageService { get; }
 
@@ -60,21 +50,17 @@ namespace TransportSystems.Backend.Application.Business
                         domainCompany.Id,
                         companyApplication.Vehicle);
 
-                    var domainDispatcher = await DomainDispatcherService.Create(
-                        companyApplication.Dispatcher.FirstName,
-                        companyApplication.Dispatcher.LastName,
-                        companyApplication.Dispatcher.PhoneNumber,
+                    var domainDispatcher = await UserService.CreateDomainDispatcher(
+                        companyApplication.Dispatcher,
                         domainCompany.Id
                     );
 
-                    var domainDriver = await DomainDriverService.Create(
-                        companyApplication.Driver.FirstName,
-                        companyApplication.Driver.LastName,
-                        companyApplication.Driver.PhoneNumber,
-                        domainCompany.Id
+                    var domainDriver = await UserService.CreateDomainDriver(
+                        companyApplication.Driver,
+                        domainCompany.Id,
+                        domainVehicle.Id
                     );
 
-                    await DomainDriverService.AssignVehicle(domainDriver.Id, domainVehicle.Id);
                     transaction.Commit();
                 }
                 catch

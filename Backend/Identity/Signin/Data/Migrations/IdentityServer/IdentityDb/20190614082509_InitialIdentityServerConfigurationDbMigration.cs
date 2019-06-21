@@ -44,7 +44,9 @@ namespace TransportSystems.Backend.Identity.Signin.Data.Migrations.IdentityServe
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
                     FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true)
+                    LastName = table.Column<string>(nullable: true),
+                    CompanyId = table.Column<int>(nullable: false),
+                    VehicleId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {

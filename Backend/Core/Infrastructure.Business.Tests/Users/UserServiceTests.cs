@@ -1,47 +1,46 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Moq;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Domain.Interfaces.Users;
-using TransportSystems.Backend.Core.Infrastructure.Business.Users;
 using TransportSystems.Backend.Core.Services.Interfaces;
-using TransportSystems.Backend.Core.Services.Interfaces.Users;
 using Xunit;
 
 namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Users
 {
-    public class TestUser : User
+    public class TestUser : IdentityUser
     {
-
     }
 
-    public class TestUserService<T> : UserService<T>, IUserService<T> where T : User, new()
+    public class TestUserService :
+        IdentityUserService<TestUser>
     {
-        public TestUserService(IUserRepository<T> repository, IIdentityUserService identityUserService) : base(repository, identityUserService)
+        public TestUserService(IIdentityUserRepository<TestUser> repository)
+            : base(repository)
         {
         }
 
-        public override Task<string[]> GetSpecificRoles()
+        public override string GetDefaultRole()
         {
-            var specificRoles = new string[] { UserRole.UserRoleName };
-
-            return Task.FromResult(specificRoles);
+            return "TestRole";
         }
     }
 
-    public class UserServiceTestSuite<T> where T : TestUser, new()
+    public class UserServiceTestSuite
     {
         public UserServiceTestSuite()
         {
-            IdentityUserServiceMock = new Mock<IIdentityUserService>();
-            UserRepositoryMock = new Mock<IUserRepository<T>>();
-            UserService = new TestUserService<T>(UserRepositoryMock.Object, IdentityUserServiceMock.Object);
+            UserRepositoryMock = new Mock<IIdentityUserRepository<TestUser>>();
+            ServiceMock = new Mock<TestUserService>(
+                UserRepositoryMock.Object);
+            ServiceMock.CallBase = true;
         }
 
-        public Mock<IIdentityUserService> IdentityUserServiceMock { get; }
+        public Mock<IIdentityUserRepository<TestUser>> UserRepositoryMock { get; }
 
-        public Mock<IUserRepository<T>> UserRepositoryMock { get; }
+        public Mock<TestUserService> ServiceMock { get; }
 
-        public IUserService<T> UserService { get; }
+        public TestUserService Service => ServiceMock.Object;
     }
 
     public class UserServiceTests
@@ -49,175 +48,91 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Users
 
         public UserServiceTests()
         {
-            Suite = new UserServiceTestSuite<TestUser>();
+            Suite = new UserServiceTestSuite();
         }
 
-        protected UserServiceTestSuite<TestUser> Suite { get; }
+        protected UserServiceTestSuite Suite { get; }
 
         [Fact]
-        public async Task CreateUserWithExistIdentityUser()
+        public async Task Create()
         {
-            var firstName = "Alexandr";
-            var lastName = "Fadeev";
-            var phoneNumber = "+77777777";
-            var identityUserId = 0;
-            var identityUser = new IdentityUser { Id = identityUserId };
-
-            Suite.IdentityUserServiceMock
-                .Setup(m => m.GetUserByPhoneNumber(phoneNumber))
-                .ReturnsAsync(identityUser);
-
-            Suite.IdentityUserServiceMock
-                .Setup(m => m.IsExistById(identityUserId))
-                .ReturnsAsync(true);
+            var phoneNumber = "79998887766";
 
             Suite.UserRepositoryMock
-                .Setup(m => m.IsExistByIdentityUser(identityUserId))
+                .Setup(m => m.IsExistByPhoneNumber(phoneNumber))
                 .ReturnsAsync(false);
 
-            var user = await Suite.UserService.Create(firstName, lastName, phoneNumber);
-
-            Assert.Equal(identityUserId, user.IdentityUserId);
-
-            Suite.IdentityUserServiceMock
-                .Verify(m => m.AssignName(identityUserId, firstName, lastName));
-
-            Suite.IdentityUserServiceMock
-                .Verify(m =>m.AsignToRoles(identityUserId, It.IsAny<string[]>()));
+            var result = await Suite.Service.Create(phoneNumber);
 
             Suite.UserRepositoryMock
-                .Verify(m => m.Add(It.Is<TestUser>(d => d.IdentityUserId.Equals(identityUserId))));
+                .Verify(m => m.Add(It.Is<TestUser>(
+                    u => u.PhoneNumber.Equals(phoneNumber))));
 
             Suite.UserRepositoryMock
                 .Verify(m => m.Save());
+
+            Suite.UserRepositoryMock
+                .Verify(m => m.AsignToRoles(It.IsAny<int>(), It.Is<string[]>(
+                    roles => Array.Exists(roles, i => i.Equals(Suite.Service.GetDefaultRole()))
+                )));
         }
 
         [Fact]
-        public async Task CreateUserWithoutIdentityUser()
+        public async Task CreateWhenUserExist()
         {
-            var firstName = "Alexandr";
-            var lastName = "Fadeev";
-            var phoneNumber = "+77777777";
-            var identityUserId = 0;
-            var identityUser = new IdentityUser { Id = identityUserId };
+            var phoneNumber = "79998887766";
 
-            Suite.IdentityUserServiceMock
-                .Setup(m => m.GetUserByPhoneNumber(phoneNumber))
-                .ReturnsAsync((IdentityUser)null);
-
-            Suite.IdentityUserServiceMock
-                .Setup(m => m.Create(firstName, lastName, phoneNumber))
-                .ReturnsAsync(identityUser);
-
-            Suite.IdentityUserServiceMock
-                .Setup(m => m.IsExistById(identityUserId))
+            Suite.UserRepositoryMock
+                .Setup(m => m.IsExistByPhoneNumber(phoneNumber))
                 .ReturnsAsync(true);
 
-            var user = await Suite.UserService.Create(firstName, lastName, phoneNumber);
-
-            Assert.Equal(identityUserId, user.IdentityUserId);
-
-            Suite.IdentityUserServiceMock
-                .Verify(m => m.Create(firstName, lastName, phoneNumber));
-
-            Suite.IdentityUserServiceMock
-                .Verify(m => m.AssignName(identityUserId, firstName, lastName));
-
-            Suite.IdentityUserServiceMock
-                .Verify(m => m.AsignToRoles(identityUserId, It.IsAny<string[]>()));
-
-            Suite.UserRepositoryMock
-                .Verify(m => m.Add(It.Is<TestUser>(d => d.IdentityUserId.Equals(identityUserId))));
-
-            Suite.UserRepositoryMock
-                .Verify(m => m.Save());
+            await Assert.ThrowsAsync<EntityAlreadyExistsException>(() => Suite.Service.Create(phoneNumber));
         }
 
         [Fact]
-        public async Task CreateUserWithIdentityCantCreateUser()
+        public async Task GetById()
         {
-            var firstName = "Alexandr";
-            var lastName = "Fadeev";
-            var phoneNumber = "+77777777";
-
-            Suite.IdentityUserServiceMock
-                .Setup(m => m.GetUserByPhoneNumber(phoneNumber))
-                .ReturnsAsync((IdentityUser)null);
-
-            Suite.IdentityUserServiceMock
-                .Setup(m => m.Create(firstName, lastName, phoneNumber))
-                .ReturnsAsync((IdentityUser)null);
-
-            await Assert.ThrowsAsync<EntityNotFoundException>(() => Suite.UserService.Create(firstName, lastName, phoneNumber));
-        }
-
-        [Fact]
-        public async Task CreateDublicateUser()
-        {
-            var firstName = "Alexandr";
-            var lastName = "Fadeev";
-            var phoneNumber = "+77777777";
-            var identityUser = new IdentityUser();
-
-            Suite.IdentityUserServiceMock
-                .Setup(m => m.GetUserByPhoneNumber(phoneNumber))
-                .ReturnsAsync(identityUser);
+            var user = new TestUser
+            {
+                Id = 1
+            };
 
             Suite.UserRepositoryMock
-                .Setup(m => m.IsExistByIdentityUser(identityUser.Id))
-                .ReturnsAsync(true);
-
-            await Assert.ThrowsAsync<EntityAlreadyExistsException>(() => Suite.UserService.Create(firstName, lastName, phoneNumber));
-        }
-
-        [Fact]
-        public async Task GetByIdentityUser()
-        {
-            var identityUserId = 1;
-            var user = new TestUser { IdentityUserId = identityUserId };
-
-            Suite.UserRepositoryMock
-                .Setup(m => m.GetByIndentityUser(identityUserId))
+                .Setup(m => m.Get(user.Id))
                 .ReturnsAsync(user);
 
-            var result = await Suite.UserService.GetByIndentityUser(identityUserId);
+            var result = await Suite.Service.Get(user.Id);
 
-            Assert.Equal(identityUserId, result.IdentityUserId);
             Assert.Equal(user, result);
         }
 
         [Fact]
         public async Task GetByPhoneNumber()
         {
-            var phoneNumber = "+77777777";
-            var identityUserId = 1;
-            var identityUser = new IdentityUser { Id = identityUserId };
-            var user = new TestUser { IdentityUserId = identityUserId };
-
-            Suite.IdentityUserServiceMock
-                .Setup(m => m.GetUserByPhoneNumber(phoneNumber))
-                .ReturnsAsync(identityUser);
+            var user = new TestUser
+            {
+                PhoneNumber = "79998887766"
+            };
 
             Suite.UserRepositoryMock
-                .Setup(m => m.GetByIndentityUser(identityUserId))
+                .Setup(m => m.GetByPhoneNumber(user.PhoneNumber))
                 .ReturnsAsync(user);
 
-            var result = await Suite.UserService.GetByPhoneNumber(phoneNumber);
+            var result = await Suite.Service.GetByPhoneNumber(user.PhoneNumber);
 
-            Assert.Equal(identityUserId, result.IdentityUserId);
             Assert.Equal(user, result);
         }
 
         [Fact]
-        public async Task IsExistByIdentityUser()
+        public async Task Exist()
         {
-            var identityUserId = 1;
+            var userId = 1;
 
             Suite.UserRepositoryMock
-                .Setup(m => m.IsExistByIdentityUser(identityUserId))
+                .Setup(m => m.IsExist(userId))
                 .ReturnsAsync(true);
 
-            var result = await Suite.UserService.IsExistByIdentityUser(identityUserId);
+            var result = await Suite.Service.IsExist(userId);
 
             Assert.True(result);
         }

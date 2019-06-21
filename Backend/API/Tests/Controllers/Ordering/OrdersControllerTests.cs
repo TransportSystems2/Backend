@@ -46,7 +46,6 @@ namespace TransportSystems.Backend.API.Tests.Controllers.Ordering
             var dispatcher = new Dispatcher
             {
                 Id = commonId++,
-                IdentityUserId = commonId++
             };
 
             Suite.Controller.ControllerContext = new ControllerContext
@@ -56,14 +55,14 @@ namespace TransportSystems.Backend.API.Tests.Controllers.Ordering
                     User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
                         {
                             new Claim(ClaimTypes.Name, "username"),
-                            new Claim("sub", dispatcher.IdentityUserId.ToString())
+                            new Claim("sub", dispatcher.Id.ToString())
                         },
-                        Identity.Core.Data.Domain.UserRole.DispatcherRoleName))
+                        IdentityUser.DispatcherRoleName))
                 }
             };
 
             Suite.UserServiceMock
-                .Setup(m => m.GetDomainDispatcherByIdentityUser(dispatcher.IdentityUserId))
+                .Setup(m => m.GetDomainDispatcher(dispatcher.Id))
                 .ReturnsAsync(dispatcher);
 
             await Suite.Controller.Create(booking);

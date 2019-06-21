@@ -2,23 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TransportSystems.Backend.Identity.Core.Database;
 
-namespace TransportSystems.Backend.Identity.Signin.Data.Migrations.IdentityServer.IdentityDb
+namespace TransportSystems.Backend.Identity.Manage.Migrations
 {
     [DbContext(typeof(IdentityContext))]
-    [Migration("20190322130556_InitialIdentityServerConfigurationDbMigration")]
-    partial class InitialIdentityServerConfigurationDbMigration
+    partial class IdentityContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
-                .HasAnnotation("ProductVersion", "2.2.1-servicing-10028")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -109,6 +107,8 @@ namespace TransportSystems.Backend.Identity.Signin.Data.Migrations.IdentityServe
 
                     b.Property<int>("AccessFailedCount");
 
+                    b.Property<int>("CompanyId");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
@@ -143,6 +143,8 @@ namespace TransportSystems.Backend.Identity.Signin.Data.Migrations.IdentityServe
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256);
+
+                    b.Property<int>("VehicleId");
 
                     b.HasKey("Id");
 

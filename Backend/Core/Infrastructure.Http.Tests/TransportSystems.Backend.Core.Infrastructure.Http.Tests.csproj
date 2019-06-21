@@ -7,13 +7,19 @@
     <ItemGroup>
         <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
         <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="Moq" Version="4.10.1" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+        <PackageReference Include="AutoMapper" Version="8.0.0" />
+        <!-- <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />-->
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\Domain.Interfaces\TransportSystems.Backend.Core.Domain.Interfaces.csproj" />
+        <ProjectReference Include="..\Infrastructure.Http\TransportSystems.Backend.Core.Infrastructure.Http.csproj" />
+        <ProjectReference Include="..\Domain.Core\TransportSystems.Backend.Core.Domain.Core.csproj" />
+        <ProjectReference Include="..\..\Identity\API\TransportSystems.Backend.Identity.API.csproj" />
+        <ProjectReference Include="..\..\Identity\Core\Domain\Data\TransportSystems.Backend.Identity.Core.Data.csproj" />
     </ItemGroup>
 </Project>
