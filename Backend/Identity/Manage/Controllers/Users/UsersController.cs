@@ -143,11 +143,6 @@ namespace TransportSystems.Backend.Identity.Manage.Controllers.Users
                 user.CompanyId = userModel.CompanyId;
             }
 
-            if (userModel.VehicleId != 0)
-            {
-                user.VehicleId = userModel.VehicleId;
-            }
-
             var result = await UserService.UpdateAsync(user);
             if (!result.Succeeded)
             {

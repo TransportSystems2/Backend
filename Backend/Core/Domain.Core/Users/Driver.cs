@@ -2,6 +2,5 @@
 {
     public class Driver : Employee
     {
-        public int VehicleId { get; set; }
     }
 }

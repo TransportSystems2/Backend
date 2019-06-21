@@ -12,14 +12,10 @@ namespace TransportSystems.Backend.Core.Infrastructure.Http.Mapping
             CreateMap<UserModel, Moderator>()
                 .ForMember(x => x.AddedDate, opt => opt.Ignore())
                 .ForMember(x => x.ModifiedDate, opt => opt.Ignore());
-            CreateMap<Moderator, UserModel>()
-                .ForMember(x => x.VehicleId, opt => opt.Ignore());
 
             CreateMap<UserModel, Dispatcher>()
                 .ForMember(x => x.AddedDate, opt => opt.Ignore())
                 .ForMember(x => x.ModifiedDate, opt => opt.Ignore());
-            CreateMap<Dispatcher, UserModel>()
-                .ForMember(x => x.VehicleId, opt => opt.Ignore());
 
             CreateMap<UserModel, Driver>()
                 .ForMember(x => x.AddedDate, opt => opt.Ignore())
@@ -29,7 +25,6 @@ namespace TransportSystems.Backend.Core.Infrastructure.Http.Mapping
                 .ForMember(x => x.AddedDate, opt => opt.Ignore())
                 .ForMember(x => x.ModifiedDate, opt => opt.Ignore());
             CreateMap<Customer, UserModel>()
-                .ForMember(x => x.VehicleId, opt => opt.Ignore())
                 .ForMember(x => x.CompanyId, opt => opt.Ignore());
         }
     }

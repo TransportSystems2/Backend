@@ -65,12 +65,9 @@ namespace TransportSystems.Backend.Application.Business
             return CreateDomainEmployee(DomainDispatcherService, dispatcher, companyId);
         }
 
-        public async Task<Driver> CreateDomainDriver(DriverAM driver, int companyId, int vehicleId)
+        public Task<Driver> CreateDomainDriver(DriverAM driver, int companyId)
         {
-            var domainDriver = await CreateDomainEmployee(DomainDriverService, driver, companyId);
-            domainDriver = await DomainDriverService.AssignVehicle(domainDriver.Id, vehicleId);
-
-            return domainDriver;
+            return CreateDomainEmployee(DomainDriverService, driver, companyId);;
         }
 
         protected async Task<TUser> CreateDomainUser<TUser>(
