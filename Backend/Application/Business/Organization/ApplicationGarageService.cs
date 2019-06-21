@@ -35,9 +35,6 @@ namespace TransportSystems.Backend.Application.Business.Organization
             int companyId,
             AddressAM address)
         {
-            var priceListBlank = await PricelistService.GetPricelistBlank();
-            var domainPricelist = await PricelistService.CreateDomainPricelist(priceListBlank);
-
             var domainAddress = await AddressService.CreateDomainAddress(AddressKind.Garage, address);
             var result = await DomainGarageService.Create(
                 companyId,
