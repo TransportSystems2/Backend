@@ -27,7 +27,8 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             ICargoService cargoService,
             IRouteService routeService,
             IBillService billService,
-            IMarketService marketService)
+            IMarketService marketService,
+            IVehicleService vehicleService)
             : base(repository)
         {
             OrderService = orderService;
@@ -39,6 +40,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             RouteService = routeService;
             BillService = billService;
             MarketService = marketService;
+            VehicleService = vehicleService;
         }
 
         protected new IOrderStateRepository Repository => (IOrderStateRepository)base.Repository;
@@ -60,6 +62,8 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
         protected IBillService BillService { get; }
 
         protected IMarketService MarketService { get; }
+
+        protected IVehicleService VehicleService { get; }
 
         public async Task<OrderState> GetCurrentState(int orderId)
         {
@@ -233,7 +237,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
             await AddState(newState);
         }
 
-        public async Task AssignToDriver(int orderId, int subDispatcherId, int driverId)
+        public async Task AssignToDriver(int orderId, int subDispatcherId, int driverId, int vehicleId)
         {
             var currentState = await GetCurrentState(orderId);
             if (currentState.Status != OrderStatus.AssignedDispatcher)
@@ -248,16 +252,34 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business
 
             if (currentState.SubDispatcherId != subDispatcherId)
             {
-                throw new AccessViolationException("Only a order subDispatcher can assign a order to driver");
+                throw new AccessViolationException("Only order's subDispatcher can assign driver for the order");
             }
 
-            if (!await DriverService.IsExist(driverId))
+            var driver = await DriverService.Get(driverId);
+            if (driver == null)
             {
                 throw new EntityNotFoundException($"DriverId:{driverId} not found", "Driver");
             }
 
+            if (!driver.CompanyId.Equals(currentState.SubCompanyId))
+            {
+                throw new AccessViolationException("Only subCompany's driver can be assigned for the order");
+            }
+
+            var vehicle = await VehicleService.Get(vehicleId);
+            if (vehicle == null)
+            {
+                throw new EntityNotFoundException($"VehicleId:{vehicleId} not found", "Vehicle");
+            }
+
+            if (!vehicle.CompanyId.Equals(currentState.SubCompanyId))
+            {
+                throw new AccessViolationException("Only subCompany's vehicle can be assigned for the order");
+            }
+
             var newState = CloneState(currentState, OrderStatus.AssignedDriver);
             newState.DriverId = driverId;
+            newState.VehicleId = vehicleId;
 
             await AddState(newState);
         }

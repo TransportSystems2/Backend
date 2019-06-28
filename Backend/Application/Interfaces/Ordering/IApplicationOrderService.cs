@@ -30,7 +30,7 @@ namespace TransportSystems.Backend.Application.Interfaces
 
         Task AssignToSubDispatcher(int orderId, int subDispatcherId);
 
-        Task AssignToDriver(int orderId, int subDispatcherId, int driverId);
+        Task AssignToDriver(int orderId, int subDispatcherId, int driverId, int vehicleId);
 
         Task ConfirmByDriver(int orderId, int driverId);
 
