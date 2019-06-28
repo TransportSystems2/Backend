@@ -15,10 +15,7 @@ namespace TransportSystems.Backend.Identity.Signin.Services
             UserManager = userManager;
         }
 
-        protected UserManager<User> UserManager
-        {
-            get;
-        }
+        protected UserManager<User> UserManager { get; }
 
         public async Task GetProfileDataAsync(ProfileDataRequestContext context)
         {
