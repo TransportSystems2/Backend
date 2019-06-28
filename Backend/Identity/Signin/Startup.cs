@@ -141,6 +141,8 @@ namespace TransportSystems.Backend.Identity.Signin
             services.AddTransient<IPushTokenService, PushTokenService>();
 
             services.AddTransient<IEventService, HandlerService>();
+            
+            services.AddTransient<IProfileService, ProfileService>();
         }
     }
 }
