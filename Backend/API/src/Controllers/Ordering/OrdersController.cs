@@ -87,10 +87,10 @@ namespace TransportSystems.API.Controllers
         }
 
         [HttpGet("assignToDriver")]
-        public async Task<IActionResult> AssignToDriver(int orderId, int driverId)
+        public async Task<IActionResult> AssignToDriver(int orderId, int driverId, int vehicleId)
         {
             var userId = User.GetIdentityId();
-            await Service.AssignToDriver(orderId, userId.Value, driverId);
+            await Service.AssignToDriver(orderId, userId.Value, driverId, vehicleId);
 
             return Ok();
         }

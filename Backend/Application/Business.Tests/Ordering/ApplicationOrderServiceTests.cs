@@ -371,12 +371,13 @@ namespace TransportSystems.Backend.Application.Business.Tests
         {
             var commonId = 1;
             var orderId = commonId++;
-            var dispatcherId = commonId++;
+            var subDispatcherId = commonId++;
             var driverId = commonId++;
+            var vehicleId = commonId++;
 
-            await Suite.OrderService.AssignToDriver(orderId, dispatcherId, driverId);
+            await Suite.OrderService.AssignToDriver(orderId, subDispatcherId, driverId, vehicleId);
             Suite.DomainOrderStateServiceMock
-                .Verify(m => m.AssignToDriver(orderId, dispatcherId, driverId));
+                .Verify(m => m.AssignToDriver(orderId, subDispatcherId, driverId, vehicleId));
         }
 
         [Fact]
