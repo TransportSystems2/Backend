@@ -132,9 +132,9 @@ namespace TransportSystems.Backend.Application.Business
             return DomainOrderStateService.AssignToSubDispatcher(orderId, subDispatcherId);
         }
 
-        public Task AssignToDriver(int orderId, int subDispatcherId, int driverId)
+        public Task AssignToDriver(int orderId, int subDispatcherId, int driverId, int vehicleId)
         {
-            return DomainOrderStateService.AssignToDriver(orderId, subDispatcherId, driverId);
+            return DomainOrderStateService.AssignToDriver(orderId, subDispatcherId, driverId, vehicleId);
         }
 
         public Task ConfirmByDriver(int orderId, int driverId)
