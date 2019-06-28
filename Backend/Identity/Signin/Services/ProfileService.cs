@@ -10,20 +10,22 @@ namespace TransportSystems.Backend.Identity.Signin.Services
 {
     public class ProfileService : IProfileService
     {
-        protected UserManager<User> _userManager;
-
         public ProfileService(UserManager<User> userManager)
         {
-            _userManager = userManager;
+            UserManager = userManager;
+        }
+
+        protected UserManager<User> UserManager
+        {
+            get;
         }
 
         public async Task GetProfileDataAsync(ProfileDataRequestContext context)
         {
-            var user = await _userManager.GetUserAsync(context.Subject);
+            var user = await UserManager.GetUserAsync(context.Subject);
 
-            var claims = new List<Claim>
-            {
-                new Claim("CompanyId", user.CompanyId.ToString())
+            var claims = new List<Claim> {
+                new Claim ("CompanyId", user.CompanyId.ToString ())
             };
 
             context.IssuedClaims.AddRange(claims);
@@ -31,7 +33,7 @@ namespace TransportSystems.Backend.Identity.Signin.Services
 
         public async Task IsActiveAsync(IsActiveContext context)
         {
-            var user = await _userManager.GetUserAsync(context.Subject);
+            var user = await UserManager.GetUserAsync(context.Subject);
             context.IsActive = user != null;
         }
     }
