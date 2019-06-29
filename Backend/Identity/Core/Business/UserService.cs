@@ -89,7 +89,7 @@ namespace TransportSystems.Backend.Identity.Core.Business
             var result = new List<User>();
             foreach (var user in allCompanyUsers)
             {
-                if (await IsInRoleAsync(user.Id, role))
+                if (await IsInRoleAsync(user, role))
                 {
                     result.Add(user);
                 }
