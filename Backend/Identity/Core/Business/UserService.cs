@@ -81,5 +81,21 @@ namespace TransportSystems.Backend.Identity.Core.Business
         {
             return Users.SingleOrDefault(usr => usr.PhoneNumber.Equals(phoneNumber));
         }
+
+        public async Task<ICollection<User>> GetUsersByCompanyInRoleAsync(int companyId, string role)
+        {
+            var allCompanyUsers = Users.Where(u => u.CompanyId.Equals(companyId));
+
+            var result = new List<User>();
+            foreach (var user in allCompanyUsers)
+            {
+                if (await IsInRoleAsync(user.Id, role))
+                {
+                    result.Add(user);
+                }
+            }
+
+            return result;
+        }
     }
 }
