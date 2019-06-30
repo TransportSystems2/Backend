@@ -28,6 +28,8 @@ namespace TransportSystems.Backend.Application.Business.Mapping
             CreateMap<BillItem, BillItemAM>();
 
             CreateMap<Customer, CustomerAM>();
+            CreateMap<Driver, DriverAM>();
+            CreateMap<Dispatcher, DispatcherAM>();
         }
     }
 }

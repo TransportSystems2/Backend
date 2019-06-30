@@ -8,6 +8,6 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Users
     {
         Task<T> AssignCompany(int id, int companyId);
 
-        Task<ICollection<T>> GetByCompany(int companyId, string role);
+        Task<ICollection<T>> GetByCompany(int companyId);
     }
 }

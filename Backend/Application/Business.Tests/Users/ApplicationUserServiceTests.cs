@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Services.Interfaces.Users;
-using TransportSystems.Backend.Application.Business;
 using TransportSystems.Backend.Application.Interfaces.Users;
 using TransportSystems.Backend.Application.Models.Users;
 using TransportSystems.Backend.Application.Business.Tests.Suite;
@@ -67,12 +66,12 @@ namespace TransportSystems.Backend.Application.Business.Tests.Users
             Suite.DomainCustomerServiceMock
                 .Setup(m => m.IsNeedAssignName(domainCustomer.Id))
                 .ReturnsAsync(true);
-            
+
             await Suite.Service.GetOrCreateDomainCustomer(customer);
 
             Suite.DomainCustomerServiceMock
                 .Verify(m => m.Create(customer.PhoneNumber));
-                
+
             Suite.DomainCustomerServiceMock
                 .Verify(m => m.AsignName(domainCustomer.Id, customer.FirstName, customer.LastName));
         }
