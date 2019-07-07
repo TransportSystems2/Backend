@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Application.Interfaces.Mapping;
 using TransportSystems.Backend.Application.Interfaces.Organization;
@@ -47,9 +46,8 @@ namespace TransportSystems.Backend.Application.Business.Organization
         public async Task<ICollection<DriverAM>> GetDrivers(int companyId)
         {
             var domainDrivers = await DomainDriverService.GetByCompany(companyId);
-            var drivers = new List<DriverAM>();
 
-            return MappingService.Map<IEnumerable<Driver>, ICollection<DriverAM>>(domainDrivers, drivers);
+            return MappingService.Map<ICollection<DriverAM>>(domainDrivers);
         }
     }
 }

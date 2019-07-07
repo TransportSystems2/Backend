@@ -22,9 +22,8 @@ namespace TransportSystems.Backend.Core.Infrastructure.Http.Users
         public async Task<ICollection<T>> GetByCompany(int companyId, string role)
         {
             var users = await IdentityUsersAPI.GetByCompany(companyId, role);
-            var employers = new List<T>();
 
-            return Mapper.Map<ICollection<UserModel>, ICollection<T>>(users, employers);
+            return Mapper.Map<ICollection<T>>(users);
         }
     }
 }
