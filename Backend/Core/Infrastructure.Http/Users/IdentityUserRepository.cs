@@ -106,19 +106,9 @@ namespace TransportSystems.Backend.Core.Infrastructure.Http.Users
 
         public async Task<T> GetByPhoneNumber(string phoneNumber)
         {
-            T result;
-
-            try
-            {
-                var userModel = await IdentityUsersAPI.FindByPhoneNumberAsync(phoneNumber);
-                result = Mapper.Map<T>(userModel);
-            }
-            catch
-            {
-                result = null;
-            }
-
-            return result;
+            var userModel = await IdentityUsersAPI.FindByPhoneNumberAsync(phoneNumber);
+           
+            return Mapper.Map<T>(userModel);;
         }
 
         public Task Remove(T entity)

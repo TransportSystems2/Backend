@@ -7,10 +7,8 @@ namespace TransportSystems.Backend.Core.Infrastructure.Http.Users
 {
     public class DriverRepository : EmployeeRepository<Driver>, IDriverRepository
     {
-        public DriverRepository(
-            IIdentityUsersAPI identityUsersAPI,
-            IMapper mapperService)
-            : base(identityUsersAPI, mapperService)
+        public DriverRepository(IIdentityUsersAPI identityUsersAPI)
+            : base(identityUsersAPI)
         {
         }
     }

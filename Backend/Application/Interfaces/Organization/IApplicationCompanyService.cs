@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using TransportSystems.Backend.Application.Models.Users;
 using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Core.Domain.Core.Users;
@@ -11,6 +12,6 @@ namespace TransportSystems.Backend.Application.Interfaces.Organization
 
         Task<Company> GetDomainCompany(string name);
 
-        Task<Dispatcher> CreateDispatcher(int companyDispatcherId, DispatcherAM newDispatcher);
+        Task<ICollection<DriverAM>> GetDrivers(int companyId);
     }
 }

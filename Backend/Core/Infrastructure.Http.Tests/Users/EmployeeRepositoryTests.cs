@@ -20,14 +20,16 @@ namespace Infrastructure.Http.Tests.Users
     {
         public EmployeeRepositoryTestSuite()
         {
-            MappingService = new AutoMapper.MapperConfiguration(cfg =>
-                {
-                    cfg.AddProfile(new UsersProfile());
-                    cfg.CreateMap<UserModel, TestEmployee>();
-                }).CreateMapper();
+            Mapper.Reset();
+            Mapper.Initialize(cfg =>
+            {
+                cfg.AddProfile<UsersProfile>();
+                cfg.CreateMap<UserModel, TestEmployee>();
+            });
 
             APIMock = new Mock<IIdentityUsersAPI>();
-            RepositoryMock = new Mock<EmployeeRepository<TestEmployee>>(APIMock.Object, MappingService);
+            RepositoryMock = new Mock<EmployeeRepository<TestEmployee>>(
+                APIMock.Object);
             RepositoryMock.CallBase = true;
         }
 
@@ -50,7 +52,7 @@ namespace Infrastructure.Http.Tests.Users
         protected EmployeeRepositoryTestSuite Suite { get; }
 
         [Fact]
-        public async Task GetByCompanyResultEmployeersCountEqualUserModelCount()
+        public async Task GetByCompany_Result_EmployeersCountEqualUserModelCount()
         {
             var commonId = 1;
             var companyId = commonId++;
@@ -72,7 +74,7 @@ namespace Infrastructure.Http.Tests.Users
         }
         
         [Fact]
-        public async Task GetByCompanyResultEmployeersPropertyEqualUserModelPropery()
+        public async Task GetByCompany_Result_EmployeersPropertyEqualUserModelPropery()
         {
             var commonId = 1;
             var companyId = commonId++;

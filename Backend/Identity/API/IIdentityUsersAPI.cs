@@ -15,7 +15,7 @@ namespace TransportSystems.Backend.Identity.API
         [Post("/identity/manage/users/all")]
         Task<ICollection<UserModel>> GetAllAsync();
 
-        [Get("/identity/manage/users/bycompany")]
+        [Get("/identity/manage/users/bycompany/{companyId}/{role}")]
         Task<ICollection<UserModel>> GetByCompany(int companyId, string role);
 
         [Post("/identity/manage/users/{id}")]

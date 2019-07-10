@@ -20,6 +20,8 @@ namespace TransportSystems.Backend.Identity.Core.Interfaces
 
         Task <IList<User>> GetUsersInRoleAsync(string role);
 
+        Task <ICollection<User>> GetUsersByCompanyInRoleAsync(int companyId, string role);
+
         Task<bool> IsInRoleAsync(int id, string role);
 
         Task<bool> ExistAsync(int id);

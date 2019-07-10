@@ -269,6 +269,32 @@ namespace TransportSystems.Backend.Identity.Manage.Controllers.Users
             return Json(userModel);
         }
 
+        [HttpGet("bycompany/{companyId}/{role}")]
+        public async Task<ICollection<UserModel>> GetByCompany(int companyId, string role)
+        {
+            var userModels = new List<UserModel>();
+
+            if (await RoleService.FindByNameAsync(role) == null)
+            {
+                Logger.LogWarning($"not found role: {role}");
+
+                return userModels;
+            }
+
+            var users = await UserService.GetUsersByCompanyInRoleAsync(companyId, role);
+            if (users == null || !users.Any())
+            {
+                Logger.LogWarning($"not found users with role: {role}");
+
+                return userModels;
+            }
+
+            var mappedModels = Mapper.Map<IEnumerable<User>, IEnumerable<UserModel>>(users);
+            userModels.AddRange(mappedModels);
+
+            return userModels;
+        }
+
         private async Task<IEnumerable<UserModel>> GetUserModelsByRole(string role)
         {
             var userModels = new List<UserModel>();
@@ -279,8 +305,7 @@ namespace TransportSystems.Backend.Identity.Manage.Controllers.Users
                 return userModels;
             }
 
-            var result = await RoleService.FindByNameAsync(role);
-            if (result == null)
+            if (await RoleService.FindByNameAsync(role) == null)
             {
                 Logger.LogWarning($"not found role: {role}");
 

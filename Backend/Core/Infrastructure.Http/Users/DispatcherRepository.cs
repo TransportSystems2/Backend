@@ -7,10 +7,8 @@ namespace TransportSystems.Backend.Core.Infrastructure.Http.Users
 {
     public class DispatcherRepository : EmployeeRepository<Dispatcher>, IDispatcherRepository
     {
-        public DispatcherRepository(
-            IIdentityUsersAPI identityUsersAPI,
-            IMapper mapperService)
-            : base(identityUsersAPI, mapperService)
+        public DispatcherRepository(IIdentityUsersAPI identityUsersAPI)
+            : base(identityUsersAPI)
         {
         }
     }

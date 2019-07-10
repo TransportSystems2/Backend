@@ -90,7 +90,6 @@ namespace TransportSystems.Backend.Application.Business
             return domainUser;
         }
 
-
         protected async Task<TEmployee> CreateDomainEmployee<TEmployee>(
             IEmployeeService<TEmployee> domainEmployeeService,
             UserAM employee,

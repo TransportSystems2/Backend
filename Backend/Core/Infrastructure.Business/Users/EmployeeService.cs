@@ -26,14 +26,14 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Users
 
         protected ICompanyService CompanyService { get; }
 
-        public async Task<ICollection<T>> GetByCompany(int companyId, string role)
+        public async Task<ICollection<T>> GetByCompany(int companyId)
         {
             if (!await CompanyService.IsExist(companyId))
             {
                 throw new EntityNotFoundException("CompanyId");
             }
 
-            return await Repository.GetByCompany(companyId, role);
+            return await Repository.GetByCompany(companyId, GetDefaultRole());
         }
 
         public async Task<T> AssignCompany(int id, int companyId)
