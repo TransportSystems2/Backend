@@ -63,9 +63,9 @@ namespace TransportSystems.Backend.API.Database
                 var vehicle = new VehicleAM
                 {
                     RegistrationNumber = "К100ЕЕ77",
-                    BrandCatalogItemId = 3,
-                    CapacityCatalogItemId = 6,
-                    KindCatalogItemId = 7
+                    BrandCatalogItem = new CatalogItemAM { Id = 3 },
+                    CapacityCatalogItem = new CatalogItemAM { Id = 6 },
+                    KindCatalogItem = new CatalogItemAM { Id = 7 }
                 };
 
                 var dispatcher = new DispatcherAM

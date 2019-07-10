@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TransportSystems.Backend.Application.Interfaces.Organization;
+using TransportSystems.Backend.Application.Models.Transport;
 using TransportSystems.Backend.Application.Models.Users;
 
 namespace TransportSystems.Backend.API.Controllers.Organization
@@ -23,6 +24,15 @@ namespace TransportSystems.Backend.API.Controllers.Organization
         {
             var companyId = User.FindFirst("companyId").Value;
             var result = await Service.GetDrivers(int.Parse(companyId));
+
+            return result;
+        }
+
+        [HttpGet("getVehicles")]
+        public async Task<ICollection<VehicleAM>> GetVehicles()
+        {
+            var companyId = User.FindFirst("companyId").Value;
+            var result = await Service.GetVehicles(int.Parse(companyId));
 
             return result;
         }

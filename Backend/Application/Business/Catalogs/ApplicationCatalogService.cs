@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using TransportSystems.Backend.Application.Interfaces.Catalogs;
+using TransportSystems.Backend.Application.Interfaces.Mapping;
+using TransportSystems.Backend.Application.Models.Catalogs;
 using TransportSystems.Backend.Core.Domain.Core.Catalogs;
 using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Catalogs;
-using TransportSystems.Backend.Application.Interfaces.Catalogs;
-using TransportSystems.Backend.Application.Models.Catalogs;
-using TransportSystems.Backend.Application.Interfaces.Mapping;
 
 namespace TransportSystems.Backend.Application.Business.Catalogs
 {
@@ -17,8 +18,7 @@ namespace TransportSystems.Backend.Application.Business.Catalogs
             ITransactionService transactionService,
             IMappingService mappingService,
             ICatalogService domainCatalogService,
-            ICatalogItemService domainCatalogItemService) 
-            : base(transactionService)
+            ICatalogItemService domainCatalogItemService) : base(transactionService)
         {
             MappingService = mappingService;
 
@@ -36,26 +36,26 @@ namespace TransportSystems.Backend.Application.Business.Catalogs
         {
             var domainResult = await DomainCatalogItemService.Create(catalogId, item.Kind, item.Name, item.Value);
 
-            return FromDomainEntity(domainResult);
+            return MappingService.Map<CatalogItemAM>(domainResult);
         }
 
-        public async Task<List<CatalogItemAM>> GetCatalogItems(CatalogKind catalogKind, CatalogItemKind catalogItemKind)
+        public async Task<CatalogItemAM> GetCatalogItem(int catalogItemId)
+        {
+            var domainCatalogItem = await DomainCatalogItemService.Get(catalogItemId);
+
+            if (domainCatalogItem == null)
+            {
+                throw new ArgumentException($"CatalogItemId:{catalogItemId} doesn't exist.", "CatalogItem");
+            }
+
+            return MappingService.Map<CatalogItemAM>(domainCatalogItem);
+        }
+
+        public async Task<ICollection<CatalogItemAM>> GetCatalogItems(CatalogKind catalogKind, CatalogItemKind catalogItemKind)
         {
             var domainItems = await DomainCatalogItemService.GetByKind(catalogKind, catalogItemKind);
 
-            var result = new List<CatalogItemAM>();
-            foreach(var domainItem in domainItems)
-            {
-                result.Add(FromDomainEntity(domainItem));
-            }
-
-            return result;
-        }
-
-        private CatalogItemAM FromDomainEntity(CatalogItem source)
-        {
-            var destination = new CatalogItemAM();
-            return MappingService.Map(source, destination);
+            return MappingService.Map<ICollection<CatalogItemAM>>(domainItems);
         }
     }
 }

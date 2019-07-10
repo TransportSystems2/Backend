@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using TransportSystems.Backend.Application.Interfaces;
 using TransportSystems.Backend.Application.Interfaces.Mapping;
 using TransportSystems.Backend.Application.Interfaces.Organization;
+using TransportSystems.Backend.Application.Models.Transport;
 using TransportSystems.Backend.Application.Models.Users;
 using TransportSystems.Backend.Core.Domain.Core.Organization;
-using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Services.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Organization;
 using TransportSystems.Backend.Core.Services.Interfaces.Users;
@@ -19,12 +20,14 @@ namespace TransportSystems.Backend.Application.Business.Organization
             ITransactionService transactionService,
             IMappingService mappingService,
             ICompanyService domainCompanyService,
-            IDriverService domainDriverService)
+            IDriverService domainDriverService,
+            IApplicationVehicleService vehicleService)
         : base(transactionService)
         {
             MappingService = mappingService;
             DomainCompanyService = domainCompanyService;
             DomainDriverService = domainDriverService;
+            VehicleService = vehicleService;
         }
 
         protected IMappingService MappingService { get; }
@@ -32,6 +35,8 @@ namespace TransportSystems.Backend.Application.Business.Organization
         protected ICompanyService DomainCompanyService { get; }
         
         protected IDriverService DomainDriverService { get; }
+        
+        protected IApplicationVehicleService VehicleService { get; }
 
         public Task<Company> CreateDomainCompany(string name)
         {
@@ -48,6 +53,11 @@ namespace TransportSystems.Backend.Application.Business.Organization
             var domainDrivers = await DomainDriverService.GetByCompany(companyId);
 
             return MappingService.Map<ICollection<DriverAM>>(domainDrivers);
+        }
+
+        public Task<ICollection<VehicleAM>> GetVehicles(int companyId)
+        {
+            return VehicleService.GetByCompany(companyId);
         }
     }
 }

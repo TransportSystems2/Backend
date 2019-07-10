@@ -7,8 +7,10 @@ namespace TransportSystems.Backend.Application.Interfaces.Catalogs
 {
     public interface IApplicationCatalogService : IApplicationTransactionService
     {
-        Task<List<CatalogItemAM>> GetCatalogItems(CatalogKind catalogKind, CatalogItemKind catalogItemKind);
+        Task<ICollection<CatalogItemAM>> GetCatalogItems(CatalogKind catalogKind, CatalogItemKind catalogItemKind);
 
         Task<CatalogItemAM> CreateCatalogItem(int catalogId, CatalogItemAM item);
+
+        Task<CatalogItemAM> GetCatalogItem(int itemId);
     }
 }

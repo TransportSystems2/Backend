@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Catalogs;
 using TransportSystems.Backend.Core.Domain.Core.Transport;
@@ -53,6 +54,16 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Transport
             };
 
             return Create(vehicle);
+        }
+
+        public async Task<ICollection<Vehicle>> GetByCompany(int companyId)
+        {
+            if (!await CompanyService.IsExist(companyId))
+            {
+                throw new ArgumentException($"CompanyId:{companyId} doesn't exist", "Company");
+            }
+
+            return await Repository.GetByCompany(companyId);
         }
 
         protected async Task<Vehicle> Create(Vehicle vehicle)
