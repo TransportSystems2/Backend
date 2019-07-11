@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Transport;
 
 namespace TransportSystems.Backend.Core.Services.Interfaces.Transport
@@ -11,5 +12,7 @@ namespace TransportSystems.Backend.Core.Services.Interfaces.Transport
             int brandCatalogItemId,
             int capacityCatalogItemId,
             int kindCatalogItemId);
+
+        Task<ICollection<Vehicle>> GetByCompany(int companyId);
     }
 }

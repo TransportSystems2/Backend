@@ -1,12 +1,14 @@
-﻿namespace TransportSystems.Backend.Application.Models.Transport
+﻿using TransportSystems.Backend.Application.Models.Catalogs;
+
+namespace TransportSystems.Backend.Application.Models.Transport
 {
-    public class VehicleAM : BaseAM
+    public class VehicleAM : DomainAM
     {
-        public int BrandCatalogItemId { get; set; }
+        public CatalogItemAM BrandCatalogItem { get; set; }
 
-        public int CapacityCatalogItemId { get; set; }
+        public CatalogItemAM CapacityCatalogItem { get; set; }
 
-        public int KindCatalogItemId { get; set; }
+        public CatalogItemAM KindCatalogItem { get; set; }
 
         public string RegistrationNumber { get; set; }
     }

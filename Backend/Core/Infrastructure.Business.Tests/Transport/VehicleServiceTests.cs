@@ -1,5 +1,6 @@
 ﻿using Moq;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Catalogs;
 using TransportSystems.Backend.Core.Domain.Core.Transport;
@@ -23,14 +24,14 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Transport
             CatalogItemServiceMock = new Mock<ICatalogItemService>();
             RegistrationNumberServiceMock = new Mock<IRegistrationNumberService>();
 
-            VehicleService = new VehicleService(
+            Service = new VehicleService(
                 VehicleRepositoryMock.Object,
                 CompanyServiceMock.Object,
                 CatalogItemServiceMock.Object,
                 RegistrationNumberServiceMock.Object);
         }
 
-        public IVehicleService VehicleService { get; }
+        public IVehicleService Service { get; }
 
         public Mock<IVehicleRepository> VehicleRepositoryMock { get; }
 
@@ -93,7 +94,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Transport
                  .Setup(m => m.ValidRegistrationNumber(registrationNumber))
                  .ReturnsAsync(true);
 
-            var vehicle = await Suite.VehicleService.Create(
+            var vehicle = await Suite.Service.Create(
                 companyId,
                 registrationNumber,
                 brandCatalogItem.Id,
@@ -130,7 +131,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Transport
 
             await Assert.ThrowsAsync<EntityNotFoundException>(
                 "CompanyId", 
-                () => Suite.VehicleService.Create(companyId, registrationNumber, 1, 1, 1));
+                () => Suite.Service.Create(companyId, registrationNumber, 1, 1, 1));
 
             Suite.VehicleRepositoryMock
                  .Verify(m => m.Add(It.IsAny<Vehicle>()), Times.Never);
@@ -151,13 +152,36 @@ namespace TransportSystems.Backend.Core.Infrastructure.Business.Tests.Transport
             
             await Assert.ThrowsAsync<ArgumentException>(
                 "RegistrationNumber",
-                () => Suite.VehicleService.Create(companyId, registrationNumber, 1, 1, 1));
+                () => Suite.Service.Create(companyId, registrationNumber, 1, 1, 1));
 
             Suite.VehicleRepositoryMock
                  .Verify(m => m.Add(It.IsAny<Vehicle>()), Times.Never);
 
             Suite.VehicleRepositoryMock
                  .Verify(m => m.Save(), Times.Never);
+        }
+
+        [Fact]
+        public async Task GetByCompany_Result_NumberOfVehiclesIsEqualNumberFromRepository()
+        {
+            var companyId = 1;
+
+            var vehicles = new List<Vehicle>
+            {
+                new Vehicle(),
+                new Vehicle()
+            };
+
+            Suite.CompanyServiceMock
+                .Setup(m => m.IsExist(companyId))
+                .ReturnsAsync(true);
+            Suite.VehicleRepositoryMock
+                .Setup(m => m.GetByCompany(companyId))
+                .ReturnsAsync(vehicles);
+
+            var result = await Suite.Service.GetByCompany(companyId);
+
+            Assert.Equal(vehicles.Count, result.Count);
         }
     }
 }

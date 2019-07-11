@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TransportSystems.Backend.Core.Domain.Core.Trading;
 using TransportSystems.Backend.Core.Domain.Interfaces.Trading;
 using TransportSystems.Backend.Core.Infrastructure.Database;
@@ -48,7 +45,7 @@ namespace TransportSystems.Backend.Core.Infrastructure.Data.Tests.Trading
             var result = await Repository.GetByStatus(LotStatus.New);
 
             Assert.Equal(3, result.Count);
-            foreach(var lot in result)
+            foreach (var lot in result)
             {
                 Assert.Equal(LotStatus.New, lot.Status);
             }

@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Moq;
 using TransportSystems.Backend.Application.Business.Organization;
 using TransportSystems.Backend.Application.Business.Tests.Suite;
+using TransportSystems.Backend.Application.Interfaces;
 using TransportSystems.Backend.Application.Interfaces.Organization;
+using TransportSystems.Backend.Application.Models.Transport;
 using TransportSystems.Backend.Core.Domain.Core.Organization;
 using TransportSystems.Backend.Core.Domain.Core.Users;
 using TransportSystems.Backend.Core.Services.Interfaces.Organization;
@@ -20,12 +22,14 @@ namespace TransportSystems.Backend.Application.Business.Tests.Organization
         {
             DomainCompanyServiceMock = new Mock<ICompanyService>();
             DomainDriverServiceMock = new Mock<IDriverService>();
+            VehicleServiceMock = new Mock<IApplicationVehicleService>();
 
             Service = new ApplicationCompanyService(
                 TransactionServiceMock.Object,
                 MappingService,
                 DomainCompanyServiceMock.Object,
-                DomainDriverServiceMock.Object);
+                DomainDriverServiceMock.Object,
+                VehicleServiceMock.Object);
         }
 
         public IApplicationCompanyService Service { get; }
@@ -33,6 +37,8 @@ namespace TransportSystems.Backend.Application.Business.Tests.Organization
         public Mock<ICompanyService> DomainCompanyServiceMock { get; }
 
         public Mock<IDriverService> DomainDriverServiceMock { get; }
+
+        public Mock<IApplicationVehicleService> VehicleServiceMock { get; }
     }
 
     public class ApplicationCompanyServiceTests : BaseServiceTests<ApplicationCompanyServiceTestSuite>
@@ -77,10 +83,9 @@ namespace TransportSystems.Backend.Application.Business.Tests.Organization
             var commonId = 1;
 
             var companyId = commonId++;
-            var domainDrivers = new List<Driver>
-            {
-                new Driver(),
-                new Driver()
+            var domainDrivers = new List<Driver> {
+                new Driver (),
+                new Driver ()
             };
 
             Suite.DomainDriverServiceMock
@@ -98,15 +103,13 @@ namespace TransportSystems.Backend.Application.Business.Tests.Organization
             var commonId = 1;
 
             var companyId = commonId++;
-            var domainDrivers = new List<Driver>
-            {
-                new Driver
-                {
-                    Id = commonId++,
-                    FirstName = "FristName1",
-                    LastName = "LastName1",
-                    AddedDate = DateTime.Now,
-                    ModifiedDate = DateTime.Now
+            var domainDrivers = new List<Driver> {
+                new Driver {
+                Id = commonId++,
+                FirstName = "FristName1",
+                LastName = "LastName1",
+                AddedDate = DateTime.Now,
+                ModifiedDate = DateTime.Now
                 }
             };
 
@@ -123,6 +126,22 @@ namespace TransportSystems.Backend.Application.Business.Tests.Organization
             Assert.Equal(domainDrivers[0].LastName, result.ElementAt(0).LastName);
             Assert.Equal(domainDrivers[0].AddedDate, result.ElementAt(0).AddedDate);
             Assert.Equal(domainDrivers[0].ModifiedDate, result.ElementAt(0).ModifiedDate);
+        }
+
+        [Fact]
+        public async Task GetVehicles()
+        {
+            var companyId = 1;
+
+            var vehicles = new List<VehicleAM>();
+
+            Suite.VehicleServiceMock
+                .Setup(m => m.GetByCompany(companyId))
+                .ReturnsAsync(vehicles);
+
+            var result = await Suite.Service.GetVehicles(companyId);
+
+            Assert.Equal(vehicles, result);
         }
     }
 }

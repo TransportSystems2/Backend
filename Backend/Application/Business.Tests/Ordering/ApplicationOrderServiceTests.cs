@@ -1,10 +1,9 @@
-﻿using DotNetDistance;
-using Moq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TransportSystems.Backend.Application.Business;
+using Moq;
+using TransportSystems.Backend.Application.Business.Tests.Suite;
 using TransportSystems.Backend.Application.Interfaces;
 using TransportSystems.Backend.Application.Interfaces.Billing;
 using TransportSystems.Backend.Application.Interfaces.Geo;
@@ -14,10 +13,10 @@ using TransportSystems.Backend.Application.Interfaces.Users;
 using TransportSystems.Backend.Application.Models.Billing;
 using TransportSystems.Backend.Application.Models.Booking;
 using TransportSystems.Backend.Application.Models.Geo;
+using TransportSystems.Backend.Application.Models.Ordering;
 using TransportSystems.Backend.Application.Models.Routing;
 using TransportSystems.Backend.Application.Models.Transport;
 using TransportSystems.Backend.Application.Models.Users;
-using TransportSystems.Backend.Application.Business.Tests.Suite;
 using TransportSystems.Backend.Core.Domain.Core.Billing;
 using TransportSystems.Backend.Core.Domain.Core.Ordering;
 using TransportSystems.Backend.Core.Domain.Core.Organization;
@@ -28,7 +27,6 @@ using TransportSystems.Backend.Core.Services.Interfaces.Interfaces;
 using TransportSystems.Backend.Core.Services.Interfaces.Ordering;
 using TransportSystems.Backend.Core.Services.Interfaces.Organization;
 using Xunit;
-using TransportSystems.Backend.Application.Models.Ordering;
 
 namespace TransportSystems.Backend.Application.Business.Tests
 {
@@ -110,8 +108,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
         [Fact]
         public async Task GetOrderGroupsByStatusesResultRightOrdersCountInGroup()
         {
-            var sourceData = new []
-            {
+            var sourceData = new[] {
                 new { Status = OrderStatus.Accepted, Count = 1 },
                 new { Status = OrderStatus.New, Count = 3 },
                 new { Status = OrderStatus.ReadyForTrade, Count = 2 }
@@ -133,29 +130,25 @@ namespace TransportSystems.Backend.Application.Business.Tests
         {
             var commonId = 1;
 
-            var domainCargos = new List<Cargo>
-            {
+            var domainCargos = new List<Cargo> {
                 new Cargo { Id = commonId++ },
                 new Cargo { Id = commonId++ },
                 new Cargo { Id = commonId++ }
             };
 
-            var domainOrders = new List<Order>
-            {
+            var domainOrders = new List<Order> {
                 new Order { Id = commonId++ },
                 new Order { Id = commonId++ },
                 new Order { Id = commonId++ }
             };
 
-            var domainOrdersStates = new List<OrderState>
-            {
-                new OrderState { Id = commonId, OrderId = domainOrders[0].Id, CargoId = domainCargos[0].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 2, 11, 55, 3) },
-                new OrderState { Id = commonId, OrderId = domainOrders[1].Id, CargoId = domainCargos[1].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 3, 12, 55, 3) },
-                new OrderState { Id = commonId, OrderId = domainOrders[2].Id, CargoId = domainCargos[2].Id, RouteId = commonId++, TimeOfDelivery = new DateTime(2018, 6, 4, 13, 55, 3) }
+            var domainOrdersStates = new List<OrderState> {
+                new OrderState { Id = commonId, OrderId = domainOrders[0].Id, CargoId = domainCargos[0].Id, RouteId = commonId++, TimeOfDelivery = new DateTime (2018, 6, 2, 11, 55, 3) },
+                new OrderState { Id = commonId, OrderId = domainOrders[1].Id, CargoId = domainCargos[1].Id, RouteId = commonId++, TimeOfDelivery = new DateTime (2018, 6, 3, 12, 55, 3) },
+                new OrderState { Id = commonId, OrderId = domainOrders[2].Id, CargoId = domainCargos[2].Id, RouteId = commonId++, TimeOfDelivery = new DateTime (2018, 6, 4, 13, 55, 3) }
             };
 
-            var routesData = new[]
-            {
+            var routesData = new[] {
                 new { Id = domainOrdersStates[0].RouteId, ShortTitle = "Рыбинск - Москва" },
                 new { Id = domainOrdersStates[1].RouteId, ShortTitle = "Москва" },
                 new { Id = domainOrdersStates[2].RouteId, ShortTitle = "Ярославль - Вологда" }
@@ -164,11 +157,11 @@ namespace TransportSystems.Backend.Application.Business.Tests
             Suite.DomainOrderStateServiceMock
                 .Setup(m => m.GetByCurrentStatus(OrderStatus.New))
                 .ReturnsAsync(domainOrdersStates);
-            
+
             Suite.CargoServiceMock
                 .Setup(m => m.GetDomainCargo(It.IsAny<int>()))
                 .Returns<int>(cargoId => Task.FromResult(domainCargos.FirstOrDefault(c => c.Id.Equals(cargoId))));
-                    
+
             Suite.RouteServiceMock
                 .Setup(m => m.GetShortTitle(It.IsAny<int>()))
                 .Returns<int>(routeId => Task.FromResult(routesData.FirstOrDefault(r => r.Id.Equals(routeId)).ShortTitle));
@@ -191,7 +184,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
         public async Task GetDetailInfo()
         {
             var commonId = 1;
-            
+
             var orderId = commonId++;
             var domainOrderState = new OrderState
             {
@@ -258,7 +251,7 @@ namespace TransportSystems.Backend.Application.Business.Tests
 
             var route = new RouteAM();
             var bill = new BillAM();
-            var marketAddress = new AddressAM ();
+            var marketAddress = new AddressAM();
             var domainRoute = new Route { Id = commonId++ };
             var domainCustomer = new Customer { Id = commonId++ };
             var domainCargo = new Cargo { Id = commonId++ };
@@ -300,20 +293,20 @@ namespace TransportSystems.Backend.Application.Business.Tests
 
             Suite.DomainOrderStateServiceMock
                 .Verify(m => m.New(
-                    domainOrder.Id,
-                    domainMarket.Id,
-                    booking.TimeOfDelivery,
-                    domainCustomer.Id,
-                    domainCargo.Id,
-                    domainRoute.Id,
-                    domainBill.Id));
+                   domainOrder.Id,
+                   domainMarket.Id,
+                   booking.TimeOfDelivery,
+                   domainCustomer.Id,
+                   domainCargo.Id,
+                   domainRoute.Id,
+                   domainBill.Id));
 
             Suite.OrderValidatorServiceMock
                 .Verify(m => m.Validate(booking, route, bill));
 
             Suite.DomainOrderStateServiceMock
                 .Verify(m => m.Accept(domainOrder.Id, genDispatcher.Id));
-            
+
             Assert.Equal(domainOrder, result);
         }
 
