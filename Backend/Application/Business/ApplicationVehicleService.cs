@@ -47,7 +47,7 @@ namespace TransportSystems.Backend.Application.Business
             return await GetVehicle(domainVehicle);
         }
 
-        public async Task<VehicleAM> GetVehicle(Vehicle domainVehicle)
+        public virtual async Task<VehicleAM> GetVehicle(Vehicle domainVehicle)
         {
             if (domainVehicle == null)
             {

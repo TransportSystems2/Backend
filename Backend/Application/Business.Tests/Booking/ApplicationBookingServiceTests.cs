@@ -1,5 +1,4 @@
 ﻿using Common.Models;
-using Common.Models.Units;
 using DotNetDistance;
 using Moq;
 using System;
