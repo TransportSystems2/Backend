@@ -2,8 +2,6 @@
 
 master [![Build Status](https://travis-ci.com/TransportSystems2/Backend.svg?branch=master)](https://travis-ci.com/TransportSystems2/Backend)
 
-develop [![Build Status](https://travis-ci.com/TransportSystems2/Backend.svg?branch=develop)](https://travis-ci.com/TransportSystems2/Backend)
-
 Диспетчерская служба эвакуации автомобилей.
 Миссия: Сделать проще процесс поиска и выполнения заказа для водителей эвакуаторов, прозрачное ценообразование для клиентов. 
 
